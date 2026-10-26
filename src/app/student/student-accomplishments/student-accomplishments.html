@@ -3,114 +3,386 @@
 
   <div class="accomplishments-page">
 
+    <!-- PAGE HEADER -->
     <header class="page-header">
-      <div>
-        <h1>Accomplishment logs</h1>
-        <p>Document your daily work and weekly learning. Follow each submission through review.</p>
+      <div class="page-heading-content">
+        <span class="page-eyebrow">STUDENT WORKSPACE</span>
+        <h1>My Accomplishments</h1>
+        <p>Manage your weekly reports, track reviews, and download your accomplishments.</p>
       </div>
 
       <button type="button" class="btn-add" (click)="openAddForm()">
-        + Add accomplishment
+        <span>+</span>
+        Add accomplishment
       </button>
     </header>
 
-    <section class="revision-notice">
-      <strong>Week 9 needs a revision</strong>
-      <p>Add the number of tickets resolved and describe your role in network maintenance.</p>
-    </section>
-
+    <!-- REPORT LIBRARY -->
     <section class="records-panel">
+
       <div class="records-heading">
-        <h2>Your submissions</h2>
-        <p>View and manage your daily and weekly accomplishment logs.</p>
+        <div>
+          <h2>Weekly Report Library</h2>
+          <p>Your weekly OJT accomplishments, organized in one place.</p>
+        </div>
       </div>
 
+      <!-- SEARCH -->
       <div class="records-toolbar">
         <label class="search-box">
           <span>⌕</span>
-          <input type="search" placeholder="Search accomplishments..." />
+          <input
+            type="search"
+            placeholder="Search by report title or week..."
+            #searchBox
+          />
         </label>
       </div>
 
-      <div class="empty-state">
-        <h3>No accomplishments connected yet</h3>
-        <p>Create your first accomplishment log to get started.</p>
-        <button type="button" class="btn-add" (click)="openAddForm()">
-          + Add accomplishment
-        </button>
-      </div>
+      <!-- LOADING -->
+      @if (isLoading) {
+        <div class="empty-state">
+          <p>Loading your accomplishment reports...</p>
+        </div>
+      }
+
+      <!-- ERROR -->
+      @else if (loadError) {
+        <div class="empty-state">
+          <h3>Unable to load reports</h3>
+          <p>{{ loadError }}</p>
+
+          <button
+            type="button"
+            class="btn-add"
+            (click)="loadReports()"
+          >
+            Try again
+          </button>
+        </div>
+      }
+
+      <!-- NO REPORTS -->
+      @else if (reports.length === 0) {
+        <div class="empty-state">
+          <div class="empty-state-icon">▤</div>
+          <h3>Your report library is empty</h3>
+          <p>
+            Start documenting your OJT journey by creating your first
+            weekly accomplishment report.
+          </p>
+
+          <button
+            type="button"
+            class="btn-add"
+            (click)="openAddForm()"
+          >
+            + Create your first report
+          </button>
+        </div>
+      }
+
+      <!-- REPORT CARDS -->
+      @else {
+        <div class="reports-grid">
+
+          @for (report of reports; track report.id; let i = $index) {
+
+            @if (
+              !searchBox.value ||
+              report.title.toLowerCase().includes(searchBox.value.toLowerCase()) ||
+              report.status.toLowerCase().includes(searchBox.value.toLowerCase()) ||
+              ('week ' + (i + 1)).includes(searchBox.value.toLowerCase())
+            ) {
+
+              <article class="report-card">
+
+                <!-- NAVY DOCUMENT HEADER -->
+                <div class="report-card-header">
+
+                  <div class="report-file-icon">
+                    <span>▤</span>
+                  </div>
+
+                  <div class="report-header-details">
+                    <span class="report-week-label">
+                      WEEK {{ (i + 1).toString().padStart(2, '0') }}
+                    </span>
+
+                    <span class="report-header-caption">
+                      OJT ACCOMPLISHMENT REPORT
+                    </span>
+                  </div>
+
+                  <div class="report-header-decoration">OJT</div>
+
+                </div>
+
+                <!-- CARD CONTENT -->
+                <div class="report-card-body">
+
+                  <div class="report-card-title-row">
+                    <div class="report-title-content">
+                      <p class="report-eyebrow">
+                        WEEKLY ACCOMPLISHMENT
+                      </p>
+
+                      <h3>{{ report.title }}</h3>
+                    </div>
+
+                    <span
+                      class="status-badge"
+                      [class.status-draft]="report.status === 'Draft'"
+                      [class.status-submitted]="report.status === 'Submitted'"
+                      [class.status-revision]="report.status === 'Revision Requested'"
+                      [class.status-approved]="report.status === 'Approved'"
+                    >
+                      {{ report.status }}
+                    </span>
+                  </div>
+
+                  <!-- REPORTING PERIOD -->
+                  <div class="report-period">
+                    <span class="report-period-icon">▦</span>
+
+                    <div>
+                      <span class="report-period-label">
+                        REPORTING PERIOD
+                      </span>
+
+                      <strong>
+                        {{ report.weekStarting }} – {{ report.weekEnding }}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <!-- TASK SUMMARY -->
+                  <div class="report-description-block">
+                    <span class="report-section-label">
+                      TASKS COMPLETED
+                    </span>
+
+                    <p class="report-description">
+                      {{ report.tasksCompleted }}
+                    </p>
+                  </div>
+
+                  <!-- COORDINATOR FEEDBACK -->
+                  @if (
+                    report.status === 'Revision Requested' &&
+                    report.coordinatorFeedback
+                  ) {
+                    <div class="report-feedback">
+                      <strong>Coordinator feedback</strong>
+                      <p>{{ report.coordinatorFeedback }}</p>
+                    </div>
+                  }
+
+                  <!-- STATUS INFORMATION -->
+                  <div class="report-submission-info">
+                    <span
+                      class="report-info-dot"
+                      [class.dot-draft]="report.status === 'Draft'"
+                      [class.dot-submitted]="report.status === 'Submitted'"
+                      [class.dot-revision]="report.status === 'Revision Requested'"
+                      [class.dot-approved]="report.status === 'Approved'"
+                    ></span>
+
+                    <span>
+                      @if (report.status === 'Draft') {
+                        Saved as draft · Not submitted
+                      } @else if (report.status === 'Submitted') {
+                        Awaiting coordinator review
+                      } @else if (report.status === 'Revision Requested') {
+                        Revision required
+                      } @else {
+                        Reviewed and approved
+                      }
+                    </span>
+                  </div>
+
+                  <!-- ACTIONS -->
+                  <div class="report-card-footer">
+
+                    <span class="report-actions-label">
+                      REPORT ACTIONS
+                    </span>
+
+                    <div class="report-actions">
+
+                      @if (
+                        report.status === 'Draft' ||
+                        report.status === 'Revision Requested'
+                      ) {
+                        <button
+                          type="button"
+                          class="report-action-btn edit-action"
+                          (click)="editReport(report)"
+                        >
+                          <span>✎</span>
+                          Edit
+                        </button>
+                      }
+
+                      <button
+                        type="button"
+                        class="report-action-btn preview-action"
+                        (click)="previewReport(report)"
+                      >
+                        <span>◉</span>
+                        Preview
+                      </button>
+
+                      <button
+                        type="button"
+                        class="report-action-btn download-action"
+                        (click)="downloadReport(report)"
+                      >
+                        <span>↓</span>
+                        PDF
+                      </button>
+
+                    </div>
+                  </div>
+
+                </div>
+              </article>
+
+            }
+          }
+
+        </div>
+
+        <!-- NO SEARCH RESULTS -->
+        @if (
+          searchBox.value &&
+          !reports.some(report =>
+            report.title.toLowerCase().includes(searchBox.value.toLowerCase()) ||
+            report.status.toLowerCase().includes(searchBox.value.toLowerCase()) ||
+            ('week ' + (reports.indexOf(report) + 1)).includes(searchBox.value.toLowerCase())
+          )
+        ) {
+          <div class="empty-state search-empty-state">
+            <h3>No matching reports found</h3>
+            <p>Try another report title, status, or week number.</p>
+          </div>
+        }
+
+      }
+
     </section>
 
   </div>
 
 } @else {
 
+  <!-- ADD / EDIT REPORT PAGE -->
   <div class="add-page">
 
     <header class="add-page-header">
       <div>
-        <div class="breadcrumb">Student workspace / Accomplishments / Add log</div>
-        <h1>Add accomplishment</h1>
-        <p>Create a daily or weekly log. Save a draft before submitting it to your coordinator.</p>
+        <div class="breadcrumb">
+          Student workspace / Accomplishments /
+          {{ editingReportId ? 'Edit report' : 'Add report' }}
+        </div>
+
+        <h1>
+          {{ editingReportId ? 'Edit weekly accomplishment' : 'Create weekly accomplishment' }}
+        </h1>
+
+        <p>
+          Record your weekly work, accomplishments, and learning
+          before sending your report to your coordinator.
+        </p>
       </div>
 
-      <button type="button" class="btn-back" (click)="backToLogs()">
-        ← Back to logs
+      <button
+        type="button"
+        class="btn-back"
+        (click)="backToLogs()"
+      >
+        ← Back to reports
       </button>
     </header>
 
     <div class="add-layout">
 
-      <form class="accomplishment-form" (submit)="$event.preventDefault()">
+      <form
+        class="accomplishment-form"
+        (submit)="$event.preventDefault()"
+      >
 
+        <!-- ACCOMPLISHMENT DETAILS -->
         <section class="form-section">
+
           <h2>Accomplishment details</h2>
           <p class="form-hint">Fields marked * are required.</p>
 
           <div class="form-grid">
 
             <div class="form-field">
-              <label for="logType">Log type *</label>
-              <select id="logType" name="logType" required>
-                <option value="daily">Daily accomplishment</option>
-                <option value="weekly">Weekly accomplishment</option>
-              </select>
+              <label for="weekStarting">Week starting *</label>
+
+              <input
+                id="weekStarting"
+                name="weekStarting"
+                type="date"
+                [(ngModel)]="weekStarting"
+                required
+              />
             </div>
 
             <div class="form-field">
-              <label for="reportDate">Reporting date *</label>
-              <input id="reportDate" name="reportDate" type="date" required />
+              <label for="weekEnding">Week ending *</label>
+
+              <input
+                id="weekEnding"
+                name="weekEnding"
+                type="date"
+                [(ngModel)]="weekEnding"
+                required
+              />
             </div>
 
             <div class="form-field full-width">
-              <label for="title">Title *</label>
+              <label for="title">Report title *</label>
+
               <input
                 id="title"
                 name="title"
                 type="text"
-                placeholder="e.g. Help desk ticket resolution and documentation"
+                [(ngModel)]="title"
+                placeholder="e.g. Help desk support and documentation"
                 required
               />
             </div>
 
             <div class="form-field full-width">
               <label for="tasks">Tasks completed *</label>
+
               <textarea
                 id="tasks"
                 name="tasks"
                 rows="4"
+                [(ngModel)]="tasksCompleted"
                 placeholder="Describe the tasks you completed and their outcomes..."
                 required
               ></textarea>
-              <small>Describe your contribution and measurable results. Do not include client names or passwords.</small>
+
+              <small>
+                Describe your contribution and results. Do not include
+                client names, passwords, or other sensitive information.
+              </small>
             </div>
 
             <div class="form-field full-width">
               <label for="skills">Skills learned and reflection *</label>
+
               <textarea
                 id="skills"
                 name="skills"
                 rows="4"
+                [(ngModel)]="skillsLearned"
                 placeholder="What skills did you practice? What did you learn?"
                 required
               ></textarea>
@@ -118,10 +390,12 @@
 
             <div class="form-field full-width">
               <label for="challenges">Challenges and next steps</label>
+
               <textarea
                 id="challenges"
                 name="challenges"
                 rows="3"
+                [(ngModel)]="challenges"
                 placeholder="Describe any challenges and what you plan to do next..."
               ></textarea>
             </div>
@@ -129,43 +403,83 @@
           </div>
         </section>
 
+        <!-- SUPPORTING EVIDENCE -->
         <section class="evidence-section">
-          <h3>Add supporting evidence (optional)</h3>
-          <p>PDF, JPG, PNG files · Up to 10 MB per file</p>
+          <h3>Supporting evidence <span>(Optional)</span></h3>
+
+         <p>
+  JPG or PNG images · Maximum 500 KB per image
+</p>
 
           <label for="evidence" class="file-picker">
-            <span>Browse files</span>
+            <span>＋ Browse files</span>
+
             <input
               id="evidence"
               name="evidence"
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
+              (change)="onEvidenceSelected($event)"
             />
           </label>
+          @if (selectedEvidence) {
+      <p>Selected: {{ evidenceFileName }}</p>
+    }
+
+    @if (evidenceError) {
+      <p class="form-error">{{ evidenceError }}</p>
+    }
         </section>
 
+        <!-- HOURS NOTICE -->
         <div class="hours-notice">
-          Your log does not add attendance hours. Record your time separately under Internship Hours.
+          Your accomplishment report does not add attendance hours.
+          Record your time separately under Internship Hours.
         </div>
 
+        <!-- ERROR MESSAGE -->
+        @if (saveError) {
+          <p class="form-error">{{ saveError }}</p>
+        }
+
+        <!-- FORM ACTIONS -->
         <footer class="form-actions">
-          <button type="button" class="btn-cancel" (click)="backToLogs()">
+
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="backToLogs()"
+          >
             Cancel
           </button>
 
           <div class="form-action-right">
-            <button type="button" class="btn-save">
-              Save draft
+
+            <button
+              type="button"
+              class="btn-save"
+              (click)="saveDraft()"
+              [disabled]="isSaving"
+            >
+              {{ isSaving ? 'Saving...' : 'Save draft' }}
             </button>
 
-            <button type="submit" class="btn-submit">
-              Submit for review
+            <button
+              type="button"
+              class="btn-submit"
+              (click)="submitReport()"
+              [disabled]="isSaving"
+            >
+              {{ isSaving ? 'Submitting...' : 'Submit for review' }}
             </button>
+
           </div>
+
         </footer>
 
       </form>
 
+      <!-- GUIDANCE SIDEBAR -->
       <aside class="form-sidebar">
 
         <section class="side-card">
@@ -186,25 +500,27 @@
             <strong>Assigned OJT coordinator</strong>
           </div>
 
-          <span class="draft-status">Draft</span>
+          <span class="draft-status">
+            {{ editingReportId ? 'Editing report' : 'New draft' }}
+          </span>
         </section>
 
         <section class="side-card">
-          <h3>A strong accomplishment log</h3>
+          <h3>Tips for a strong report</h3>
 
           <div class="guideline">
-            <strong>Write what you did</strong>
-            <p>Describe the task, the outcome, and what you learned.</p>
+            <strong>Describe your work</strong>
+            <p>Explain the task, its outcome, and what you learned.</p>
           </div>
 
           <div class="guideline">
             <strong>Protect sensitive information</strong>
-            <p>Remove passwords, personal data, and customer identifiers from attachments.</p>
+            <p>Remove passwords, personal data, and customer identifiers.</p>
           </div>
 
           <div class="guideline">
             <strong>After submission</strong>
-            <p>Your coordinator may approve the log or request a revision.</p>
+            <p>Your coordinator may approve your report or request revisions.</p>
           </div>
         </section>
 
@@ -215,3 +531,113 @@
   </div>
 
 }
+
+
+@if (showPreview && selectedReport) {
+  <div class="preview-overlay" (click)="closePreview()">
+    <section
+      class="preview-modal"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Accomplishment report preview"
+    >
+      <header class="preview-header">
+        <div>
+          <p>OJT PROGRESSTRACK</p>
+          <h2>Weekly Accomplishment Report</h2>
+        </div>
+
+        <button
+          type="button"
+          class="preview-close"
+          (click)="closePreview()"
+          aria-label="Close preview"
+        >
+          &times;
+        </button>
+      </header>
+
+      <div class="preview-content">
+        <span class="preview-status">
+          {{ selectedReport.status }}
+        </span>
+
+        <h3>{{ selectedReport.title }}</h3>
+
+        <p>
+          <strong>Week starting:</strong>
+          {{ selectedReport.weekStarting }}
+        </p>
+
+        <p>
+          <strong>Week ending:</strong>
+          {{ selectedReport.weekEnding }}
+        </p>
+
+        <hr />
+
+        <h4>Tasks Completed</h4>
+        <p class="preview-text">
+          {{ selectedReport.tasksCompleted || 'No information provided.' }}
+        </p>
+
+        <h4>Skills Learned</h4>
+        <p class="preview-text">
+          {{ selectedReport.skillsLearned || 'No information provided.' }}
+        </p>
+
+        <h4>Challenges Encountered</h4>
+        <p class="preview-text">
+          {{ selectedReport.challenges || 'No information provided.' }}
+        </p>
+
+        
+@if (selectedReport.evidenceBase64) {
+  <h4>Supporting Evidence</h4>
+
+  <div class="preview-evidence">
+    <img
+      [src]="selectedReport.evidenceBase64"
+      [alt]="selectedReport.evidenceFileName || 'Supporting evidence image'"
+      class="preview-evidence-image"
+    />
+
+    @if (selectedReport.evidenceFileName) {
+      <p class="preview-evidence-filename">
+        {{ selectedReport.evidenceFileName }}
+      </p>
+    }
+  </div>
+}
+
+
+        @if (selectedReport.coordinatorFeedback) {
+          <h4>Coordinator Feedback</h4>
+          <p class="preview-text">
+            {{ selectedReport.coordinatorFeedback }}
+          </p>
+        }
+      </div>
+
+      <footer class="preview-footer">
+        <button
+          type="button"
+          class="preview-cancel-btn"
+          (click)="closePreview()"
+        >
+          Close
+        </button>
+
+        <button
+          type="button"
+          class="preview-download-btn"
+          (click)="downloadReport(selectedReport!)"
+        >
+          Download PDF
+        </button>
+      </footer>
+    </section>
+  </div>
+}
+

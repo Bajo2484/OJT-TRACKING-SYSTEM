@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import {
   collection,
@@ -9,7 +10,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../../services/firebase';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit,ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StudentAccountService } from '../../services/student-account.service';
 import { StudentCacheService } from '../../services/student-cache.service';
@@ -33,7 +34,7 @@ interface OjtStudent {
 export class OjtStudents implements OnInit {
   private studentAccountService = inject(StudentAccountService);
   private studentCache = inject(StudentCacheService);
-
+  private cdr = inject(ChangeDetectorRef);
  
 async onStudentFileSelected(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
@@ -191,15 +192,27 @@ if (!alreadyDisplayed) {
 
   
 
-  async loadStudents(): Promise<void> {
-  // Use cached records if already loaded
+async loadStudents(): Promise<void> {
+  // Use cached records only if they were already loaded.
   if (this.studentCache.isLoaded) {
-    this.students = this.studentCache.students;
+    this.students = [...this.studentCache.students];
     this.totalStudents = this.students.length;
+    this.cdr.detectChanges();
     return;
   }
 
-  this.isLoading = true;
+  this.isLoadingStudents = true;
+
+  Swal.fire({
+    title: 'Loading Students...',
+    text: 'Please wait while we retrieve student records.',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
 
   try {
     const studentsQuery = query(
@@ -207,9 +220,10 @@ if (!alreadyDisplayed) {
       where('role', '==', 'student')
     );
 
+    // Wait until Firestore returns the student records.
     const snapshot = await getDocs(studentsQuery);
 
-    const loadedStudents = snapshot.docs.map(document => {
+    const loadedStudents: OjtStudent[] = snapshot.docs.map(document => {
       const data = document.data();
 
       return {
@@ -219,22 +233,39 @@ if (!alreadyDisplayed) {
         course: data['course'] ?? '',
         yearLevel: data['yearLevel'] ?? '',
         accountStatus: data['accountStatus'] ?? 'Created'
-      } as OjtStudent;
+      };
     });
 
-    this.studentCache.students = loadedStudents;
+    // Assign the fetched data to the page.
+    this.students = loadedStudents;
+    this.totalStudents = loadedStudents.length;
+
+    // Update cache after fetching succeeds.
+    this.studentCache.students = [...loadedStudents];
     this.studentCache.isLoaded = true;
 
-    this.students = this.studentCache.students;
-    this.totalStudents = this.students.length;
+    // Force Angular to refresh the view before closing loading.
+    this.cdr.detectChanges();
 
   } catch (error) {
     console.error('Failed to load student records:', error);
-    alert('Unable to load student records. Please check Firebase.');
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Unable to Load Students',
+      text: 'Please check your connection and try again.',
+      confirmButtonColor: '#17365d'
+    });
+
   } finally {
-    this.isLoading = false;
+    this.isLoadingStudents = false;
+
+    // Apply the final loading state before closing the modal.
+    this.cdr.detectChanges();
+    Swal.close();
   }
 }
+
 
   // Dashboard summary counts
   totalStudents = 0;
@@ -250,6 +281,7 @@ if (!alreadyDisplayed) {
   // Add Student form
   showAddStudentForm = false;
   isLoading = false;
+  isLoadingStudents = false;
 
   // Track which student is being edited
   editingStudentId: string | null = null;

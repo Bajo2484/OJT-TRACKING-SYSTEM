@@ -399,30 +399,58 @@ downloadChecklist(): void {
 
 
 
+
 async submitDocument(): Promise<void> {
   if (!this.selectedRequirement || !this.selectedFile) {
-    alert('Please select a requirement and a file.');
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Missing Document',
+      text: 'Please select a requirement and a file.',
+      confirmButtonColor: '#1c2f4d'
+    });
     return;
   }
 
   const requirement = this.selectedRequirement;
-const file = this.selectedFile;
-const studentUid = auth.currentUser?.uid;
-const maxFileSize = 100 * 1024; // 100 KB
+  const file = this.selectedFile;
+  const studentUid = auth.currentUser?.uid;
+  const maxFileSize = 100 * 1024; // 100 KB
 
-if (!studentUid) {
-  alert('Unable to identify the logged-in student. Please log in again.');
-  return;
-}
+  if (!studentUid) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'Session Expired',
+      text: 'Unable to identify the logged-in student. Please log in again.',
+      confirmButtonColor: '#1c2f4d'
+    });
+    return;
+  }
 
   if (file.size > maxFileSize) {
-    alert('File is too large. Please select a file that is 100 KB or smaller.');
+    await Swal.fire({
+      icon: 'warning',
+      title: 'File Too Large',
+      text: 'Please select a file that is 100 KB or smaller.',
+      confirmButtonColor: '#1c2f4d'
+    });
     return;
   }
 
   this.isSubmitting = true;
 
   try {
+    // Show loading while the document is being submitted.
+    Swal.fire({
+      title: 'Submitting Document',
+      text: 'Please wait while we save your requirement.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     const base64Data: string = await new Promise(
       (resolve, reject) => {
         const reader = new FileReader();
@@ -454,35 +482,63 @@ if (!studentUid) {
     );
 
     await this.requirementsService.addSubmission({
-  studentUid: studentUid,
-  requirementId: requirement.id ?? '',
-  requirementName: requirement.name,
-  fileName: file.name,
-  fileType: file.type,
-  fileSize: file.size,
-  fileDataBase64: base64Data,
-  status: 'Submitted'
-});
+      studentUid: studentUid,
+      requirementId: requirement.id ?? '',
+      requirementName: requirement.name,
+      fileName: file.name,
+      fileType: file.type,
+      fileSize: file.size,
+      fileDataBase64: base64Data,
+      status: 'Submitted'
+    });
 
-        // Refresh saved submissions so the table status updates.
+    // Refresh submissions from Firebase.
     const updatedSubmissions =
       await this.requirementsService.getSubmissionsForStudent(studentUid);
 
     this.submissions = updatedSubmissions;
-
-    alert('Requirement submitted successfully!');
+    this.updateSummaryCounts();
 
     this.showSubmissionModal = false;
     this.selectedRequirement = null;
     this.selectedFile = null;
 
+    Swal.close();
+
+await Swal.fire({
+  icon: 'success',
+  title: 'Document Submitted Successfully!',
+  text: 'Your requirement has been submitted and is awaiting review.',
+  confirmButtonText: 'OK',
+  confirmButtonColor: '#1c2f4d',
+  allowOutsideClick: false,
+  allowEscapeKey: false
+});
+
+// Close the modal after the student clicks OK.
+this.showSubmissionModal = false;
+this.selectedRequirement = null;
+this.selectedFile = null;
+this.cdr.detectChanges();
+
   } catch (error) {
     console.error('Failed to submit requirement:', error);
-    alert('Failed to submit requirement. Please try again.');
+
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Submission Failed',
+      text: 'Unable to submit your document. Please try again.',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#1c2f4d'
+    });
+
   } finally {
     this.isSubmitting = false;
   }
 }
+
 
 
 }

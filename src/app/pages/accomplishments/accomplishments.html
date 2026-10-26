@@ -147,3 +147,168 @@
   </footer>
 
 </div>
+
+
+@if (selectedRecord; as record) {
+  <div class="modal-backdrop" (click)="closeDetails()">
+    <section
+      class="details-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="details-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="modal-header">
+        <div>
+          <span class="modal-eyebrow">OJT PROGRESSTRACK</span>
+          <h2 id="details-modal-title">Accomplishment Details</h2>
+          <p>Review the student's weekly internship report.</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          aria-label="Close details"
+          (click)="closeDetails()"
+        >×</button>
+      </header>
+
+      <div class="modal-content">
+        <section class="detail-section student-section">
+          <div class="section-heading">
+            <span class="section-number">01</span>
+            <h3>Student Information</h3>
+          </div>
+
+          <div class="student-info-grid">
+            <div class="info-item">
+              <span>Student Name</span>
+              <strong>{{ record.fullName }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Student ID</span>
+              <strong>{{ record.studentId }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <div class="section-heading">
+            <span class="section-number">02</span>
+            <h3>Report Information</h3>
+          </div>
+
+          <div class="report-title-block">
+            <span>Report Title</span>
+            <h4>{{ record.title || 'Weekly Accomplishment Report' }}</h4>
+          </div>
+
+          <div class="student-info-grid">
+            <div class="info-item">
+              <span>Week Starting</span>
+              <strong>{{ record.date || 'Not provided' }}</strong>
+            </div>
+            <div class="info-item">
+              <span>Week Ending</span>
+              <strong>{{ record.weekEnding || 'Not provided' }}</strong>
+            </div>
+          </div>
+
+          <div class="status-row">
+            <span>Review Status</span>
+            <span
+              class="status-badge"
+              [class.status-review]="record.status === 'For Review'"
+              [class.status-reviewed]="record.status === 'Reviewed'"
+              [class.status-revision]="record.status === 'Needs Revision'"
+            >{{ record.status }}</span>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <div class="section-heading">
+            <span class="section-number">03</span>
+            <h3>Weekly Accomplishment</h3>
+          </div>
+
+          <div class="report-text-block">
+            <h4>Tasks Completed</h4>
+            <p>{{ record.description || 'No tasks recorded.' }}</p>
+          </div>
+
+          <div class="report-text-block">
+            <h4>Skills Learned</h4>
+            <p>{{ record.skillsLearned || 'No skills recorded.' }}</p>
+          </div>
+
+          <div class="report-text-block">
+            <h4>Challenges Encountered</h4>
+            <p>{{ record.challenges || 'No challenges recorded.' }}</p>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <div class="section-heading">
+            <span class="section-number">04</span>
+            <h3>Supporting Evidence</h3>
+          </div>
+
+          @if (record.evidenceBase64) {
+            <div class="evidence-card">
+              @if (record.evidenceMimeType?.startsWith('image/')) {
+                <div class="evidence-image-wrap">
+                  <img
+                    [src]="record.evidenceBase64"
+                    [alt]="record.evidenceFileName || 'Student supporting evidence'"
+                    class="evidence-image"
+                  />
+                </div>
+              } @else {
+                <div class="evidence-file-icon">▤</div>
+                <p class="evidence-note">
+                  This attachment is not an image and cannot be previewed here.
+                </p>
+              }
+
+              <div class="evidence-file-info">
+                <span class="evidence-label">ATTACHED FILE</span>
+                <strong>{{ record.evidenceFileName || 'Supporting evidence' }}</strong>
+                <span class="evidence-mime">
+                  {{ record.evidenceMimeType || 'File type unavailable' }}
+                </span>
+              </div>
+            </div>
+          } @else {
+            <div class="no-evidence">
+              <span class="no-evidence-icon">▧</span>
+              <div>
+                <strong>No supporting evidence</strong>
+                <p>The student did not attach a file to this report.</p>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="detail-section feedback-section">
+          <div class="section-heading">
+            <span class="section-number">05</span>
+            <h3>Coordinator Feedback</h3>
+          </div>
+
+          <p class="feedback-text">
+            {{ record.remarks || 'No coordinator feedback has been provided yet.' }}
+          </p>
+        </section>
+      </div>
+
+      <footer class="modal-footer">
+        <span>OJT ProgressTrack · Accomplishment Review</span>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDetails()"
+        >Close</button>
+      </footer>
+    </section>
+  </div>
+}
