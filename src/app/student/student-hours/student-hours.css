@@ -1,0 +1,549 @@
+
+:host {
+  display: block;
+  min-width: 0;
+  color: #243247;
+  font-family: Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+
+
+
+.page-header h1 {
+  margin: 0 0 8px;
+  color: #243247;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.page-header p,
+.section-heading p,
+.attendance-heading p {
+  margin: 0;
+  color: #748196;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Shared panel styling */
+.attendance-panel,
+.progress-panel,
+.history-panel,
+.dtr-panel {
+  min-width: 0;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e7ebf2;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(36, 50, 71, 0.04);
+}
+
+/* Today's attendance */
+.attendance-panel {
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+}
+
+.attendance-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: #3478e5;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.attendance-heading h2,
+.section-heading h2,
+.dtr-panel h2 {
+  margin: 0 0 8px;
+  color: #243247;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.attendance-badge {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  color: #8a6518;
+  background: #fff4d8;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.attendance-times {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.time-item {
+  min-width: 0;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #e7ebf2;
+  border-radius: 12px;
+}
+
+.time-item span {
+  display: block;
+  margin-bottom: 10px;
+  color: #748196;
+  font-size: 13px;
+}
+
+.time-item strong {
+  color: #243247;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.attendance-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.attendance-buttons button {
+  min-height: 46px;
+  padding: 12px 22px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-time-in {
+  color: #ffffff;
+  background: #3478e5;
+}
+
+.btn-time-in:hover {
+  background: #2865c5;
+}
+
+.btn-time-out {
+  color: #3478e5;
+  background: #ffffff;
+  border-color: #cbdaf4 !important;
+}
+
+.attendance-buttons button:disabled {
+  color: #9aa5b5;
+  background: #edf0f5;
+  border-color: #edf0f5 !important;
+  cursor: not-allowed;
+}
+
+.attendance-note,
+.dtr-note {
+  margin: 16px 0 0;
+  color: #748196;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* Section headings */
+.section-heading {
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  margin-bottom: 6px;
+}
+
+/* Hours summary */
+.hours-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.summary-card {
+  min-width: 0;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e7ebf2;
+  border-radius: 13px;
+}
+
+.summary-card span {
+  display: block;
+  margin-bottom: 14px;
+  color: #748196;
+  font-size: 13px;
+}
+
+.summary-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #243247;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.summary-card small {
+  color: #8792a3;
+  font-size: 12px;
+}
+
+/* Internship progress */
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #647187;
+  font-size: 13px;
+}
+
+.progress-labels strong {
+  color: #3478e5;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: #e9eef7;
+  border-radius: 20px;
+}
+
+.progress-fill {
+  width: 19.8%;
+  height: 100%;
+  background: #3478e5;
+  border-radius: inherit;
+}
+
+/* Attendance history */
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-item {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.history-item:first-child {
+  padding-top: 4px;
+}
+
+.history-item:last-child {
+  padding-bottom: 4px;
+  border-bottom: none;
+}
+
+.history-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  min-height: 58px;
+  background: #f0f5ff;
+  border-radius: 10px;
+}
+
+.history-date strong {
+  color: #3478e5;
+  font-size: 21px;
+}
+
+.history-date span {
+  margin-top: 3px;
+  color: #647187;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.history-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.history-details strong {
+  color: #243247;
+  font-size: 14px;
+}
+
+.history-details span {
+  color: #526178;
+  font-size: 13px;
+}
+
+.history-details small {
+  color: #8792a3;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.record-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.record-status.pending {
+  color: #936b13;
+  background: #fff4d8;
+}
+
+.record-status.approved {
+  color: #237748;
+  background: #e5f6ec;
+}
+
+/* DTR verification */
+.dtr-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dtr-panel > div:first-child p {
+  margin: 0;
+  color: #748196;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.dtr-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #f8faff;
+  border: 1px solid #e7ebf2;
+  border-radius: 12px;
+}
+
+.dtr-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 48px;
+  flex-shrink: 0;
+  color: #d34c4c;
+  background: #fff0f0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dtr-status > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.dtr-status strong {
+  color: #243247;
+  font-size: 14px;
+}
+
+.dtr-status > div span {
+  color: #8792a3;
+  font-size: 12px;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+  .hours-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hours-page {
+    padding: 20px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .hours-page {
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .page-header h1 {
+    font-size: 23px;
+  }
+
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .attendance-panel,
+  .progress-panel,
+  .history-panel,
+  .dtr-panel {
+    padding: 17px;
+    border-radius: 13px;
+  }
+
+  .attendance-heading {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .attendance-heading h2,
+  .section-heading h2,
+  .dtr-panel h2 {
+    font-size: 17px;
+  }
+
+  .attendance-times {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .time-item {
+    padding: 13px;
+  }
+
+  .time-item:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .time-item span {
+    font-size: 12px;
+  }
+
+  .time-item strong {
+    font-size: 21px;
+  }
+
+  .attendance-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .attendance-buttons button {
+    min-width: 0;
+    min-height: 48px;
+    padding: 12px 8px;
+  }
+
+  .hours-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 15px;
+  }
+
+  .summary-card span {
+    min-height: 30px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .summary-card strong {
+    font-size: 23px;
+  }
+
+  .summary-card small {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .history-item {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 12px;
+    padding: 15px 0;
+  }
+
+  .history-date {
+    width: 44px;
+    min-height: 52px;
+  }
+
+  .history-date strong {
+    font-size: 19px;
+  }
+
+  .history-details strong {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .history-details span,
+  .history-details small {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .record-status {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: -3px;
+  }
+
+  .progress-labels {
+    font-size: 12px;
+  }
+
+  .dtr-status {
+    padding: 13px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .hours-page {
+    padding: 10px;
+  }
+
+  .attendance-panel,
+  .progress-panel,
+  .history-panel,
+  .dtr-panel {
+    padding: 13px;
+  }
+
+  .hours-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card span {
+    min-height: auto;
+  }
+
+  .attendance-buttons {
+    grid-template-columns: 1fr;
+  }
+}

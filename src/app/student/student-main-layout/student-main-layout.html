@@ -1,0 +1,106 @@
+
+<div class="student-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="student-sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-icon">✓</div>
+
+      <div class="brand-text">
+        <span>OJT</span>
+        <h2>ProgressTrack</h2>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="section-label">INTERNSHIP PORTAL</p>
+      <p class="portal-role">OJT Student</p>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <a
+        routerLink="/student/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link">
+        <span class="nav-icon">▦</span>
+        <span>Overview</span>
+      </a>
+
+      <a routerLink="/student/hours" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">◷</span>
+        <span>Internship Hours</span>
+      </a>
+
+      <a routerLink="/student/accomplishments" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">▤</span>
+        <span>Accomplishments</span>
+      </a>
+
+      <a routerLink="/student/requirements" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">▣</span>
+        <span>Requirements</span>
+      </a>
+
+      <a routerLink="/student/profile" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">♙</span>
+        <span>Profile &amp; Placement</span>
+      </a>
+
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>OJT ProgressTrack</p>
+      <span>Your internship progress in one place.</span>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="student-main">
+
+    <!-- TOPBAR -->
+    <header class="student-topbar">
+      <div class="topbar-page-title">
+        <span>Student Portal</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" class="notification-btn" aria-label="Notifications">
+          ♧
+        </button>
+
+       
+<div class="student-user">
+  <div class="user-avatar">S</div>
+
+  <div class="user-details">
+    <strong>OJT Student</strong>
+    <span>Student Account</span>
+  </div>
+</div>
+
+<button
+  type="button"
+  class="logout-btn"
+  (click)="logout()"
+  aria-label="Log out of your account"
+  title="Log out">
+  <span aria-hidden="true">↪</span>
+  <span>Logout</span>
+</button>
+
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="student-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

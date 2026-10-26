@@ -1,0 +1,350 @@
+<div class="requirements-page">
+
+  <header class="page-header">
+    <div>
+      <p class="breadcrumb">Student Workspace / Requirements</p>
+      <h1>Requirements &amp; Documents</h1>
+      <p>Keep track of your internship documents and their submission status.</p>
+    </div>
+    
+<button
+  type="button"
+  class="checklist-button"
+  (click)="downloadChecklist()"
+>
+  <span aria-hidden="true">⇩</span>
+  Download Checklist
+</button>
+
+  </header>
+
+ 
+<!-- SUMMARY -->
+<section class="summary-bar" aria-label="Requirements summary">
+
+  <div class="summary-progress">
+    <strong>Requirements Overview</strong>
+    <span>Track your document submission progress in one place.</span>
+
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">
+      <span class="summary-icon approved-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+          stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m8 12 2.5 2.5L16 9"></path>
+        </svg>
+      </span>
+      <span>Approved</span>
+    </div>
+    <strong>{{ approvedCount }}</strong>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">
+      <span class="summary-icon review-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+          stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 7v5l3 2"></path>
+        </svg>
+      </span>
+      <span>Awaiting Review</span>
+    </div>
+    <strong>{{ awaitingReviewCount }}</strong>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">
+      <span class="summary-icon action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+          stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3 22 20H2L12 3Z"></path>
+          <path d="M12 9v5"></path>
+          <path d="M12 17h.01"></path>
+        </svg>
+      </span>
+      <span>Action Required</span>
+    </div>
+    <strong>{{ actionRequiredCount }}</strong>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">
+      <span class="summary-icon pending-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+          stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 3h7l4 4v14H7z"></path>
+          <path d="M14 3v5h4"></path>
+          <path d="M10 13h5M10 16h5"></path>
+        </svg>
+      </span>
+      <span>Not Yet Submitted</span>
+    </div>
+    <strong>{{ notSubmittedCount }}</strong>
+  </div>
+
+</section>
+
+
+  <!-- DOCUMENT CHECKLIST -->
+  <section class="requirements-panel">
+    <div class="section-heading">
+      <div>
+        <h2>Document Checklist</h2>
+        <p>Your OJT documents and their latest submission status.</p>
+      </div>
+    </div>
+
+   
+<div class="requirements-toolbar">
+  <label class="search-box">
+    <span aria-hidden="true">⌕</span>
+    <input
+      type="search"
+      placeholder="Search documents..."
+      aria-label="Search documents"
+      [(ngModel)]="searchTerm"
+    >
+  </label>
+
+  <select
+    aria-label="Filter documents by status"
+    [(ngModel)]="selectedStatus"
+  >
+    <option value="All statuses">All statuses</option>
+    <option value="Submitted">Submitted</option>
+    <option value="Not Yet Submitted">Not Yet Submitted</option>
+  </select>
+</div>
+
+
+    <div class="table-scroll">
+      <table class="requirements-table">
+        <thead>
+          <tr>
+            <th>Requirement</th>
+            <th>File Name</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        
+<tbody>
+  @if (isLoading) {
+    <tr>
+      <td colspan="5">
+        <div class="empty-state">
+          <h3>Loading requirements...</h3>
+          <p>Please wait while we retrieve your OJT requirements.</p>
+        </div>
+      </td>
+    </tr>
+  } @else if (loadError) {
+    <tr>
+      <td colspan="5">
+        <div class="empty-state">
+          <h3>Unable to load requirements</h3>
+          <p>{{ loadError }}</p>
+          <button type="button" (click)="loadRequirements()">
+            Try Again
+          </button>
+        </div>
+      </td>
+    </tr>
+  } @else {
+   @for (requirement of filteredRequirements; track requirement.id) {
+      <tr>
+        
+<td>
+  <div class="requirement-info">
+   <span class="requirement-icon" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    width="21"
+    height="21"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M7 3.75h7l4 4v12.5H7z"></path>
+    <path d="M14 3.75v4h4"></path>
+    <path d="M10 12h5M10 15.5h5"></path>
+  </svg>
+</span>
+
+    <div class="requirement-text">
+      <strong>{{ requirement.name }}</strong>
+      <p>{{ requirement.description }}</p>
+    </div>
+  </div>
+</td>
+
+        
+<td>
+  <span>{{ requirement.expectedFileName || 'Not specified' }}</span>
+</td>
+
+        <td>{{ requirement.dueDate }}</td>
+        <td>
+  @if (hasSubmission(requirement)) {
+    <span class="status-badge submitted">Submitted</span>
+  } @else {
+    <span class="status-badge">Not Yet Submitted</span>
+  }
+</td>
+        
+<td>
+  @if (hasSubmission(requirement)) {
+    <div class="action-buttons">
+      <button
+        type="button"
+        class="view-button"
+        (click)="viewSubmission(requirement)"
+      >
+        View
+      </button>
+
+      <button
+        type="button"
+        class="submit-button"
+        (click)="openSubmissionModal(requirement)"
+      >
+        Replace File
+      </button>
+    </div>
+  } @else {
+    <button
+      type="button"
+      class="submit-button"
+      (click)="openSubmissionModal(requirement)"
+    >
+      Submit
+    </button>
+  }
+</td>
+
+      </tr>
+    } @empty {
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">▤</div>
+            <h3>No requirements available yet</h3>
+            <p>Your coordinator's configured OJT requirements will appear here once they are available.</p>
+          </div>
+        </td>
+      </tr>
+    }
+  }
+</tbody>
+
+      </table>
+    </div>
+  </section>
+
+  
+
+</div>
+
+
+  <!-- DOCUMENT SUBMISSION MODAL -->
+  @if (showSubmissionModal && selectedRequirement) {
+    <div class="modal-overlay" (click)="closeSubmissionModal()">
+      <section
+        class="submission-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="submission-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <h2 id="submission-modal-title">Submit or Replace a Document</h2>
+            <p>Upload your document for coordinator review.</p>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            aria-label="Close modal"
+            (click)="closeSubmissionModal()"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-requirement-info">
+          <span>Selected Requirement</span>
+          <strong>{{ selectedRequirement.name }}</strong>
+          <p>{{ selectedRequirement.description }}</p>
+          <p><strong>Due Date:</strong> {{ selectedRequirement.dueDate }}</p>
+        </div>
+
+        <div class="feedback-notice">
+          <span aria-hidden="true">ⓘ</span>
+          <div>
+            <strong>Coordinator feedback</strong>
+            <p>Feedback will appear here if your coordinator requests a correction.</p>
+          </div>
+        </div>
+
+        <label class="upload-area">
+          <span class="upload-icon" aria-hidden="true">⇧</span>
+          <strong>Choose a document to upload</strong>
+          <span>Choose the file you want to submit for this requirement.</span>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            (change)="onFileSelected($event)"
+          >
+        </label>
+
+        @if (selectedFile) {
+          <div class="selected-file">
+            <span aria-hidden="true">▤</span>
+            <div>
+              <strong>{{ selectedFile.name }}</strong>
+              <p>{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</p>
+            </div>
+            <button type="button" (click)="clearSelectedFile()">Remove</button>
+          </div>
+        }
+
+        <p class="upload-help">
+          Make sure your document is complete, readable, and follows your school's requirements.
+        </p>
+
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="closeSubmissionModal()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="submit-button"
+            [disabled]="!selectedFile || isSubmitting"
+            (click)="submitDocument()"
+          >
+            {{ isSubmitting ? 'Submitting...' : 'Submit Document' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }

@@ -1,0 +1,197 @@
+
+/* =========================
+   OJT HOURS PAGE
+========================= */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ojt-hours-page {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  color: #243247;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.page-title h2 {
+  margin: 0 0 8px;
+  color: #17365d;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.page-title p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================
+   HEADER BUTTONS
+========================= */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 14px;
+  border: 1px solid #d5deea;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17365d;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.btn-secondary:hover {
+  background: #f3f6fa;
+  border-color: #b9c8da;
+}
+
+/* =========================
+   SUMMARY CARDS
+========================= */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+  padding: 22px 18px;
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(23, 54, 93, 0.04);
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.students-icon {
+  background: #e5edf8;
+  color: #17365d;
+}
+
+.hours-icon {
+  background: #e3f4e8;
+  color: #247542;
+}
+
+.ontrack-icon {
+  background: #e5edf8;
+  color: #315b89;
+}
+
+.review-icon {
+  background: #fff0dc;
+  color: #a65b00;
+}
+
+.card-info {
+  min-width: 0;
+}
+
+.card-info p {
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.card-info h3 {
+  margin: 0 0 6px;
+  color: #17365d;
+  font-size: 25px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.card-info span {
+  color: #8491a3;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 17px;
+  }
+}

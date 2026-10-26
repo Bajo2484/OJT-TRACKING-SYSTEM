@@ -1,0 +1,355 @@
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #243247;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f3f6fa;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  min-height: 100vh;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  background: #17365d;
+  color: #ffffff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 28px;
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #17365d;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.brand-text h2 {
+  margin: 0 0 5px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.brand-text p {
+  margin: 0;
+  color: #d4dfed;
+  font-size: 12px;
+}
+
+.menu-label {
+  padding: 12px;
+  color: #b9c9dc;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px;
+  border-radius: 7px;
+  color: #dbe5f1;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menu-icon {
+  width: 22px;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 20px;
+}
+
+.menu-item:hover {
+  background: #294a70;
+  color: #ffffff;
+}
+
+.menu-item.active {
+  background: #ffffff;
+  color: #17365d;
+  font-weight: 700;
+}
+
+/* =========================
+   SIDEBAR PROFILE
+========================= */
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.coordinator-profile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 8px 0;
+  border-top: 1px solid #385779;
+}
+
+.profile-avatar,
+.admin-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dce6f2;
+  color: #17365d;
+  font-weight: 700;
+}
+
+.profile-info h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+}
+
+.profile-info p {
+  margin: 0;
+  color: #c3d1e1;
+  font-size: 11px;
+}
+
+/* =========================
+   MAIN AREA
+========================= */
+
+.main-area {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 30px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e7ef;
+}
+
+.topbar-title h1 {
+  margin: 0 0 6px;
+  color: #17365d;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.topbar-title p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.admin-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-name {
+  color: #243247;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-role {
+  color: #64748b;
+  font-size: 11px;
+}
+
+/* =========================
+   PAGE CONTENT
+========================= */
+
+.page-content {
+  flex: 1;
+  min-width: 0;
+  padding: 30px;
+}
+
+/* =========================
+   RESPONSIVE LAYOUT
+========================= */
+
+@media (max-width: 1000px) {
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .topbar {
+    padding: 18px 22px;
+  }
+
+  .page-content {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 700px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    min-height: auto;
+    padding: 16px;
+  }
+
+  .brand {
+    padding-bottom: 16px;
+  }
+
+  .sidebar-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sidebar-bottom {
+    margin-top: 20px;
+  }
+
+  .topbar {
+    min-height: 75px;
+    padding: 16px;
+  }
+
+  .topbar-title h1 {
+    font-size: 17px;
+  }
+
+  .topbar-title p {
+    font-size: 11px;
+  }
+
+  .admin-info {
+    display: none;
+  }
+
+  .page-content {
+    padding: 16px;
+  }
+}
+
+
+/* =========================
+   LOG OUT BUTTON
+========================= */
+
+.logout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid #d5deea;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17365d;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #f0f5fb;
+  border-color: #b9c8da;
+}
+
+.logout-button:active {
+  background: #e5edf7;
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid #5279a8;
+  outline-offset: 2px;
+}
+
+.logout-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* RESPONSIVE LOG OUT BUTTON */
+@media (max-width: 700px) {
+  .topbar-right {
+    gap: 8px;
+  }
+
+  .logout-button {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+}
+
+
+@media (max-width: 420px) {
+  .sidebar-menu {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,98 @@
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- BRAND -->
+    <div class="brand">
+      <div class="brand-icon">
+        <span>O</span>
+      </div>
+
+      <div class="brand-text">
+        <h2>OJT ProgressTrack</h2>
+        <p>Coordinator Portal</p>
+      </div>
+    </div>
+
+    <!-- MENU LABEL -->
+    <div class="menu-label">MAIN MENU</div>
+
+    <!-- NAVIGATION -->
+    <nav class="sidebar-menu">
+
+      @for (item of menuItems; track item.route) {
+        <a
+          class="menu-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">
+
+          <span class="menu-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+
+        </a>
+      }
+
+    </nav>
+
+    <!-- SIDEBAR PROFILE -->
+    <div class="sidebar-bottom">
+      <div class="coordinator-profile">
+
+        <div class="profile-avatar">C</div>
+
+        <div class="profile-info">
+          <h4>Coordinator</h4>
+          <p>OJT Administrator</p>
+        </div>
+
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <div class="topbar-title">
+        <h1>OJT ProgressTrack</h1>
+        <p>Internship Progress and Requirement Monitoring</p>
+      </div>
+
+      <div class="topbar-right">
+
+        <div class="admin-avatar">C</div>
+
+        <div class="admin-info">
+          <span class="admin-name">Coordinator</span>
+          <span class="admin-role">Administrator</span>
+        </div>
+
+        <!-- LOG OUT BUTTON -->
+        <button
+          class="logout-button"
+          type="button"
+          (click)="logout()">
+
+          <span class="logout-icon">↪</span>
+          <span>Log Out</span>
+
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+      <router-outlet />
+    </main>
+
+  </div>
+
+</div>

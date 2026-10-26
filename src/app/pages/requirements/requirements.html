@@ -1,0 +1,485 @@
+
+<div class="requirements-page">
+
+  <!-- PAGE HEADER -->
+  
+  <section class="page-header">
+    <div class="page-title">
+      <h2>Requirements</h2>
+      <p>Monitor student requirement completion and progress.</p>
+    </div>
+
+    <button
+      type="button"
+      class="add-requirement-button"
+      (click)="showAddForm = !showAddForm"
+    >
+      <span aria-hidden="true">+</span>
+      Add Requirement
+    </button>
+  </section>
+
+  
+  <!-- ADD REQUIREMENT FORM -->
+ 
+@if (showAddForm) {
+  <div class="modal-backdrop" (click)="showAddForm = false">
+    <section
+      class="requirement-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="requirementModalTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div>
+          <h3 id="requirementModalTitle">Add OJT Requirement</h3>
+          <p>Create a document requirement for OJT students.</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          aria-label="Close modal"
+          (click)="showAddForm = false; formError = ''"
+          [disabled]="isSaving"
+        >
+          &times;
+        </button>
+      </div>
+
+      <form class="requirement-form" (ngSubmit)="saveRequirement()">
+        <div class="form-field">
+          <label for="requirementName">Requirement Name</label>
+          <input
+            id="requirementName"
+            type="text"
+            name="requirementName"
+            [(ngModel)]="newRequirement.name"
+            placeholder="e.g. Endorsement Letter"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="requirementDescription">Description</label>
+          <textarea
+            id="requirementDescription"
+            name="requirementDescription"
+            [(ngModel)]="newRequirement.description"
+            placeholder="Enter requirement details..."
+            rows="3"
+            required
+          ></textarea>
+        </div>
+
+        
+        <div class="form-field">
+          <label for="expectedFileName">Expected File Name</label>
+          <input
+            id="expectedFileName"
+            type="text"
+            name="expectedFileName"
+            [(ngModel)]="newRequirement.expectedFileName"
+            placeholder="e.g. OJT_Agreement.pdf"
+            required
+          />
+          <small>Enter the expected filename students should follow.</small>
+        </div>
+
+        
+        <div class="form-field">
+          <label for="requirementDueDate">Due Date</label>
+          <input
+            id="requirementDueDate"
+            type="date"
+            name="requirementDueDate"
+            [(ngModel)]="newRequirement.dueDate"
+            required
+          />
+        </div>
+
+
+
+        @if (formError) {
+          <p class="form-error" role="alert">{{ formError }}</p>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="showAddForm = false; formError = ''"
+            [disabled]="isSaving"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="add-requirement-button"
+            [disabled]="isSaving"
+          >
+            {{ isSaving ? 'Saving...' : 'Save Requirement' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
+
+
+
+
+  <!-- SUMMARY CARDS -->
+  <section class="summary-grid">
+
+    <div class="summary-card">
+      <div class="card-icon students-icon">
+        <span aria-hidden="true">♙</span>
+      </div>
+      <div class="card-info">
+        <p>Total Students</p>
+        <h3>{{ totalStudents }}</h3>
+        <span>Registered OJT students</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon" style="background: #fff0dc; color: #925000;">
+        <span aria-hidden="true">!</span>
+      </div>
+      <div class="card-info">
+        <p>Incomplete Students</p>
+        <h3>{{ incompleteStudents }}</h3>
+        <span>Students with pending items</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon complete-icon">
+        <span aria-hidden="true">✓</span>
+      </div>
+      <div class="card-info">
+        <p>Complete</p>
+        <h3>{{ completeStudents }}</h3>
+        <span>All items approved</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon" style="background: #fce9e7; color: #b42318;">
+        <span aria-hidden="true">▤</span>
+      </div>
+      <div class="card-info">
+        <p>Pending Requirements</p>
+        <h3>{{ pendingRequirements }}</h3>
+        <span>Items awaiting approval</span>
+      </div>
+    </div>
+
+  </section>
+
+<!-- CONFIGURED REQUIREMENTS -->
+<section class="records-panel configured-requirements">
+  <div class="panel-header">
+    <div>
+      <h3>Configured Requirements</h3>
+      <p>Requirements created for OJT students.</p>
+    </div>
+  </div>
+
+  <div class="configured-requirements-list">
+    @for (requirement of requirements; track requirement.id) {
+      <article class="configured-requirement-item">
+        <div class="configured-requirement-info">
+          <h4>{{ requirement.name }}</h4>
+          <p>{{ requirement.description }}</p>
+          <span class="requirement-due-date">
+            Due date: {{ requirement.dueDate }}
+          </span>
+        </div>
+      </article>
+    } @empty {
+      <div class="configured-requirements-empty">
+        <h4>No requirements added yet</h4>
+        <p>Click “Add Requirement” to create your first requirement.</p>
+      </div>
+    }
+  </div>
+</section>
+
+
+  <!-- STUDENT REQUIREMENTS -->
+  <section class="records-panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Student Requirements</h3>
+        <p>Track each student's requirement completion.</p>
+      </div>
+    </div>
+
+    <!-- SEARCH AND FILTER -->
+    <div class="table-toolbar">
+
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          placeholder="Search Student ID or name..."
+          aria-label="Search students"
+          [(ngModel)]="searchText"
+        />
+      </div>
+
+      <select
+        class="status-filter"
+        aria-label="Filter by requirement status"
+        [(ngModel)]="selectedStatus"
+      >
+        <option value="All Statuses">All Statuses</option>
+        <option value="Complete">Complete</option>
+        <option value="Incomplete">Incomplete</option>
+        <option value="Submitted">Submitted</option>
+      </select>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Requirements Progress</th>
+            <th>Completion</th>
+            <th>Status</th>
+            <th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (student of filteredStudents; track student.studentId) {
+            <tr>
+              <td>
+                <div class="student-name">{{ student.fullName }}</div>
+                <div class="student-id">{{ student.studentId }}</div>
+              </td>
+
+              <td class="progress-cell">
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    [class.progress-complete]="getProgressPercentage(student) === 100"
+                    [style.width.%]="getProgressPercentage(student)"
+                  ></div>
+                </div>
+                <span class="progress-label">
+                  {{ student.completedRequirements }} of
+                  {{ student.totalRequirements }} requirements
+                </span>
+              </td>
+
+              <td class="percentage">
+                {{ getProgressPercentage(student) }}%
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.status-complete]="student.status === 'Complete'"
+                  [class.status-incomplete]="student.status === 'Incomplete'"
+                  [class.status-submitted]="student.status === 'Submitted'"
+                >
+                  {{ student.status }}
+                </span>
+              </td>
+
+              <td class="actions-cell">
+                <button
+                  class="view-button"
+                  type="button"
+                  (click)="viewDetails(student)"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-icon">☷</div>
+                <h4>No student records found</h4>
+                <p>Try changing your search or status filter.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing {{ filteredStudents.length }} student(s)</span>
+    </div>
+
+  </section>
+
+  <footer class="page-footer">
+    OJT ProgressTrack — Internship Progress and Requirement Monitoring
+  </footer>
+
+</div>
+
+
+@if (showReviewModal) {
+  <div class="review-modal-backdrop" (click)="closeReviewModal()">
+    <section
+      class="review-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reviewModalTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="review-modal-header">
+        <div>
+          <h2 id="reviewModalTitle">Review Student Requirements</h2>
+
+          @if (selectedStudent) {
+            <p>
+              {{ selectedStudent.fullName }}
+              · Student ID: {{ selectedStudent.studentId }}
+            </p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="review-modal-close"
+          aria-label="Close review modal"
+          (click)="closeReviewModal()"
+        >
+          &times;
+        </button>
+      </header>
+
+      <div class="review-modal-body">
+        @if (isReviewLoading) {
+          <p class="review-loading">Loading student submissions...</p>
+        } @else if (selectedStudentSubmissions.length === 0) {
+          <div class="review-empty">
+            <h3>No uploaded files yet</h3>
+            <p>This student has not submitted any requirements.</p>
+          </div>
+        } @else {
+          <div class="submission-review-list">
+            @for (submission of selectedStudentSubmissions; track submission.id) {
+              <article class="submission-review-card">
+
+                <!-- LEFT SIDE: FILE DETAILS -->
+                <div class="submission-file-panel">
+                  <div class="submission-file-heading">
+                    <span class="submission-file-icon">PDF</span>
+
+                    <div class="submission-file-info">
+                      <h3>{{ submission.fileName }}</h3>
+                      <p>{{ submission.requirementName }}</p>
+                    </div>
+                  </div>
+
+                  <p class="submission-date">
+                    Submitted:
+                    {{ submission.submittedAt?.toDate()?.toLocaleString() || 'Date unavailable' }}
+                  </p>
+
+                  <div class="submission-file-actions">
+                    <button
+                      type="button"
+                      class="file-view-button"
+                      (click)="viewUploadedFile(submission)"
+                    >
+                      View File
+                    </button>
+
+                    <button
+                      type="button"
+                      class="file-download-button"
+                      (click)="downloadUploadedFile(submission)"
+                    >
+                      Download
+                    </button>
+                  </div>
+                </div>
+
+                <!-- RIGHT SIDE: REVIEW DECISION -->
+                <div class="submission-decision-panel">
+                  <h3>Review Decision</h3>
+
+                  <span
+                    class="review-status"
+                    [class.review-status-approved]="submission.status === 'Approved'"
+                    [class.review-status-revision]="submission.status === 'Needs Revision'"
+                    [class.review-status-pending]="submission.status === 'Submitted'"
+                  >
+                    {{
+                      submission.status === 'Submitted'
+                        ? 'Pending Review'
+                        : submission.status === 'Approved'
+                          ? 'Approved'
+                          : 'Needs Revision'
+                    }}
+                  </span>
+
+                  @if (submission.status === 'Approved') {
+                    <p class="review-feedback">
+                      {{ submission.feedback || 'No additional feedback.' }}
+                    </p>
+                  } @else {
+                    <label [for]="'feedback-' + submission.id">Feedback</label>
+
+                    <p class="review-feedback">
+                      {{
+                        submission.feedback ||
+                        'No feedback yet. You can request corrections if needed.'
+                      }}
+                    </p>
+
+                    <div class="review-decision-actions">
+                      <button
+                        type="button"
+                        class="approve-button"
+                        (click)="reviewSubmission(submission, 'Approved')"
+                      >
+                        Approve
+                      </button>
+
+                      <button
+                        type="button"
+                        class="revision-button"
+                        (click)="reviewSubmission(submission, 'Needs Revision')"
+                      >
+                        Request Revision
+                      </button>
+                    </div>
+                  }
+                </div>
+
+              </article>
+            }
+          </div>
+        }
+      </div>
+
+      <footer class="review-modal-footer">
+        <button
+          type="button"
+          class="review-close-button"
+          (click)="closeReviewModal()"
+        >
+          Close
+        </button>
+      </footer>
+    </section>
+  </div>
+}
+

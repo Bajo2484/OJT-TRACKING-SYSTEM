@@ -1,0 +1,180 @@
+
+<div class="student-dashboard">
+
+  <section class="page-heading">
+    <div>
+      <p class="eyebrow">STUDENT OVERVIEW</p>
+      <h1>Welcome to your Dashboard!</h1>
+      <p class="page-description">
+        Monitor your internship hours, requirements, and accomplishments
+        in one place.
+      </p>
+    </div>
+  </section>
+
+  <section class="summary-cards">
+
+    <article class="summary-card">
+      <div class="card-icon blue">◷</div>
+      <p class="card-label">Recorded OJT Hours</p>
+      <h2>{{ isLoading ? '...' : recordedHours.toFixed(2) }} <span>hrs</span></h2>
+      <p class="card-note">Completed attendance hours</p>
+    </article>
+
+    <article class="summary-card">
+      <div class="card-icon orange">◴</div>
+      <p class="card-label">Required Hours</p>
+      <h2>{{ requiredHours }} <span>hrs</span></h2>
+      <p class="card-note">Total hours required for OJT</p>
+    </article>
+
+    <article class="summary-card">
+      <div class="card-icon purple">◷</div>
+      <p class="card-label">Remaining Hours</p>
+      <h2>{{ isLoading ? '...' : remainingHours.toFixed(2) }} <span>hrs</span></h2>
+      <p class="card-note">Hours left to complete</p>
+    </article>
+
+    <article class="summary-card">
+      <div class="card-icon green">✓</div>
+      <p class="card-label">OJT Progress</p>
+      <h2>{{ isLoading ? '...' : progressPercentage.toFixed(1) }}<span>%</span></h2>
+      <p class="card-note">Based on completed attendance</p>
+    </article>
+
+  </section>
+
+  <section class="dashboard-grid">
+
+    <article class="dashboard-panel progress-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Internship Progress</h2>
+          <p>Your overall OJT completion</p>
+        </div>
+        <span class="status-badge">
+          {{ progressPercentage >= 100 ? 'Completed' : 'In Progress' }}
+        </span>
+      </div>
+
+      <div class="progress-summary">
+        <div>
+          <span class="muted-label">Recorded Hours</span>
+          <h3>
+            {{ isLoading ? '...' : recordedHours.toFixed(2) }}
+            <span>/ {{ requiredHours }} hours</span>
+          </h3>
+        </div>
+        <strong class="progress-percent">
+          {{ isLoading ? '...' : progressPercentage.toFixed(1) }}%
+        </strong>
+      </div>
+
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-label="Internship progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-valuenow]="progressPercentage">
+        <div
+          class="progress-fill"
+          [style.width.%]="progressPercentage">
+        </div>
+      </div>
+
+      <p class="panel-note">
+        Your progress updates based on your completed attendance records.
+      </p>
+
+      @if (message) {
+        <p class="panel-note">{{ message }}</p>
+      }
+    </article>
+
+    <article class="dashboard-panel attention-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Needs Your Attention</h2>
+          <p>Items to check during your internship</p>
+        </div>
+      </div>
+
+      <div class="attention-item">
+        <span class="attention-icon">!</span>
+        <div>
+          <h3>OJT Requirements</h3>
+          <p>Check whether your required documents have been submitted.</p>
+        </div>
+      </div>
+
+      <div class="attention-item">
+        <span class="attention-icon">◷</span>
+        <div>
+          <h3>Internship Hours</h3>
+          <p>Review your attendance records and make sure each session has a Time Out.</p>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="dashboard-grid lower-grid">
+
+    <article class="dashboard-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Internship Placement</h2>
+          <p>Your internship information</p>
+        </div>
+      </div>
+
+      <div class="placement-details">
+        <div class="detail-row">
+          <span>Company</span>
+          <strong>Not yet available</strong>
+        </div>
+
+        <div class="detail-row">
+          <span>Industry Supervisor</span>
+          <strong>Not yet available</strong>
+        </div>
+
+        <div class="detail-row">
+          <span>OJT Coordinator</span>
+          <strong>Not yet available</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="dashboard-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Recent Accomplishments</h2>
+          <p>Your latest OJT submissions</p>
+        </div>
+      </div>
+
+      <div class="empty-state">
+        <div class="empty-icon">▤</div>
+        <h3>No accomplishments yet</h3>
+        <p>Your submitted accomplishments will appear here.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="dashboard-panel activity-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Recent Activity</h2>
+        <p>Updates related to your OJT records</p>
+      </div>
+    </div>
+
+    <div class="empty-state compact-empty">
+      <p>No recent activity to display.</p>
+    </div>
+  </section>
+
+</div>

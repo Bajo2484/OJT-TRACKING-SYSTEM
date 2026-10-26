@@ -1,0 +1,134 @@
+
+<div class="dashboard-page">
+
+  <!-- PAGE HEADER -->
+  <section class="welcome-section">
+    <div>
+      <h2>Dashboard</h2>
+      <p>Monitor OJT students, hours, requirements, and overall progress.</p>
+    </div>
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section class="summary-grid">
+
+    <!-- Total OJT Students -->
+    <div class="summary-card">
+      <div class="card-icon students-icon">♙</div>
+      <div>
+        <p>Total OJT Students</p>
+        <h3>{{ totalOJTStudents }}</h3>
+      </div>
+    </div>
+
+    <!-- Students Behind Schedule -->
+    <div class="summary-card">
+      <div class="card-icon behind-icon">◷</div>
+      <div>
+        <p>Students Behind Schedule</p>
+        <h3>{{ studentsBehindSchedule }}</h3>
+      </div>
+    </div>
+
+    <!-- Incomplete Requirements -->
+    <div class="summary-card">
+      <div class="card-icon requirements-icon">☷</div>
+      <div>
+        <p>Incomplete Requirements</p>
+        <h3>{{ incompleteRequirements }}</h3>
+      </div>
+    </div>
+
+    <!-- Overall Progress -->
+    <div class="summary-card">
+      <div class="card-icon progress-icon">▦</div>
+      <div>
+        <p>Overall Progress</p>
+        <h3>{{ overallProgress }}%</h3>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- STUDENTS REQUIRING ATTENTION -->
+  <section class="dashboard-panel">
+    <div class="panel-header">
+      <div>
+        <h3>Students Requiring Attention</h3>
+        <p>OJT students who may need follow-up.</p>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Completed Hours</th>
+            <th>Remaining Hours</th>
+            <th>Requirements</th>
+            <th>Progress Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (student of studentsRequiringAttention; track student.fullName) {
+            <tr>
+              <td>{{ student.fullName }}</td>
+              <td>{{ student.completedHours }}</td>
+              <td>{{ student.remainingHours }}</td>
+              <td>{{ student.requirementStatus }}</td>
+              <td>
+                <span class="status-badge">
+                  {{ student.progressStatus }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                No students currently require attention.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RECENT OJT UPDATES -->
+  <section class="dashboard-panel">
+    <div class="panel-header">
+      <div>
+        <h3>Recent OJT Updates</h3>
+        <p>Latest recorded OJT activities.</p>
+      </div>
+    </div>
+
+    <div class="activity-list">
+      @for (activity of recentActivities; track $index) {
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+
+          <div class="activity-details">
+            <p>
+              <strong>{{ activity.studentName }}</strong>
+              {{ activity.activity }}
+            </p>
+            <span>{{ activity.date }}</span>
+          </div>
+        </div>
+      } @empty {
+        <p class="empty-state">
+          No recent OJT updates available.
+        </p>
+      }
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="dashboard-footer">
+    OJT ProgressTrack — Internship Progress and Requirement Monitoring
+  </footer>
+
+</div>

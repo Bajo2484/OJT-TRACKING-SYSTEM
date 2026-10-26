@@ -1,0 +1,64 @@
+
+<div class="ojt-hours-page">
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="page-title">
+      <h2>OJT Hours</h2>
+      <p>Monitor student internship hours and overall progress.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" type="button">
+        <span>↓</span>
+        Export Report
+      </button>
+    </div>
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section class="summary-grid">
+
+    <!-- Students with OJT Records -->
+    <div class="summary-card">
+      <div class="card-icon students-icon">♙</div>
+      <div class="card-info">
+        <p>Students with OJT Records</p>
+        <h3>{{ totalStudents }}</h3>
+        <span>Students being monitored</span>
+      </div>
+    </div>
+
+    <!-- Approved Hours -->
+    <div class="summary-card">
+      <div class="card-icon hours-icon">◷</div>
+      <div class="card-info">
+        <p>Total Approved Hours</p>
+        <h3>{{ totalApprovedHours }}</h3>
+        <span>Hours completed and approved</span>
+      </div>
+    </div>
+
+    <!-- On Track -->
+    <div class="summary-card">
+      <div class="card-icon ontrack-icon">✓</div>
+      <div class="card-info">
+        <p>On Track</p>
+        <h3>{{ studentsOnTrack }}</h3>
+        <span>Meeting expected progress</span>
+      </div>
+    </div>
+
+    <!-- Needs Review -->
+    <div class="summary-card">
+      <div class="card-icon review-icon">!</div>
+      <div class="card-info">
+        <p>Needs Review</p>
+        <h3>{{ studentsNeedingReview }}</h3>
+        <span>Hours requiring attention</span>
+      </div>
+    </div>
+
+  </section>
+
+</div>

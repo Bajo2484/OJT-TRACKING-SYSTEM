@@ -1,0 +1,351 @@
+
+<div class="ojt-students-page">
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="page-title">
+      <h2>OJT Students</h2>
+      <p>Manage and monitor students participating in OJT.</p>
+    </div>
+
+    <button
+  class="btn btn-primary"
+  type="button"
+  (click)="studentFileInput.click()"
+>
+  <span>↑</span>
+  Import Students
+</button>
+
+<input
+  #studentFileInput
+  type="file"
+  accept=".csv,.xlsx,.xls"
+  hidden
+  (change)="onStudentFileSelected($event)"
+/>
+
+      <button
+        class="btn btn-secondary"
+        type="button"
+        (click)="openAddStudent()"
+      >
+        <span>+</span>
+        Add Student
+      </button>
+
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section class="summary-grid">
+
+    <div class="summary-card">
+      <div class="card-icon students-icon">♙</div>
+      <div class="card-info">
+        <p>Total Students</p>
+        <h3>{{ totalStudents }}</h3>
+        <span>Registered OJT students</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon followup-icon">!</div>
+      <div class="card-info">
+        <p>Needs Follow-up</p>
+        <h3>{{ studentsNeedingFollowUp }}</h3>
+        <span>Students needing attention</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ADD STUDENT MODAL OVERLAY -->
+  @if (showAddStudentForm) {
+    <div
+      class="modal-overlay"
+      (click)="closeAddStudent()"
+    >
+      <section
+        class="modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="addStudentTitle"
+        (click)="$event.stopPropagation()"
+      >
+
+        <!-- MODAL HEADER -->
+        <div class="modal-header">
+          <div>
+            <h3 id="addStudentTitle">
+  {{ editingStudentId !== null ? 'Edit OJT Student' : 'Add New OJT Student' }}
+</h3>
+            <p>Enter the student's information and login credentials.</p>
+          </div>
+
+          <button
+            class="modal-close"
+            type="button"
+            aria-label="Close form"
+            (click)="closeAddStudent()"
+          >
+            ×
+          </button>
+        </div>
+
+        <!-- STUDENT INFORMATION -->
+        <div class="modal-section">
+          <h4>Student Information</h4>
+
+          <div class="form-fields">
+         <label>
+  Student ID *
+  <input
+    type="text"
+    [(ngModel)]="newStudent.studentId"
+    (ngModelChange)="updateStudentCredentials()"
+     [readonly]="editingStudentId !== null"
+    placeholder="Enter Student ID"
+    autocomplete="off"
+    required
+  />
+</label>
+
+<label>
+  First Name *
+  <input
+    type="text"
+    [(ngModel)]="newStudent.firstName"
+    placeholder="Enter first name"
+    required
+  />
+</label>
+
+<label>
+  Last Name *
+  <input
+    type="text"
+    [(ngModel)]="newStudent.lastName"
+    (ngModelChange)="updateStudentCredentials()"
+    placeholder="Enter last name"
+    required
+  />
+</label>
+
+            <label>
+              Course / Program *
+              <input
+                type="text"
+                [(ngModel)]="newStudent.course"
+                placeholder="Enter course or program"
+                required
+              />
+            </label>
+
+            <label>
+              Year Level *
+              <select
+                [(ngModel)]="newStudent.yearLevel"
+                required
+              >
+                <option value="">Select year level</option>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+                <option value="5th Year">5th Year</option>
+              </select>
+            </label>
+
+            <label>
+              Section *
+              <input
+                type="text"
+                [(ngModel)]="newStudent.section"
+                placeholder="Enter section"
+                required
+              />
+            </label>
+          </div>
+        </div>
+
+        <!-- LOGIN CREDENTIALS -->
+        <!-- LOGIN CREDENTIALS -->
+<div class="modal-section" [hidden]="editingStudentId !== null">
+  <h4>Login Credentials</h4>
+
+          <div class="form-fields">
+            <label>
+              Username
+              <input
+                type="text"
+                [value]="newStudent.studentId"
+                readonly
+                placeholder="Based on Student ID"
+              />
+              <span class="field-hint">
+                The Student ID will be used as the username.
+              </span>
+            </label>
+
+            <label>
+  Temporary Password *
+  <input
+    type="text"
+    [value]="newStudent.password"
+    readonly
+    placeholder="Automatically generated"
+    autocomplete="off"
+    required
+  />
+  <span class="field-hint">
+    Automatically generated using lowercase last name + Student ID.
+  </span>
+</label>
+          </div>
+
+          <p class="security-note">
+            The password will be handled through Firebase Authentication
+            when account creation is implemented.
+          </p>
+        </div>
+
+        <!-- MODAL ACTIONS -->
+        <div class="modal-actions">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            (click)="closeAddStudent()"
+          >
+            Cancel
+          </button>
+
+          <button
+  class="btn btn-primary"
+  type="button"
+  (click)="saveStudent()"
+>
+  {{ editingStudentId !== null ? 'Save Changes' : 'Create Student' }}
+</button>
+        </div>
+
+      </section>
+    </div>
+  }
+
+  <!-- STUDENT RECORDS -->
+  <section class="records-panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Student Records</h3>
+        <p>View and manage registered OJT student records.</p>
+      </div>
+    </div>
+
+    <!-- SEARCH AND FILTER -->
+    <div class="table-toolbar">
+
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          placeholder="Search Student ID or name..."
+          aria-label="Search students"
+          [(ngModel)]="searchText"
+        />
+      </div>
+
+      <select
+        class="section-filter"
+        aria-label="Filter by section"
+        [(ngModel)]="selectedSection"
+      >
+        <option value="">All Sections</option>
+        @for (section of sections; track section) {
+          <option [value]="section">{{ section }}</option>
+        }
+      </select>
+
+    </div>
+
+    <!-- STUDENT TABLE -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Full Name</th>
+            <th>Section</th>
+            <th>Account Status</th>
+            <th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (student of filteredStudents; track student.studentId) {
+            <tr>
+              <td class="student-id">{{ student.studentId }}</td>
+              <td class="student-name">{{ student.fullName }}</td>
+              <td>{{ student.section }}</td>
+              <td>
+                <span
+                  class="account-status"
+                  [class.status-created]="student.accountStatus === 'Created'"
+                  [class.status-pending]="student.accountStatus === 'Pending'"
+                  [class.status-failed]="student.accountStatus === 'Failed'"
+                >
+                  {{ student.accountStatus }}
+                </span>
+              </td>
+              <td class="actions-cell">
+  <button
+    class="view-button"
+    type="button"
+    (click)="viewStudent(student)"
+  >
+    View Details
+  </button>
+
+  <button
+    class="edit-button"
+    type="button"
+    (click)="editStudent(student)"
+  >
+    Edit
+  </button>
+
+  <button
+    class="remove-button"
+    type="button"
+    (click)="removeStudent(student)"
+  >
+    Remove
+  </button>
+</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-icon">♙</div>
+                <h4>No student records found</h4>
+                <p>Import a student list or add a student to get started.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TABLE FOOTER -->
+    <div class="table-footer">
+      <span>Showing {{ filteredStudents.length }} student(s)</span>
+    </div>
+
+  </section>
+
+  <!-- PAGE FOOTER -->
+  <footer class="page-footer">
+    OJT ProgressTrack — Internship Progress and Requirement Monitoring
+  </footer>
+
+</div>

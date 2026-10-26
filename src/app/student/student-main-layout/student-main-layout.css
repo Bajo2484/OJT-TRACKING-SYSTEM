@@ -1,0 +1,386 @@
+
+/* =========================
+   STUDENT MAIN LAYOUT
+========================= */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.student-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: #f3f5f9;
+  color: #243247;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.student-sidebar {
+  width: 245px;
+  min-width: 245px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #122944;
+  color: #ffffff;
+  padding: 24px 16px 18px;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 5px 30px;
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #2864b4;
+  color: #ffffff;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.brand-text span {
+  display: block;
+  margin-bottom: 2px;
+  color: #b8c9dc;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.brand-text h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sidebar-section {
+  padding: 0 5px 20px;
+}
+
+.section-label {
+  margin: 0 0 8px;
+  color: #9eb3ca;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.portal-role {
+  margin: 0;
+  color: #e1eaf5;
+  font-size: 12px;
+}
+
+/* =========================
+   SIDEBAR NAVIGATION
+========================= */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 42px;
+  padding: 11px 12px;
+  border-radius: 6px;
+  color: #c5d3e3;
+  text-decoration: none;
+  font-size: 12px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #1b3a5c;
+  color: #ffffff;
+}
+
+.nav-link.active {
+  background: #24476d;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  flex-shrink: 0;
+  font-size: 17px;
+}
+
+/* =========================
+   SIDEBAR FOOTER
+========================= */
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 18px 5px 0;
+  color: #b8c9dc;
+}
+
+.sidebar-footer p {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sidebar-footer span {
+  display: block;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* =========================
+   MAIN CONTENT AREA
+========================= */
+
+.student-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.student-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  padding: 12px 26px;
+  border-bottom: 1px solid #e4e8ef;
+  background: #ffffff;
+}
+
+.topbar-page-title span {
+  color: #35445a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.notification-btn {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #64748b;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.notification-btn:hover {
+  background: #f1f5f9;
+}
+
+.student-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e2eaf8;
+  color: #315a91;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.user-details strong,
+.user-details span {
+  display: block;
+}
+
+.user-details strong {
+  color: #29374b;
+  font-size: 11px;
+}
+
+.user-details span {
+  margin-top: 3px;
+  color: #8793a5;
+  font-size: 10px;
+}
+
+/* =========================
+   PAGE CONTENT
+========================= */
+
+.student-content {
+  flex: 1;
+  min-width: 0;
+  padding: 26px;
+  background: #f3f5f9;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 900px) {
+  .student-sidebar {
+    width: 210px;
+    min-width: 210px;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .student-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .student-layout {
+    flex-direction: column;
+  }
+
+  .student-sidebar {
+    width: 100%;
+    min-width: 0;
+    min-height: auto;
+    padding: 15px;
+  }
+
+  .sidebar-brand {
+    padding-bottom: 15px;
+  }
+
+  .sidebar-section,
+  .sidebar-footer {
+    display: none;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .student-topbar {
+    min-height: 58px;
+    padding: 10px 15px;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+  .user-details {
+    display: none;
+  }
+
+  .student-content {
+    padding: 16px;
+  }
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  color: #c24141;
+  background: #fff;
+  border: 1px solid #f0dada;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.logout-btn span:first-child {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.logout-btn:hover {
+  background: #fff1f1;
+  border-color: #e8bcbc;
+}
+
+.logout-btn:focus-visible {
+  outline: 2px solid #c24141;
+  outline-offset: 3px;
+}
+
+/* TOPBAR RESPONSIVE */
+@media (max-width: 600px) {
+  .logout-btn {
+    gap: 5px;
+    min-height: 36px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+
+  .logout-btn span:first-child {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 380px) {
+  .logout-btn {
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
+  }
+
+  .logout-btn span:last-child {
+    display: none;
+  }
+}

@@ -1,0 +1,471 @@
+
+/* =========================
+   ACCOMPLISHMENTS PAGE
+========================= */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.accomplishments-page {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  color: #243247;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.page-title h2 {
+  margin: 0 0 8px;
+  color: #17365d;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.page-title p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================
+   HEADER BUTTON
+========================= */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 14px;
+  border: 1px solid #d5deea;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17365d;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.btn-secondary:hover {
+  background: #f3f6fa;
+  border-color: #b9c8da;
+}
+
+/* =========================
+   SUMMARY CARDS
+========================= */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(23, 54, 93, 0.04);
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.records-icon {
+  background: #e5edf8;
+  color: #17365d;
+}
+
+.review-icon {
+  background: #fff0dc;
+  color: #a65b00;
+}
+
+.card-info {
+  min-width: 0;
+}
+
+.card-info p {
+  margin: 0 0 7px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.card-info h3 {
+  margin: 0 0 6px;
+  color: #17365d;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.card-info span {
+  color: #8491a3;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================
+   RECORDS PANEL
+========================= */
+
+.records-panel {
+  margin-bottom: 24px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(23, 54, 93, 0.04);
+}
+
+.panel-header {
+  padding: 21px 22px;
+  border-bottom: 1px solid #e8edf3;
+}
+
+.panel-header h3 {
+  margin: 0 0 6px;
+  color: #17365d;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.panel-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================
+   SEARCH AND DATE FILTER
+========================= */
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 180px;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #d5deea;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.search-icon {
+  color: #8491a3;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.search-box input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #243247;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.search-box:focus-within {
+  border-color: #315b89;
+  box-shadow: 0 0 0 2px rgba(49, 91, 137, 0.1);
+}
+
+.search-box input::placeholder {
+  color: #9aa6b6;
+}
+
+.date-filter {
+  min-width: 165px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d5deea;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #334155;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.date-filter:focus {
+  border-color: #315b89;
+}
+
+/* =========================
+   RECORDS TABLE
+========================= */
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+thead {
+  background: #f7f9fc;
+}
+
+th {
+  padding: 15px 18px;
+  color: #52647a;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+td {
+  padding: 16px 18px;
+  border-top: 1px solid #edf1f5;
+  color: #475569;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background: #fafcff;
+}
+
+.student-name {
+  margin-bottom: 5px;
+  color: #17365d;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.student-id {
+  color: #8491a3;
+  font-size: 11px;
+}
+
+.accomplishment-description {
+  min-width: 200px;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.actions-heading,
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* =========================
+   REVIEW STATUS
+========================= */
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-review {
+  background: #fff0dc;
+  color: #925000;
+}
+
+.status-reviewed {
+  background: #e3f4e8;
+  color: #247542;
+}
+
+.status-revision {
+  background: #fce8e8;
+  color: #b42318;
+}
+
+/* =========================
+   VIEW DETAILS BUTTON
+========================= */
+
+.view-button {
+  padding: 7px 10px;
+  border: 1px solid #d5deea;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #17365d;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-button:hover {
+  background: #f0f5fb;
+  border-color: #b9c8da;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-state {
+  padding: 48px 20px;
+  color: #8491a3;
+  text-align: center;
+}
+
+.empty-icon {
+  margin-bottom: 12px;
+  color: #9aaabe;
+  font-size: 32px;
+}
+
+.empty-state h4 {
+  margin: 0 0 7px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #8491a3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================
+   TABLE FOOTER
+========================= */
+
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-top: 1px solid #e8edf3;
+  color: #8491a3;
+  font-size: 11px;
+}
+
+/* =========================
+   PAGE FOOTER
+========================= */
+
+.page-footer {
+  padding: 8px 0 2px;
+  color: #8491a3;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 900px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 17px;
+  }
+
+  .table-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .date-filter {
+    width: 100%;
+  }
+
+  .panel-header {
+    padding: 17px;
+  }
+
+  .table-footer {
+    padding: 13px 15px;
+  }
+
+  th,
+  td {
+    padding: 13px;
+  }
+}

@@ -1,0 +1,217 @@
+
+@if (!showAddForm) {
+
+  <div class="accomplishments-page">
+
+    <header class="page-header">
+      <div>
+        <h1>Accomplishment logs</h1>
+        <p>Document your daily work and weekly learning. Follow each submission through review.</p>
+      </div>
+
+      <button type="button" class="btn-add" (click)="openAddForm()">
+        + Add accomplishment
+      </button>
+    </header>
+
+    <section class="revision-notice">
+      <strong>Week 9 needs a revision</strong>
+      <p>Add the number of tickets resolved and describe your role in network maintenance.</p>
+    </section>
+
+    <section class="records-panel">
+      <div class="records-heading">
+        <h2>Your submissions</h2>
+        <p>View and manage your daily and weekly accomplishment logs.</p>
+      </div>
+
+      <div class="records-toolbar">
+        <label class="search-box">
+          <span>⌕</span>
+          <input type="search" placeholder="Search accomplishments..." />
+        </label>
+      </div>
+
+      <div class="empty-state">
+        <h3>No accomplishments connected yet</h3>
+        <p>Create your first accomplishment log to get started.</p>
+        <button type="button" class="btn-add" (click)="openAddForm()">
+          + Add accomplishment
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+} @else {
+
+  <div class="add-page">
+
+    <header class="add-page-header">
+      <div>
+        <div class="breadcrumb">Student workspace / Accomplishments / Add log</div>
+        <h1>Add accomplishment</h1>
+        <p>Create a daily or weekly log. Save a draft before submitting it to your coordinator.</p>
+      </div>
+
+      <button type="button" class="btn-back" (click)="backToLogs()">
+        ← Back to logs
+      </button>
+    </header>
+
+    <div class="add-layout">
+
+      <form class="accomplishment-form" (submit)="$event.preventDefault()">
+
+        <section class="form-section">
+          <h2>Accomplishment details</h2>
+          <p class="form-hint">Fields marked * are required.</p>
+
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label for="logType">Log type *</label>
+              <select id="logType" name="logType" required>
+                <option value="daily">Daily accomplishment</option>
+                <option value="weekly">Weekly accomplishment</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="reportDate">Reporting date *</label>
+              <input id="reportDate" name="reportDate" type="date" required />
+            </div>
+
+            <div class="form-field full-width">
+              <label for="title">Title *</label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                placeholder="e.g. Help desk ticket resolution and documentation"
+                required
+              />
+            </div>
+
+            <div class="form-field full-width">
+              <label for="tasks">Tasks completed *</label>
+              <textarea
+                id="tasks"
+                name="tasks"
+                rows="4"
+                placeholder="Describe the tasks you completed and their outcomes..."
+                required
+              ></textarea>
+              <small>Describe your contribution and measurable results. Do not include client names or passwords.</small>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="skills">Skills learned and reflection *</label>
+              <textarea
+                id="skills"
+                name="skills"
+                rows="4"
+                placeholder="What skills did you practice? What did you learn?"
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-field full-width">
+              <label for="challenges">Challenges and next steps</label>
+              <textarea
+                id="challenges"
+                name="challenges"
+                rows="3"
+                placeholder="Describe any challenges and what you plan to do next..."
+              ></textarea>
+            </div>
+
+          </div>
+        </section>
+
+        <section class="evidence-section">
+          <h3>Add supporting evidence (optional)</h3>
+          <p>PDF, JPG, PNG files · Up to 10 MB per file</p>
+
+          <label for="evidence" class="file-picker">
+            <span>Browse files</span>
+            <input
+              id="evidence"
+              name="evidence"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+            />
+          </label>
+        </section>
+
+        <div class="hours-notice">
+          Your log does not add attendance hours. Record your time separately under Internship Hours.
+        </div>
+
+        <footer class="form-actions">
+          <button type="button" class="btn-cancel" (click)="backToLogs()">
+            Cancel
+          </button>
+
+          <div class="form-action-right">
+            <button type="button" class="btn-save">
+              Save draft
+            </button>
+
+            <button type="submit" class="btn-submit">
+              Submit for review
+            </button>
+          </div>
+        </footer>
+
+      </form>
+
+      <aside class="form-sidebar">
+
+        <section class="side-card">
+          <h3>Submission context</h3>
+
+          <div class="context-item">
+            <span>Student</span>
+            <strong>Your student profile</strong>
+          </div>
+
+          <div class="context-item">
+            <span>Placement</span>
+            <strong>Your OJT placement</strong>
+          </div>
+
+          <div class="context-item">
+            <span>Reviewer</span>
+            <strong>Assigned OJT coordinator</strong>
+          </div>
+
+          <span class="draft-status">Draft</span>
+        </section>
+
+        <section class="side-card">
+          <h3>A strong accomplishment log</h3>
+
+          <div class="guideline">
+            <strong>Write what you did</strong>
+            <p>Describe the task, the outcome, and what you learned.</p>
+          </div>
+
+          <div class="guideline">
+            <strong>Protect sensitive information</strong>
+            <p>Remove passwords, personal data, and customer identifiers from attachments.</p>
+          </div>
+
+          <div class="guideline">
+            <strong>After submission</strong>
+            <p>Your coordinator may approve the log or request a revision.</p>
+          </div>
+        </section>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+}

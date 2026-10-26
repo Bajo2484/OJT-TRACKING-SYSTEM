@@ -1,0 +1,174 @@
+ <div class="profile-page">
+
+  <header class="page-header">
+    <div>
+      <p class="breadcrumb">Student Workspace&nbsp; / &nbsp;Profile &amp; Placement</p>
+      <h1>Profile &amp; Internship Placement</h1>
+      <p>Review your academic information, contact details, and internship assignment.</p>
+    </div>
+  </header>
+
+  <section class="student-banner">
+    <div class="student-identity">
+      <div class="avatar-placeholder" aria-hidden="true">S</div>
+      <div class="student-overview-info">
+        <h2>Student Name</h2>
+        <p>Student ID: Not available</p>
+        <span class="course-line">Course and year level not available</span>
+      </div>
+    </div>
+    <span class="status-badge status-neutral">OJT Student</span>
+  </section>
+
+  <div class="profile-layout">
+
+    <div class="left-column">
+
+      <section class="profile-card">
+        <div class="card-heading">
+          <div>
+            <h2>Academic Information</h2>
+            <p>College-managed details · Read-only</p>
+          </div>
+        </div>
+
+        <div class="details-grid">
+          <div class="detail-item">
+            <span>Student Number</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Year &amp; Section</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Degree Program</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>OJT Coordinator</span>
+            <strong>Not assigned</strong>
+          </div>
+          <div class="detail-item">
+            <span>Required Internship Hours</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>College Email</span>
+            <strong>Not available</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-card">
+        <div class="card-heading">
+          <div>
+            <h2>Contact Information</h2>
+            <p>Your contact details for internship coordination.</p>
+          </div>
+        </div>
+
+        <form class="contact-form" (submit)="$event.preventDefault()">
+          <label class="form-field">
+            <span>College Email</span>
+            <input type="email" value="Not available" readonly>
+            <small>Contact your coordinator to update your college email.</small>
+          </label>
+
+          <label class="form-field">
+            <span>Mobile Number</span>
+            <input type="tel" placeholder="No mobile number recorded">
+          </label>
+
+          <label class="form-field">
+            <span>Home Address</span>
+            <textarea rows="2" placeholder="No address recorded"></textarea>
+          </label>
+
+          <label class="form-field">
+            <span>Emergency Contact Name</span>
+            <input type="text" placeholder="No emergency contact recorded">
+          </label>
+
+          <label class="form-field">
+            <span>Emergency Contact Number</span>
+            <input type="tel" placeholder="Enter emergency contact number">
+          </label>
+
+          <button type="button" class="save-button" disabled>Save Contact Details</button>
+          <p class="form-note">Contact editing will be available once your profile is connected.</p>
+        </form>
+      </section>
+
+    </div>
+
+    <div class="right-column">
+
+      <section class="profile-card placement-card">
+        <div class="card-heading placement-heading">
+          <div>
+            <h2>Approved Placement</h2>
+            <p>Your assigned internship details.</p>
+          </div>
+          <span class="status-badge status-pending">Not assigned</span>
+        </div>
+
+        <div class="company-block">
+          <div class="company-icon" aria-hidden="true">⌂</div>
+          <div>
+            <h3>Company / Establishment</h3>
+            <p>Company name not available</p>
+          </div>
+        </div>
+
+        <div class="placement-details">
+          <div class="detail-item">
+            <span>Company Address</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Assigned Department</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Internship Start Date</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Target End Date</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Work Schedule</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Required OJT Hours</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Company Supervisor</span>
+            <strong>Not available</strong>
+          </div>
+          <div class="detail-item">
+            <span>Supervisor Contact</span>
+            <strong>Not available</strong>
+          </div>
+        </div>
+
+        <div class="placement-note">
+          <span aria-hidden="true">ⓘ</span>
+          <div>
+            <strong>Placement changes need review</strong>
+            <p>Your approved placement cannot be edited directly here. Contact your coordinator if your company, supervisor, or schedule needs to change.</p>
+          </div>
+        </div>
+
+        <button type="button" class="correction-button" disabled>Request Correction</button>
+        <p class="form-note">Correction requests will be enabled when the feature is connected.</p>
+      </section>
+
+    </div>
+  </div>
+
+</div>

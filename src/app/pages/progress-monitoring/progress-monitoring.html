@@ -1,0 +1,181 @@
+
+<div class="progress-monitoring-page">
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="page-title">
+      <h2>Progress Monitoring</h2>
+      <p>Monitor overall OJT hours, requirements, and student progress.</p>
+    </div>
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section class="summary-grid">
+
+    <div class="summary-card">
+      <div class="card-icon students-icon">♙</div>
+      <div class="card-info">
+        <p>Total Students</p>
+        <h3>{{ totalStudents }}</h3>
+        <span>Students being monitored</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon completed-icon">✓</div>
+      <div class="card-info">
+        <p>Completed OJT</p>
+        <h3>{{ completedStudents }}</h3>
+        <span>Students marked completed</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon progress-icon">◷</div>
+      <div class="card-info">
+        <p>In Progress</p>
+        <h3>{{ studentsInProgress }}</h3>
+        <span>OJT currently ongoing</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon followup-icon">!</div>
+      <div class="card-info">
+        <p>Needs Follow-up</p>
+        <h3>{{ studentsNeedingFollowUp }}</h3>
+        <span>Students needing attention</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- STUDENT PROGRESS TABLE -->
+  <section class="records-panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Student OJT Progress</h3>
+        <p>Review internship hours and requirement completion.</p>
+      </div>
+    </div>
+
+    <!-- SEARCH AND FILTER -->
+    <div class="table-toolbar">
+
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          placeholder="Search Student ID or name..."
+          aria-label="Search students"
+          [(ngModel)]="searchText"
+        />
+      </div>
+
+      <select
+        class="status-filter"
+        aria-label="Filter by progress status"
+        [(ngModel)]="selectedStatus"
+      >
+        <option value="All Statuses">All Statuses</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+        <option value="Needs Follow-up">Needs Follow-up</option>
+      </select>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>OJT Hours</th>
+            <th>Overall Progress</th>
+            <th>Requirements</th>
+            <th>Status</th>
+            <th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (student of filteredStudents; track student.studentId) {
+            <tr>
+              <td>
+                <div class="student-name">{{ student.fullName }}</div>
+                <div class="student-id">{{ student.studentId }}</div>
+              </td>
+
+              <td class="hours-cell">
+                <strong>{{ student.completedHours }}</strong>
+                <span> / {{ student.requiredHours }} hrs</span>
+              </td>
+
+              <td class="progress-cell">
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    [class.progress-complete]="getProgressPercentage(student) === 100"
+                    [style.width.%]="getProgressPercentage(student)"
+                  ></div>
+                </div>
+                <span class="progress-label">
+                  {{ getProgressPercentage(student) }}% of required hours
+                </span>
+              </td>
+
+              <td>
+                <span class="requirements-count">
+                  {{ student.completedRequirements }}
+                  / {{ student.totalRequirements }}
+                </span>
+                <span class="requirements-label">completed</span>
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.status-completed]="student.status === 'Completed'"
+                  [class.status-progress]="student.status === 'In Progress'"
+                  [class.status-followup]="student.status === 'Needs Follow-up'"
+                >
+                  {{ student.status }}
+                </span>
+              </td>
+
+              <td class="actions-cell">
+                <button
+                  class="view-button"
+                  type="button"
+                  (click)="viewDetails(student)"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-icon">▦</div>
+                <h4>No student records found</h4>
+                <p>Try changing your search or status filter.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing {{ filteredStudents.length }} student(s)</span>
+    </div>
+
+  </section>
+
+  <footer class="page-footer">
+    OJT ProgressTrack — Internship Progress and Requirement Monitoring
+  </footer>
+
+</div>

@@ -1,0 +1,173 @@
+
+<div class="hours-page">
+
+  <header class="page-header">
+    <div>
+      <h1>Internship Hours</h1>
+      <p>Monitor your OJT attendance and progress.</p>
+    </div>
+  </header>
+
+  <!-- TODAY'S ATTENDANCE -->
+  <section class="attendance-panel">
+    <div class="attendance-heading">
+      <div>
+        <span class="eyebrow">TODAY'S ATTENDANCE</span>
+        <h2>Track your duty hours</h2>
+        <p>Record your attendance for today's OJT.</p>
+      </div>
+      <span class="attendance-badge">
+  {{ todayRecord?.timeOut ? 'Completed' : todayRecord?.timeIn ? 'Timed In' : 'Not Timed In' }}
+</span>
+    </div>
+
+    <div class="attendance-times">
+      <div class="time-item">
+        <span>Time In</span>
+        <strong>{{ formatTime(todayRecord?.timeIn ?? null) }}</strong>
+      </div>
+
+      <div class="time-item">
+  <span>Time Out</span>
+  <strong>{{ formatTime(todayRecord?.timeOut ?? null) }}</strong>
+</div>
+
+      <div class="time-item">
+        <span>Today's Hours</span>
+        <strong>{{ todayHours.toFixed(2) }} hrs</strong>
+      </div>
+    </div>
+
+    <div class="attendance-buttons">
+  <button
+    type="button"
+    class="btn-time-in"
+    (click)="timeIn()"
+    [disabled]="!canTimeIn || isLoading"
+  >
+    {{ isSaving ? 'Saving...' : 'Time In' }}
+  </button>
+
+  <button
+    type="button"
+    class="btn-time-out"
+    (click)="timeOut()"
+    [disabled]="!canTimeOut || isLoading"
+  >
+    Time Out
+  </button>
+</div>
+
+
+@if (message) {
+  <p role="status" aria-live="polite">{{ message }}</p>
+}
+
+    <p class="attendance-note">
+      Recorded hours must be verified before they count toward your
+      approved internship hours.
+    </p>
+  </section>
+
+  
+<!-- HOURS SUMMARY -->
+<div class="hours-summary">
+  <article class="summary-card">
+    <span>Required Hours</span>
+    <strong>{{ requiredHours }}</strong>
+    <small>Hours required</small>
+  </article>
+
+  <article class="summary-card">
+    <span>Recorded OJT Hours</span>
+    <strong>{{ recordedHours.toFixed(2) }}</strong>
+    <small>Completed attendance hours</small>
+  </article>
+
+  <article class="summary-card">
+    <span>Remaining Hours</span>
+    <strong>{{ remainingHours.toFixed(2) }}</strong>
+    <small>Hours to complete</small>
+  </article>
+
+  <article class="summary-card">
+    <span>Today's Hours</span>
+    <strong>{{ todayHours.toFixed(2) }}</strong>
+    <small>Hours recorded today</small>
+  </article>
+</div>
+
+
+  
+<!-- ATTENDANCE HISTORY -->
+<section class="history-panel">
+  <div class="section-heading">
+    <h2>Attendance History</h2>
+    <p>Review your recorded duty hours.</p>
+  </div>
+
+  <div class="history-list">
+    @if (isLoading) {
+      <p role="status">Loading attendance records...</p>
+    } @else if (attendanceHistory.length === 0) {
+      <p>No attendance records yet. Use Time In when your duty begins.</p>
+    } @else {
+      @for (record of attendanceHistory; track record.id) {
+        <article class="history-item">
+          <div class="history-date">
+            <strong>{{ record.date.split('-')[2] }}</strong>
+            <span>{{ formatDate(record.date).split(' ')[0].toUpperCase() }}</span>
+          </div>
+
+          <div class="history-details">
+            <strong>{{ formatDate(record.date) }}</strong>
+
+            <span>
+              {{ formatTime(record.timeIn) }}
+              –
+              {{ formatTime(record.timeOut) }}
+            </span>
+
+            <small>
+              {{ record.timeOut ? record.hours.toFixed(2) + ' hours' : 'Duty in progress' }}
+            </small>
+          </div>
+
+<span
+  class="record-status"
+  [class.pending]="!record.timeOut"
+  [class.approved]="!!record.timeOut"
+>
+  {{ record.timeOut ? 'Completed' : 'In Progress' }}
+</span>
+
+        </article>
+      }
+    }
+  </div>
+</section>
+
+  <!-- DTR STATUS -->
+  <section class="dtr-panel">
+    <div>
+      <h2>DTR Verification</h2>
+      <p>Check the status of your Daily Time Record.</p>
+    </div>
+
+    
+<div class="dtr-status">
+  <span class="dtr-icon">PDF</span>
+  <div>
+    <strong>Daily Time Record</strong>
+    <span>Attendance records are available above.</span>
+  </div>
+</div>
+
+
+    <p class="dtr-note">
+      Submit your DTR according to your school's OJT requirements.
+      Your coordinator will review the required attendance records.
+    </p>
+  </section>
+
+</div>

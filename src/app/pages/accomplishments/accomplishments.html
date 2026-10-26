@@ -1,0 +1,149 @@
+
+<div class="accomplishments-page">
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="page-title">
+      <h2>Accomplishments</h2>
+      <p>Review and monitor recorded OJT activities and accomplishments.</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" type="button">
+        <span>↓</span>
+        Export Report
+      </button>
+    </div>
+  </section>
+
+  <!-- SUMMARY CARDS -->
+  <section class="summary-grid">
+
+    <!-- TOTAL RECORDS -->
+    <div class="summary-card">
+      <div class="card-icon records-icon">☷</div>
+      <div class="card-info">
+        <p>Total Records</p>
+        <h3>{{ totalRecords }}</h3>
+        <span>Recorded accomplishments</span>
+      </div>
+    </div>
+
+    <!-- FOR REVIEW -->
+    <div class="summary-card">
+      <div class="card-icon review-icon">◷</div>
+      <div class="card-info">
+        <p>For Review</p>
+        <h3>{{ recordsForReview }}</h3>
+        <span>Awaiting coordinator review</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ACCOMPLISHMENT RECORDS -->
+  <section class="records-panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Accomplishment Records</h3>
+        <p>View and review recorded student activities.</p>
+      </div>
+    </div>
+
+    <!-- SEARCH AND DATE FILTER -->
+    <div class="table-toolbar">
+
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          placeholder="Search Student ID or name..."
+          aria-label="Search accomplishments by student"
+          [(ngModel)]="searchText"
+        />
+      </div>
+
+      <input
+        class="date-filter"
+        type="date"
+        aria-label="Filter accomplishments by date"
+        [(ngModel)]="selectedDate"
+      />
+
+    </div>
+
+    <!-- RECORDS TABLE -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Date</th>
+            <th>Accomplishment</th>
+            <th>Review Status</th>
+            <th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (record of filteredRecords; track record.id) {
+            <tr>
+              <td>
+                <div class="student-name">{{ record.fullName }}</div>
+                <div class="student-id">{{ record.studentId }}</div>
+              </td>
+
+              <td>{{ record.date }}</td>
+
+              <td class="accomplishment-description">
+                {{ record.description }}
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.status-review]="record.status === 'For Review'"
+                  [class.status-reviewed]="record.status === 'Reviewed'"
+                  [class.status-revision]="record.status === 'Needs Revision'"
+                >
+                  {{ record.status }}
+                </span>
+              </td>
+
+              <td class="actions-cell">
+                <button
+                  class="view-button"
+                  type="button"
+                  (click)="viewDetails(record)"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-icon">☷</div>
+                <h4>No accomplishment records found</h4>
+                <p>Student accomplishment records will appear here when available.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TABLE FOOTER -->
+    <div class="table-footer">
+      <span>Showing {{ filteredRecords.length }} record(s)</span>
+    </div>
+
+  </section>
+
+  <!-- PAGE FOOTER -->
+  <footer class="page-footer">
+    OJT ProgressTrack — Internship Progress and Requirement Monitoring
+  </footer>
+
+</div>
