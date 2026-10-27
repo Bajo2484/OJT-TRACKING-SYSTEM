@@ -5,7 +5,10 @@
 
 :host {
   display: block;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
   color: #243247;
 }
@@ -16,7 +19,10 @@
 
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
   background: #f3f6fa;
 }
 
@@ -27,10 +33,13 @@
 .sidebar {
   width: 250px;
   min-width: 250px;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  flex-shrink: 0;
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
   background: #17365d;
   color: #ffffff;
 }
@@ -75,6 +84,10 @@
   font-weight: 700;
   letter-spacing: 1.2px;
 }
+
+/* =========================
+   SIDEBAR MENU
+========================= */
 
 .sidebar-menu {
   display: flex;
@@ -163,6 +176,9 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* =========================
@@ -170,6 +186,9 @@
 ========================= */
 
 .topbar {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
   min-height: 86px;
   display: flex;
   align-items: center;
@@ -219,80 +238,18 @@
 
 /* =========================
    PAGE CONTENT
+   ONLY THIS AREA SCROLLS
 ========================= */
 
 .page-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   padding: 30px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
 }
-
-/* =========================
-   RESPONSIVE LAYOUT
-========================= */
-
-@media (max-width: 1000px) {
-  .sidebar {
-    width: 220px;
-    min-width: 220px;
-  }
-
-  .topbar {
-    padding: 18px 22px;
-  }
-
-  .page-content {
-    padding: 22px;
-  }
-}
-
-@media (max-width: 700px) {
-  .app-layout {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    min-width: 0;
-    min-height: auto;
-    padding: 16px;
-  }
-
-  .brand {
-    padding-bottom: 16px;
-  }
-
-  .sidebar-menu {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .sidebar-bottom {
-    margin-top: 20px;
-  }
-
-  .topbar {
-    min-height: 75px;
-    padding: 16px;
-  }
-
-  .topbar-title h1 {
-    font-size: 17px;
-  }
-
-  .topbar-title p {
-    font-size: 11px;
-  }
-
-  .admin-info {
-    display: none;
-  }
-
-  .page-content {
-    padding: 16px;
-  }
-}
-
 
 /* =========================
    LOG OUT BUTTON
@@ -335,8 +292,99 @@
   line-height: 1;
 }
 
-/* RESPONSIVE LOG OUT BUTTON */
+/* =========================
+   RESPONSIVE LAYOUT
+========================= */
+
+@media (max-width: 1000px) {
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .topbar {
+    padding: 18px 22px;
+  }
+
+  .page-content {
+    padding: 22px;
+  }
+}
+
+/* =========================
+   TABLET AND MOBILE LAYOUT
+========================= */
+
 @media (max-width: 700px) {
+  :host {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .app-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: auto;
+    padding: 16px;
+    overflow: visible;
+  }
+
+  .brand {
+    padding-bottom: 16px;
+  }
+
+  .sidebar-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sidebar-bottom {
+    margin-top: 20px;
+  }
+
+  .main-area {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    min-height: 75px;
+    padding: 16px;
+  }
+
+  .topbar-title h1 {
+    font-size: 17px;
+  }
+
+  .topbar-title p {
+    font-size: 11px;
+  }
+
+  .admin-info {
+    display: none;
+  }
+
+  .page-content {
+    flex: initial;
+    min-height: 0;
+    padding: 16px;
+    overflow: visible;
+  }
+
   .topbar-right {
     gap: 8px;
   }
@@ -347,6 +395,9 @@
   }
 }
 
+/* =========================
+   EXTRA SMALL SCREENS
+========================= */
 
 @media (max-width: 420px) {
   .sidebar-menu {

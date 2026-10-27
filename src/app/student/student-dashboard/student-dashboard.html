@@ -1,16 +1,33 @@
-
 <div class="student-dashboard">
 
-  <section class="page-heading">
+<section class="page-heading welcome-banner">
+  <div class="welcome-content">
+    <p class="eyebrow">STUDENT OVERVIEW</p>
+
+    <h1>{{ greeting }}, {{ studentName }}!</h1>
+
+    <p class="page-description">
+      Keep track of your internship journey, monitor your progress,
+      and stay on top of your OJT goals.
+    </p>
+  </div>
+
+  <div class="welcome-date">
+    <div class="date-icon">▦</div>
+
     <div>
-      <p class="eyebrow">STUDENT OVERVIEW</p>
-      <h1>Welcome to your Dashboard!</h1>
-      <p class="page-description">
-        Monitor your internship hours, requirements, and accomplishments
-        in one place.
-      </p>
+      <span class="date-label">TODAY</span>
+
+      <strong>
+        {{ currentDate | date:'MMMM d, yyyy' }}
+      </strong>
+
+      <span class="date-day">
+        {{ currentDate | date:'EEEE' }}
+      </span>
     </div>
-  </section>
+  </div>
+</section>
 
   <section class="summary-cards">
 
@@ -104,7 +121,23 @@
         <span class="attention-icon">!</span>
         <div>
           <h3>OJT Requirements</h3>
-          <p>Check whether your required documents have been submitted.</p>
+          @if (notSubmittedRequirements > 0) {
+            <p>You have {{ notSubmittedRequirements }} requirement(s) not yet submitted.</p>
+          } @else {
+            <p>All currently listed requirements have a submission.</p>
+          }
+        </div>
+      </div>
+
+      <div class="attention-item">
+        <span class="attention-icon">↻</span>
+        <div>
+          <h3>Requirements for Revision</h3>
+          @if (needsRevisionRequirements > 0) {
+            <p>{{ needsRevisionRequirements }} submission(s) need revision. Please review the coordinator's feedback.</p>
+          } @else {
+            <p>You have no requirements marked for revision.</p>
+          }
         </div>
       </div>
 
@@ -131,18 +164,23 @@
 
       <div class="placement-details">
         <div class="detail-row">
+          <span>Placement Status</span>
+          <strong>{{ placementStatus }}</strong>
+        </div>
+
+        <div class="detail-row">
           <span>Company</span>
-          <strong>Not yet available</strong>
+          <strong>{{ placementCompany }}</strong>
+        </div>
+
+        <div class="detail-row">
+          <span>Department</span>
+          <strong>{{ placementDepartment }}</strong>
         </div>
 
         <div class="detail-row">
           <span>Industry Supervisor</span>
-          <strong>Not yet available</strong>
-        </div>
-
-        <div class="detail-row">
-          <span>OJT Coordinator</span>
-          <strong>Not yet available</strong>
+          <strong>{{ placementSupervisor }}</strong>
         </div>
       </div>
     </article>
@@ -151,15 +189,31 @@
       <div class="panel-heading">
         <div>
           <h2>Recent Accomplishments</h2>
-          <p>Your latest OJT submissions</p>
+          <p>Your latest OJT accomplishment records</p>
         </div>
       </div>
 
-      <div class="empty-state">
-        <div class="empty-icon">▤</div>
-        <h3>No accomplishments yet</h3>
-        <p>Your submitted accomplishments will appear here.</p>
-      </div>
+      @if (accomplishments.length > 0) {
+        <div class="placement-details">
+          @for (item of accomplishments; track item.id) {
+            <div class="detail-row">
+              <div>
+                <strong>{{ item.title }}</strong>
+                <p class="card-note">
+                  Week: {{ item.weekStarting }} – {{ item.weekEnding }}
+                </p>
+              </div>
+              <strong>{{ item.status }}</strong>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">▤</div>
+          <h3>No accomplishments yet</h3>
+          <p>Your accomplishment records will appear here once available.</p>
+        </div>
+      }
     </article>
 
   </section>
@@ -168,12 +222,25 @@
     <div class="panel-heading">
       <div>
         <h2>Recent Activity</h2>
-        <p>Updates related to your OJT records</p>
+        <p>Summary of your current OJT records</p>
       </div>
     </div>
 
-    <div class="empty-state compact-empty">
-      <p>No recent activity to display.</p>
+    <div class="placement-details">
+      <div class="detail-row">
+        <span>Requirement submissions</span>
+        <strong>{{ submissions.length }}</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Accomplishment records</span>
+        <strong>{{ accomplishments.length }}</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Placement status</span>
+        <strong>{{ placementStatus }}</strong>
+      </div>
     </div>
   </section>
 

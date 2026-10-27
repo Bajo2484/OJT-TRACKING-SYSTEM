@@ -3,36 +3,42 @@
 
   <!-- PAGE HEADER -->
   <section class="page-header">
+
     <div class="page-title">
       <h2>OJT Students</h2>
       <p>Manage and monitor students participating in OJT.</p>
     </div>
 
-    <button
-  class="btn btn-primary"
-  type="button"
-  (click)="studentFileInput.click()"
->
-  <span>↑</span>
-  Import Students
-</button>
+    <!-- IMPORT AND ADD STUDENT BUTTONS -->
+    <div class="header-actions">
+
+  <button
+    class="btn btn-primary"
+    type="button"
+    (click)="studentFileInput.click()"
+  >
+    <span>↑</span>
+    Import Students
+  </button>
+
+  <button
+    class="btn btn-secondary"
+    type="button"
+    (click)="openAddStudent()"
+  >
+    <span>+</span>
+    Add Student
+  </button>
+
+</div>
 
 <input
   #studentFileInput
   type="file"
   accept=".csv,.xlsx,.xls"
-  hidden
   (change)="onStudentFileSelected($event)"
+  style="display: none;"
 />
-
-      <button
-        class="btn btn-secondary"
-        type="button"
-        (click)="openAddStudent()"
-      >
-        <span>+</span>
-        Add Student
-      </button>
 
   </section>
 
@@ -77,8 +83,8 @@
         <div class="modal-header">
           <div>
             <h3 id="addStudentTitle">
-  {{ editingStudentId !== null ? 'Edit OJT Student' : 'Add New OJT Student' }}
-</h3>
+              {{ editingStudentId !== null ? 'Edit OJT Student' : 'Add New OJT Student' }}
+            </h3>
             <p>Enter the student's information and login credentials.</p>
           </div>
 
@@ -97,39 +103,40 @@
           <h4>Student Information</h4>
 
           <div class="form-fields">
-         <label>
-  Student ID *
-  <input
-    type="text"
-    [(ngModel)]="newStudent.studentId"
-    (ngModelChange)="updateStudentCredentials()"
-     [readonly]="editingStudentId !== null"
-    placeholder="Enter Student ID"
-    autocomplete="off"
-    required
-  />
-</label>
 
-<label>
-  First Name *
-  <input
-    type="text"
-    [(ngModel)]="newStudent.firstName"
-    placeholder="Enter first name"
-    required
-  />
-</label>
+            <label>
+              Student ID *
+              <input
+                type="text"
+                [(ngModel)]="newStudent.studentId"
+                (ngModelChange)="updateStudentCredentials()"
+                [readonly]="editingStudentId !== null"
+                placeholder="Enter Student ID"
+                autocomplete="off"
+                required
+              />
+            </label>
 
-<label>
-  Last Name *
-  <input
-    type="text"
-    [(ngModel)]="newStudent.lastName"
-    (ngModelChange)="updateStudentCredentials()"
-    placeholder="Enter last name"
-    required
-  />
-</label>
+            <label>
+              First Name *
+              <input
+                type="text"
+                [(ngModel)]="newStudent.firstName"
+                placeholder="Enter first name"
+                required
+              />
+            </label>
+
+            <label>
+              Last Name *
+              <input
+                type="text"
+                [(ngModel)]="newStudent.lastName"
+                (ngModelChange)="updateStudentCredentials()"
+                placeholder="Enter last name"
+                required
+              />
+            </label>
 
             <label>
               Course / Program *
@@ -165,15 +172,19 @@
                 required
               />
             </label>
+
           </div>
         </div>
 
         <!-- LOGIN CREDENTIALS -->
-        <!-- LOGIN CREDENTIALS -->
-<div class="modal-section" [hidden]="editingStudentId !== null">
-  <h4>Login Credentials</h4>
+        <div
+          class="modal-section"
+          [hidden]="editingStudentId !== null"
+        >
+          <h4>Login Credentials</h4>
 
           <div class="form-fields">
+
             <label>
               Username
               <input
@@ -188,19 +199,20 @@
             </label>
 
             <label>
-  Temporary Password *
-  <input
-    type="text"
-    [value]="newStudent.password"
-    readonly
-    placeholder="Automatically generated"
-    autocomplete="off"
-    required
-  />
-  <span class="field-hint">
-    Automatically generated using lowercase last name + Student ID.
-  </span>
-</label>
+              Temporary Password *
+              <input
+                type="text"
+                [value]="newStudent.password"
+                readonly
+                placeholder="Automatically generated"
+                autocomplete="off"
+                required
+              />
+              <span class="field-hint">
+                Automatically generated using lowercase last name + Student ID.
+              </span>
+            </label>
+
           </div>
 
           <p class="security-note">
@@ -211,6 +223,7 @@
 
         <!-- MODAL ACTIONS -->
         <div class="modal-actions">
+
           <button
             class="btn btn-secondary"
             type="button"
@@ -220,12 +233,13 @@
           </button>
 
           <button
-  class="btn btn-primary"
-  type="button"
-  (click)="saveStudent()"
->
-  {{ editingStudentId !== null ? 'Save Changes' : 'Create Student' }}
-</button>
+            class="btn btn-primary"
+            type="button"
+            (click)="saveStudent()"
+          >
+            {{ editingStudentId !== null ? 'Save Changes' : 'Create Student' }}
+          </button>
+
         </div>
 
       </section>
@@ -271,12 +285,14 @@
     <!-- STUDENT TABLE -->
     <div class="table-container">
       <table>
+
         <thead>
           <tr>
             <th>Student ID</th>
             <th>Full Name</th>
             <th>Section</th>
             <th>Account Status</th>
+            <th>Placement Status</th>
             <th class="actions-heading">Actions</th>
           </tr>
         </thead>
@@ -284,9 +300,16 @@
         <tbody>
           @for (student of filteredStudents; track student.studentId) {
             <tr>
-              <td class="student-id">{{ student.studentId }}</td>
-              <td class="student-name">{{ student.fullName }}</td>
+              <td class="student-id">
+                {{ student.studentId }}
+              </td>
+
+              <td class="student-name">
+                {{ student.fullName }}
+              </td>
+
               <td>{{ student.section }}</td>
+
               <td>
                 <span
                   class="account-status"
@@ -297,35 +320,48 @@
                   {{ student.accountStatus }}
                 </span>
               </td>
+
+              <td>
+                <span
+                  class="placement-status"
+                  [class.placement-not-submitted]="!student.placementStatus || student.placementStatus === 'Not Submitted'"
+                  [class.placement-pending]="student.placementStatus === 'Pending Review'"
+                  [class.placement-approved]="student.placementStatus === 'Approved'"
+                  [class.placement-correction]="student.placementStatus === 'Correction Requested'"
+                >
+                  {{ student.placementStatus || 'Not Submitted' }}
+                </span>
+              </td>
+
               <td class="actions-cell">
-  <button
-    class="view-button"
-    type="button"
-    (click)="viewStudent(student)"
-  >
-    View Details
-  </button>
+                <button
+                  class="view-button"
+                  type="button"
+                  (click)="viewStudent(student)"
+                >
+                  View Details
+                </button>
 
-  <button
-    class="edit-button"
-    type="button"
-    (click)="editStudent(student)"
-  >
-    Edit
-  </button>
+                <button
+                  class="edit-button"
+                  type="button"
+                  (click)="editStudent(student)"
+                >
+                  Edit
+                </button>
 
-  <button
-    class="remove-button"
-    type="button"
-    (click)="removeStudent(student)"
-  >
-    Remove
-  </button>
-</td>
+                <button
+                  class="remove-button"
+                  type="button"
+                  (click)="removeStudent(student)"
+                >
+                  Remove
+                </button>
+              </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="empty-state">
+              <td colspan="6" class="empty-state">
                 <div class="empty-icon">♙</div>
                 <h4>No student records found</h4>
                 <p>Import a student list or add a student to get started.</p>
@@ -333,6 +369,7 @@
             </tr>
           }
         </tbody>
+
       </table>
     </div>
 

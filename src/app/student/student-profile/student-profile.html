@@ -11,11 +11,17 @@
   <section class="student-banner">
     <div class="student-identity">
       <div class="avatar-placeholder" aria-hidden="true">S</div>
+     
       <div class="student-overview-info">
-        <h2>Student Name</h2>
-        <p>Student ID: Not available</p>
-        <span class="course-line">Course and year level not available</span>
-      </div>
+  <h2>{{ studentProfile.fullName || 'Student Name' }}</h2>
+  <p>Student ID: {{ studentProfile.studentId || 'Not available' }}</p>
+  <span class="course-line">
+    {{ studentProfile.course || 'Course not available' }}
+    · Year {{ studentProfile.yearLevel || 'N/A' }}
+    · {{ studentProfile.section || 'Section not available' }}
+  </span>
+</div>
+
     </div>
     <span class="status-badge status-neutral">OJT Student</span>
   </section>
@@ -23,150 +29,417 @@
   <div class="profile-layout">
 
     <div class="left-column">
+      
+<section class="profile-card">
+  <div class="card-heading">
+    <div>
+      <h2>Academic Information</h2>
+      <p>College-managed details · Read-only</p>
+    </div>
+  </div>
 
-      <section class="profile-card">
-        <div class="card-heading">
-          <div>
-            <h2>Academic Information</h2>
-            <p>College-managed details · Read-only</p>
-          </div>
-        </div>
+  <div class="details-grid">
+    <div class="detail-item">
+      <span>Student Number</span>
+      <strong>{{ studentProfile.studentId || 'Not available' }}</strong>
+    </div>
 
-        <div class="details-grid">
-          <div class="detail-item">
-            <span>Student Number</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Year &amp; Section</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Degree Program</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>OJT Coordinator</span>
-            <strong>Not assigned</strong>
-          </div>
-          <div class="detail-item">
-            <span>Required Internship Hours</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>College Email</span>
-            <strong>Not available</strong>
-          </div>
-        </div>
-      </section>
+    <div class="detail-item">
+      <span>Year &amp; Section</span>
+      <strong>
+        {{ (studentProfile.yearLevel || 'N/A') + ' - ' + (studentProfile.section || 'N/A') }}
+      </strong>
+    </div>
 
-      <section class="profile-card">
-        <div class="card-heading">
-          <div>
-            <h2>Contact Information</h2>
-            <p>Your contact details for internship coordination.</p>
-          </div>
-        </div>
+    <div class="detail-item">
+      <span>Degree Program</span>
+      <strong>{{ studentProfile.course || 'Not available' }}</strong>
+    </div>
 
-        <form class="contact-form" (submit)="$event.preventDefault()">
-          <label class="form-field">
-            <span>College Email</span>
-            <input type="email" value="Not available" readonly>
-            <small>Contact your coordinator to update your college email.</small>
-          </label>
+    <div class="detail-item">
+      <span>OJT Coordinator</span>
+      <strong>{{ studentProfile.coordinatorName || 'Not assigned' }}</strong>
+    </div>
 
-          <label class="form-field">
-            <span>Mobile Number</span>
-            <input type="tel" placeholder="No mobile number recorded">
-          </label>
+    <div class="detail-item">
+      <span>Required Internship Hours</span>
+      <strong>
+        {{ studentProfile.requiredHours != null
+          ? (studentProfile.requiredHours + ' hours')
+          : 'Not available' }}
+      </strong>
+    </div>
 
-          <label class="form-field">
-            <span>Home Address</span>
-            <textarea rows="2" placeholder="No address recorded"></textarea>
-          </label>
+    <div class="detail-item">
+      <span>Contact Email</span>
+      <strong>{{ contact.contactEmail || 'Not provided' }}</strong>
+    </div>
+  </div>
+</section>
 
-          <label class="form-field">
-            <span>Emergency Contact Name</span>
-            <input type="text" placeholder="No emergency contact recorded">
-          </label>
+      
+<section class="profile-card">
+  <div class="card-heading">
+    <div>
+      <h2>Contact Information</h2>
+      <p>Your contact details for internship coordination.</p>
+    </div>
 
-          <label class="form-field">
-            <span>Emergency Contact Number</span>
-            <input type="tel" placeholder="Enter emergency contact number">
-          </label>
+    @if (hasSavedContactDetails && !isEditingContact) {
+      <span class="status-badge status-neutral">Saved</span>
+    }
+  </div>
 
-          <button type="button" class="save-button" disabled>Save Contact Details</button>
-          <p class="form-note">Contact editing will be available once your profile is connected.</p>
-        </form>
-      </section>
+  @if (hasSavedContactDetails && !isEditingContact) {
+    <div class="details-grid">
+      <div class="detail-item">
+        <span>Email Address</span>
+        <strong>{{ contact.contactEmail || 'Not provided' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Mobile Number</span>
+        <strong>{{ contact.mobileNumber || 'Not provided' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Home Address</span>
+        <strong>{{ contact.homeAddress || 'Not provided' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Emergency Contact Name</span>
+        <strong>{{ contact.emergencyContactName || 'Not provided' }}</strong>
+      </div>
+
+      <div class="detail-item">
+        <span>Emergency Contact Number</span>
+        <strong>{{ contact.emergencyContactNumber || 'Not provided' }}</strong>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="save-button"
+        (click)="editContactDetails()"
+      >
+        Edit Details
+      </button>
+    </div>
+
+    <p class="form-note">
+      Your contact details are saved. Select Edit Details if you need to make changes.
+    </p>
+  } @else {
+    <form class="contact-form" (submit)="$event.preventDefault()">
+      <label class="form-field">
+        <span>Email Address</span>
+        <input
+          type="email"
+          name="contactEmail"
+          [(ngModel)]="contact.contactEmail"
+          placeholder="Enter your email address"
+        >
+      </label>
+
+      <label class="form-field">
+        <span>Mobile Number</span>
+        <input
+          type="tel"
+          name="mobileNumber"
+          [(ngModel)]="contact.mobileNumber"
+          placeholder="Enter your mobile number"
+        >
+      </label>
+
+      <label class="form-field">
+        <span>Home Address</span>
+        <textarea
+          rows="2"
+          name="homeAddress"
+          [(ngModel)]="contact.homeAddress"
+          placeholder="Enter your home address"
+        ></textarea>
+      </label>
+
+      <label class="form-field">
+        <span>Emergency Contact Name</span>
+        <input
+          type="text"
+          name="emergencyContactName"
+          [(ngModel)]="contact.emergencyContactName"
+          placeholder="Enter emergency contact name"
+        >
+      </label>
+
+      <label class="form-field">
+        <span>Emergency Contact Number</span>
+        <input
+          type="tel"
+          name="emergencyContactNumber"
+          [(ngModel)]="contact.emergencyContactNumber"
+          placeholder="Enter emergency contact number"
+        >
+      </label>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="save-button"
+          [disabled]="isSavingContact || isLoading"
+          (click)="saveContactDetails()"
+        >
+          {{
+            isSavingContact
+              ? 'Saving...'
+              : (hasSavedContactDetails ? 'Save Changes' : 'Save Contact Details')
+          }}
+        </button>
+
+        @if (hasSavedContactDetails && isEditingContact) {
+          <button
+            type="button"
+            class="cancel-button"
+            [disabled]="isSavingContact"
+            (click)="cancelContactEdit()"
+          >
+            Cancel
+          </button>
+        }
+      </div>
+
+      <p class="form-note">
+        Your contact details will be saved to your student profile.
+      </p>
+    </form>
+  }
+</section>
+
 
     </div>
 
     <div class="right-column">
 
-      <section class="profile-card placement-card">
-        <div class="card-heading placement-heading">
-          <div>
-            <h2>Approved Placement</h2>
-            <p>Your assigned internship details.</p>
-          </div>
-          <span class="status-badge status-pending">Not assigned</span>
-        </div>
+      
+<section class="profile-card placement-card">
+  <div class="card-heading placement-heading">
+    <div>
+      <h2>Internship Placement</h2>
+      <p>Submit your proposed internship details for coordinator review.</p>
+    </div>
 
-        <div class="company-block">
-          <div class="company-icon" aria-hidden="true">⌂</div>
-          <div>
-            <h3>Company / Establishment</h3>
-            <p>Company name not available</p>
-          </div>
+    <span
+      class="status-badge"
+      [class.status-pending]="studentProfile.placementStatus === 'Pending Review'"
+      [class.status-neutral]="!studentProfile.placementStatus || studentProfile.placementStatus === 'Not Submitted'"
+      [class.status-created]="studentProfile.placementStatus === 'Approved'"
+      [class.status-failed]="studentProfile.placementStatus === 'Correction Requested'"
+    >
+      {{ studentProfile.placementStatus || 'Not Submitted' }}
+    </span>
+  </div>
+
+  @if (studentProfile.placementStatus === 'Approved') {
+    <div class="placement-note">
+      <span aria-hidden="true">✓</span>
+      <div>
+        <strong>Your placement has been approved</strong>
+        <p>Your coordinator has approved your proposed internship placement.</p>
+      </div>
+    </div>
+
+    <div class="company-block">
+      <div class="company-icon" aria-hidden="true">⌂</div>
+      <div>
+        <h3>{{ studentProfile.approvedCompanyName || studentProfile.proposedCompanyName }}</h3>
+        <p>Approved Internship Company</p>
+      </div>
+    </div>
+
+    <div class="placement-details">
+      <div class="detail-item">
+        <span>Company Address</span>
+        <strong>{{ studentProfile.approvedCompanyAddress || studentProfile.proposedCompanyAddress || 'Not available' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Assigned Department</span>
+        <strong>{{ studentProfile.approvedDepartment || studentProfile.proposedDepartment || 'Not available' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Internship Start Date</span>
+        <strong>{{ studentProfile.approvedStartDate || studentProfile.proposedStartDate || 'Not available' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Target End Date</span>
+        <strong>{{ studentProfile.approvedEndDate || studentProfile.proposedEndDate || 'Not available' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Work Schedule</span>
+        <strong>{{ studentProfile.approvedWorkSchedule || studentProfile.proposedWorkSchedule || 'Not available' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Company Supervisor</span>
+        <strong>{{ studentProfile.approvedSupervisorName || studentProfile.proposedSupervisorName || 'Not available' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>Supervisor Contact</span>
+        <strong>{{ studentProfile.approvedSupervisorContact || studentProfile.proposedSupervisorContact || 'Not available' }}</strong>
+      </div>
+    </div>
+
+    <p class="form-note">
+      Contact your coordinator if your approved placement needs to change.
+    </p>
+  } @else {
+    @if (studentProfile.placementStatus === 'Correction Requested') {
+      <div class="placement-note">
+        <span aria-hidden="true">!</span>
+        <div>
+          <strong>Correction requested by coordinator</strong>
+          <p>{{ studentProfile.placementRemarks || 'Please contact your coordinator for further instructions.' }}</p>
         </div>
+      </div>
+    } @else if (studentProfile.placementStatus === 'Pending Review') {
+      <div class="placement-note">
+        <span aria-hidden="true">ⓘ</span>
+        <div>
+          <strong>Waiting for coordinator review</strong>
+          <p>Your proposed placement has been submitted. You can check back here for an update.</p>
+        </div>
+      </div>
+    }
+
+    @if (studentProfile.placementStatus !== 'Pending Review') {
+      <form class="contact-form" (submit)="$event.preventDefault(); submitPlacement()">
+        <label class="form-field">
+          <span>Company / Establishment *</span>
+          <input
+            type="text"
+            name="companyName"
+            [(ngModel)]="placement.companyName"
+            placeholder="Enter company name"
+            [disabled]="isSavingPlacement"
+            required
+          >
+        </label>
+
+        <label class="form-field">
+          <span>Company Address *</span>
+          <textarea
+            rows="2"
+            name="companyAddress"
+            [(ngModel)]="placement.companyAddress"
+            placeholder="Enter company address"
+            [disabled]="isSavingPlacement"
+            required
+          ></textarea>
+        </label>
+
+        <label class="form-field">
+          <span>Proposed Department *</span>
+          <input
+            type="text"
+            name="department"
+            [(ngModel)]="placement.department"
+            placeholder="Enter department or assigned unit"
+            [disabled]="isSavingPlacement"
+            required
+          >
+        </label>
 
         <div class="placement-details">
-          <div class="detail-item">
-            <span>Company Address</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Assigned Department</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Internship Start Date</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Target End Date</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Work Schedule</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Required OJT Hours</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Company Supervisor</span>
-            <strong>Not available</strong>
-          </div>
-          <div class="detail-item">
-            <span>Supervisor Contact</span>
-            <strong>Not available</strong>
-          </div>
+          <label class="form-field">
+            <span>Internship Start Date *</span>
+            <input
+              type="date"
+              name="startDate"
+              [(ngModel)]="placement.startDate"
+              [disabled]="isSavingPlacement"
+              required
+            >
+          </label>
+
+          <label class="form-field">
+            <span>Target End Date *</span>
+            <input
+              type="date"
+              name="endDate"
+              [(ngModel)]="placement.endDate"
+              [min]="placement.startDate"
+              [disabled]="isSavingPlacement"
+              required
+            >
+          </label>
         </div>
+
+        <label class="form-field">
+          <span>Proposed Work Schedule *</span>
+          <input
+            type="text"
+            name="workSchedule"
+            [(ngModel)]="placement.workSchedule"
+            placeholder="e.g. Monday–Friday, 8:00 AM–5:00 PM"
+            [disabled]="isSavingPlacement"
+            required
+          >
+        </label>
+
+        <label class="form-field">
+          <span>Company Supervisor *</span>
+          <input
+            type="text"
+            name="supervisorName"
+            [(ngModel)]="placement.supervisorName"
+            placeholder="Enter supervisor name"
+            [disabled]="isSavingPlacement"
+            required
+          >
+        </label>
+
+        <label class="form-field">
+          <span>Supervisor Contact *</span>
+          <input
+            type="text"
+            name="supervisorContact"
+            [(ngModel)]="placement.supervisorContact"
+            placeholder="Enter supervisor phone number or email"
+            [disabled]="isSavingPlacement"
+            required
+          >
+        </label>
 
         <div class="placement-note">
           <span aria-hidden="true">ⓘ</span>
           <div>
-            <strong>Placement changes need review</strong>
-            <p>Your approved placement cannot be edited directly here. Contact your coordinator if your company, supervisor, or schedule needs to change.</p>
+            <strong>Coordinator approval required</strong>
+            <p>Your proposed placement is not final until your coordinator reviews and approves it.</p>
           </div>
         </div>
 
-        <button type="button" class="correction-button" disabled>Request Correction</button>
-        <p class="form-note">Correction requests will be enabled when the feature is connected.</p>
-      </section>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            [disabled]="isSavingPlacement"
+            (click)="loadStudentProfile()"
+          >
+            Reset Form
+          </button>
+
+          <button
+            type="submit"
+            class="save-button"
+            [disabled]="isSavingPlacement || isLoading"
+          >
+            {{ isSavingPlacement ? 'Submitting...' : 'Submit for Review' }}
+          </button>
+        </div>
+      </form>
+    }
+  }
+</section>
+
 
     </div>
   </div>

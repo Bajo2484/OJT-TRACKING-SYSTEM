@@ -12,31 +12,29 @@
 * {
   box-sizing: border-box;
 }
-
 .student-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
   width: 100%;
+  overflow: hidden;
   background: #f3f5f9;
   color: #243247;
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* =========================
-   SIDEBAR
-========================= */
-
 .student-sidebar {
   width: 245px;
   min-width: 245px;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
   background: #122944;
   color: #ffffff;
   padding: 24px 16px 18px;
 }
-
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -122,6 +120,8 @@
   background: #24476d;
   color: #ffffff;
   font-weight: 600;
+  border-left: 3px solid #ffc928;
+  padding-left: 9px;
 }
 
 .nav-icon {
@@ -155,35 +155,33 @@
   font-size: 10px;
   line-height: 1.6;
 }
-
-/* =========================
-   MAIN CONTENT AREA
-========================= */
-
 .student-main {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
-
-/* =========================
-   TOPBAR
-========================= */
-
 .student-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  min-height: 64px;
+  min-height: 68px;
   padding: 12px 26px;
-  border-bottom: 1px solid #e4e8ef;
-  background: #ffffff;
+  border-bottom: 3px solid #ffc928;
+  background: #122944;
+  color: #ffffff;
+  box-shadow: 0 3px 12px rgba(18, 41, 68, 0.12);
+  flex-shrink: 0;
+position: relative;
+z-index: 10;
 }
 
 .topbar-page-title span {
-  color: #35445a;
+  color: #ffffff;
   font-size: 13px;
   font-weight: 600;
 }
@@ -194,20 +192,28 @@
   gap: 18px;
 }
 
+/* =========================
+   NOTIFICATION BUTTON
+========================= */
+
 .notification-btn {
   width: 34px;
   height: 34px;
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 7px;
-  background: transparent;
-  color: #64748b;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   font-size: 19px;
   cursor: pointer;
 }
 
 .notification-btn:hover {
-  background: #f1f5f9;
+  background: rgba(255, 255, 255, 0.16);
 }
+
+/* =========================
+   STUDENT USER
+========================= */
 
 .student-user {
   display: flex;
@@ -228,31 +234,68 @@
   font-weight: 700;
 }
 
-.user-details strong,
-.user-details span {
-  display: block;
-}
-
 .user-details strong {
-  color: #29374b;
+  color: #ffffff;
   font-size: 11px;
 }
 
 .user-details span {
+  display: block;
   margin-top: 3px;
-  color: #8793a5;
+  color: #c5d3e3;
   font-size: 10px;
 }
-
-/* =========================
-   PAGE CONTENT
-========================= */
 
 .student-content {
   flex: 1;
   min-width: 0;
   padding: 26px;
-  background: #f3f5f9;
+  background-color: #eef4fc;
+  background-image:
+    linear-gradient(
+      rgba(238, 244, 252, 0.90),
+      rgba(238, 244, 252, 0.96)
+    ),
+    url('/images/campus-building.jpg');
+  background-position: center, center;
+  background-size: cover, cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 0;
+overflow-y: auto;
+overflow-x: hidden;
+}
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  color: #ffffff;
+  background-color: #24476d;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.logout-btn span:first-child {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.logout-btn:hover {
+  background-color: #315982;
+  border-color: #ffc928;
+}
+
+.logout-btn:focus-visible {
+  outline: 2px solid #ffc928;
+  outline-offset: 3px;
 }
 
 /* =========================
@@ -269,8 +312,22 @@
 
   .student-content {
     padding: 20px;
+    background: #eef4fc;
+  }
+
+  .student-topbar {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .topbar-actions {
+    gap: 12px;
   }
 }
+
+/* =========================
+   MOBILE LAYOUT
+========================= */
 
 @media (max-width: 600px) {
   .student-layout {
@@ -323,44 +380,7 @@
   .student-content {
     padding: 16px;
   }
-}
 
-/* LOGOUT BUTTON */
-.logout-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 14px;
-  color: #c24141;
-  background: #fff;
-  border: 1px solid #f0dada;
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
-  white-space: nowrap;
-}
-
-.logout-btn span:first-child {
-  font-size: 19px;
-  line-height: 1;
-}
-
-.logout-btn:hover {
-  background: #fff1f1;
-  border-color: #e8bcbc;
-}
-
-.logout-btn:focus-visible {
-  outline: 2px solid #c24141;
-  outline-offset: 3px;
-}
-
-/* TOPBAR RESPONSIVE */
-@media (max-width: 600px) {
   .logout-btn {
     gap: 5px;
     min-height: 36px;
@@ -372,6 +392,10 @@
     font-size: 17px;
   }
 }
+
+/* =========================
+   EXTRA SMALL SCREENS
+========================= */
 
 @media (max-width: 380px) {
   .logout-btn {

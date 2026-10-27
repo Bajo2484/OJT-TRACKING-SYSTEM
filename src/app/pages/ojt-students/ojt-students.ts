@@ -15,14 +15,28 @@ import { FormsModule } from '@angular/forms';
 import { StudentAccountService } from '../../services/student-account.service';
 import { StudentCacheService } from '../../services/student-cache.service';
 
+
 interface OjtStudent {
+  uid?: string;
   studentId: string;
   fullName: string;
   section: string;
   accountStatus: 'Created' | 'Pending' | 'Failed';
   course?: string;
   yearLevel?: string;
+
+  placementStatus?: string;
+  proposedCompanyName?: string;
+  proposedCompanyAddress?: string;
+  proposedDepartment?: string;
+  proposedStartDate?: string;
+  proposedEndDate?: string;
+  proposedWorkSchedule?: string;
+  proposedSupervisorName?: string;
+  proposedSupervisorContact?: string;
+  placementRemarks?: string;
 }
+
 
 @Component({
   selector: 'app-ojt-students',
@@ -36,6 +50,7 @@ export class OjtStudents implements OnInit {
   private studentCache = inject(StudentCacheService);
   private cdr = inject(ChangeDetectorRef);
  
+
 async onStudentFileSelected(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
@@ -48,13 +63,30 @@ async onStudentFileSelected(event: Event): Promise<void> {
   let failed = 0;
   const importedIds = new Set<string>();
 
+  // Show loading while importing the selected file.
+  Swal.fire({
+    title: 'Importing Students...',
+    text: 'Please wait while student accounts are being created.',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
   try {
     const fileData = await file.arrayBuffer();
     const workbook = XLSX.read(fileData, { type: 'array' });
     const firstSheetName = workbook.SheetNames[0];
 
     if (!firstSheetName) {
-      alert('The selected file has no worksheet.');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Worksheet Found',
+        text: 'The selected file does not contain a worksheet.',
+        confirmButtonColor: '#17365d'
+      });
       return;
     }
 
@@ -65,7 +97,12 @@ async onStudentFileSelected(event: Event): Promise<void> {
     );
 
     if (rows.length === 0) {
-      alert('The selected file has no student records.');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'No Student Records',
+        text: 'The selected file does not contain any student records.',
+        confirmButtonColor: '#17365d'
+      });
       return;
     }
 
@@ -95,7 +132,8 @@ async onStudentFileSelected(event: Event): Promise<void> {
         continue;
       }
 
-      const duplicateInFile = importedIds.has(studentId);
+      const duplicateInFile = importedIds.has(studentId.toLowerCase());
+
       const duplicateInTable = this.students.some(
         student =>
           student.studentId.trim().toLowerCase() ===
@@ -107,8 +145,6 @@ async onStudentFileSelected(event: Event): Promise<void> {
         continue;
       }
 
-      importedIds.add(studentId);
-
       const nameParts = fullName.split(/\s+/);
       const firstName = nameParts[0];
       const lastName = nameParts.length > 1
@@ -119,6 +155,8 @@ async onStudentFileSelected(event: Event): Promise<void> {
         failed++;
         continue;
       }
+
+      importedIds.add(studentId.toLowerCase());
 
       const password = lastName.toLowerCase() + studentId;
       const email = `${studentId}@students.ojtprogresstrack.com`;
@@ -136,24 +174,8 @@ async onStudentFileSelected(event: Event): Promise<void> {
           yearLevel
         });
 
-       const alreadyDisplayed = this.students.some(
-  student =>
-    student.studentId.trim().toLowerCase() ===
-    studentId.trim().toLowerCase()
-);
-
-if (!alreadyDisplayed) {
-  this.students.push({
-    studentId,
-    fullName,
-    section,
-    course,
-    yearLevel,
-    accountStatus: 'Created'
-  });
-}
-
         successful++;
+
       } catch (error) {
         console.error(
           `Failed to create account for ${studentId}:`,
@@ -163,24 +185,56 @@ if (!alreadyDisplayed) {
       }
     }
 
-    this.studentCache.students = this.students;
-    this.studentCache.isLoaded = true;
-    this.totalStudents = this.students.length;
+    // Refresh student records from Firestore after importing.
+    Swal.close();
 
-    alert(
-      `Import finished!\n\n` +
-      `Successful accounts: ${successful}\n` +
-      `Failed or skipped records: ${failed}`
-    );
+    this.studentCache.isLoaded = false;
+
+    await this.loadStudents();
+
+    // Show the final import summary.
+    await Swal.fire({
+      icon: successful > 0
+        ? 'success'
+        : 'warning',
+      title: successful > 0
+        ? 'Import Successful!'
+        : 'Import Completed',
+      html: `
+        <div style="text-align: center; line-height: 1.8;">
+          <p>Student import process has finished.</p>
+          <p>
+            <b>Successfully imported:</b>
+            ${successful}
+          </p>
+          <p>
+            <b>Failed or skipped:</b>
+            ${failed}
+          </p>
+        </div>
+      `,
+      confirmButtonText: 'Done',
+      confirmButtonColor: '#17365d'
+    });
+
   } catch (error) {
     console.error('Failed to import student file:', error);
-    alert(
-      'Unable to read this file. Please check that it is a valid Excel or CSV file.'
-    );
+
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Import Failed',
+      text: 'Unable to process this file. Please check that it is a valid Excel or CSV file and try again.',
+      confirmButtonColor: '#17365d'
+    });
+
   } finally {
     input.value = '';
+    Swal.close();
   }
 }
+
 
 
 
@@ -223,18 +277,32 @@ async loadStudents(): Promise<void> {
     // Wait until Firestore returns the student records.
     const snapshot = await getDocs(studentsQuery);
 
-    const loadedStudents: OjtStudent[] = snapshot.docs.map(document => {
-      const data = document.data();
+    
+const loadedStudents: OjtStudent[] = snapshot.docs.map(document => {
+  const data = document.data();
 
-      return {
-        studentId: data['studentId'] ?? '',
-        fullName: data['fullName'] ?? '',
-        section: data['section'] ?? '',
-        course: data['course'] ?? '',
-        yearLevel: data['yearLevel'] ?? '',
-        accountStatus: data['accountStatus'] ?? 'Created'
-      };
-    });
+  return {
+    uid: document.id,
+    studentId: data['studentId'] ?? '',
+    fullName: data['fullName'] ?? '',
+    section: data['section'] ?? '',
+    course: data['course'] ?? '',
+    yearLevel: data['yearLevel'] ?? '',
+    accountStatus: data['accountStatus'] ?? 'Created',
+
+    placementStatus: data['placementStatus'] ?? 'Not Submitted',
+    proposedCompanyName: data['proposedCompanyName'] ?? '',
+    proposedCompanyAddress: data['proposedCompanyAddress'] ?? '',
+    proposedDepartment: data['proposedDepartment'] ?? '',
+    proposedStartDate: data['proposedStartDate'] ?? '',
+    proposedEndDate: data['proposedEndDate'] ?? '',
+    proposedWorkSchedule: data['proposedWorkSchedule'] ?? '',
+    proposedSupervisorName: data['proposedSupervisorName'] ?? '',
+    proposedSupervisorContact: data['proposedSupervisorContact'] ?? '',
+    placementRemarks: data['placementRemarks'] ?? ''
+  };
+});
+
 
     // Assign the fetched data to the page.
     this.students = loadedStudents;
@@ -411,13 +479,16 @@ async loadStudents(): Promise<void> {
     });
 
     const updatedStudent: OjtStudent = {
-      studentId: this.editingStudentId,
-      fullName,
-      section,
-      course,
-      yearLevel,
-      accountStatus: 'Created'
-    };
+  ...this.students.find(
+    student => student.studentId === this.editingStudentId
+  ),
+  studentId: this.editingStudentId,
+  fullName,
+  section,
+  course,
+  yearLevel,
+  accountStatus: 'Created'
+};
 
     this.students = this.students.map(student =>
       student.studentId === this.editingStudentId
@@ -541,15 +612,192 @@ async loadStudents(): Promise<void> {
   }
 
   // View student details
-  viewStudent(student: OjtStudent): void {
-    alert(
-      `Student Details\n\n` +
-      `Student ID: ${student.studentId}\n` +
-      `Full Name: ${student.fullName}\n` +
-      `Section: ${student.section}\n` +
-      `Account Status: ${student.accountStatus}`
-    );
+  async viewStudent(student: OjtStudent): Promise<void> {
+  if (!student.uid) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Student Record Not Ready',
+      text: 'Please reload the student list, then try again.',
+      confirmButtonColor: '#17365d'
+    });
+    return;
   }
+
+  if (!student.proposedCompanyName) {
+    await Swal.fire({
+      icon: 'info',
+      title: 'No Placement Submitted',
+      text: 'This student has not submitted proposed internship placement details yet.',
+      confirmButtonColor: '#17365d'
+    });
+    return;
+  }
+
+  const result = await Swal.fire({
+    title: 'Internship Placement Review',
+    html: `
+      <div style="text-align:left; line-height:1.8;">
+        <p><b>Student:</b> ${student.fullName}</p>
+        <p><b>Student ID:</b> ${student.studentId}</p>
+        <hr>
+        <p><b>Company:</b> ${student.proposedCompanyName}</p>
+        <p><b>Company Address:</b> ${student.proposedCompanyAddress || '—'}</p>
+        <p><b>Department:</b> ${student.proposedDepartment || '—'}</p>
+        <p><b>Start Date:</b> ${student.proposedStartDate || '—'}</p>
+        <p><b>End Date:</b> ${student.proposedEndDate || '—'}</p>
+        <p><b>Work Schedule:</b> ${student.proposedWorkSchedule || '—'}</p>
+        <p><b>Supervisor:</b> ${student.proposedSupervisorName || '—'}</p>
+        <p><b>Supervisor Contact:</b> ${student.proposedSupervisorContact || '—'}</p>
+        <p><b>Placement Status:</b> ${student.placementStatus || 'Not Submitted'}</p>
+        ${student.placementRemarks
+          ? `<p><b>Previous Remarks:</b> ${student.placementRemarks}</p>`
+          : ''}
+      </div>
+    `,
+    showCancelButton: true,
+    showDenyButton: true,
+    confirmButtonText: 'Approve Placement',
+    denyButtonText: 'Request Correction',
+    cancelButtonText: 'Close',
+    confirmButtonColor: '#198754',
+    denyButtonColor: '#d97706',
+    cancelButtonColor: '#64748b',
+    width: '650px'
+  });
+
+  if (result.isConfirmed) {
+    const confirmation = await Swal.fire({
+      icon: 'question',
+      title: 'Approve Placement?',
+      text: 'This will mark the student’s proposed internship placement as approved.',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Approve',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#198754'
+    });
+
+    if (!confirmation.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: 'Approving Placement...',
+        text: 'Please wait while the placement is being updated.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      await updateDoc(doc(db, 'users', student.uid), {
+        placementStatus: 'Approved',
+        approvedCompanyName: student.proposedCompanyName,
+        approvedCompanyAddress: student.proposedCompanyAddress ?? '',
+        approvedDepartment: student.proposedDepartment ?? '',
+        approvedStartDate: student.proposedStartDate ?? '',
+        approvedEndDate: student.proposedEndDate ?? '',
+        approvedWorkSchedule: student.proposedWorkSchedule ?? '',
+        approvedSupervisorName: student.proposedSupervisorName ?? '',
+        approvedSupervisorContact: student.proposedSupervisorContact ?? '',
+        placementApprovedAt: new Date(),
+        placementRemarks: ''
+      });
+
+      this.studentCache.isLoaded = false;
+
+      Swal.close();
+
+      await this.loadStudents();
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Placement Approved!',
+        text: 'The placement has been approved and the student records have been refreshed.',
+        confirmButtonColor: '#17365d'
+      });
+
+    } catch (error) {
+      console.error('Error approving placement:', error);
+
+      Swal.close();
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Approval Failed',
+        text: 'Unable to approve this placement. Please try again.',
+        confirmButtonColor: '#17365d'
+      });
+    }
+  } else if (result.isDenied) {
+    const correction = await Swal.fire({
+      title: 'Request Correction',
+      input: 'textarea',
+      inputLabel: 'Correction Remarks',
+      inputPlaceholder: 'Explain what the student needs to correct...',
+      inputAttributes: {
+        'aria-label': 'Correction remarks'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Send Remarks',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d97706',
+      inputValidator: (value) => {
+        if (!value || !value.trim()) {
+          return 'Please enter the correction remarks.';
+        }
+        return null;
+      }
+    });
+
+    if (!correction.isConfirmed || !correction.value) return;
+
+    try {
+      const remarks = correction.value.trim();
+
+      Swal.fire({
+        title: 'Sending Correction Request...',
+        text: 'Please wait while the correction remarks are being saved.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      await updateDoc(doc(db, 'users', student.uid), {
+        placementStatus: 'Correction Requested',
+        placementRemarks: remarks
+      });
+
+      this.studentCache.isLoaded = false;
+
+      Swal.close();
+
+      await this.loadStudents();
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Correction Request Sent!',
+        text: 'The correction remarks have been saved and the student records have been refreshed.',
+        confirmButtonColor: '#17365d'
+      });
+
+    } catch (error) {
+      console.error('Error requesting placement correction:', error);
+
+      Swal.close();
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Request Failed',
+        text: 'Unable to submit the correction request. Please try again.',
+        confirmButtonColor: '#17365d'
+      });
+    }
+  }
+}
 
   // Remove student record from current list
   removeStudent(student: OjtStudent): void {
