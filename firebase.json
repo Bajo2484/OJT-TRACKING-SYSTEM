@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "dist/ojt-track-system/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

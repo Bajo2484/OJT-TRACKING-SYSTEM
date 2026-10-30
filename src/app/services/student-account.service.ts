@@ -7,7 +7,11 @@ import {
 import {
   Firestore,
   doc,
-  setDoc
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where
 } from 'firebase/firestore';
 import {
   studentCreationAuth,
@@ -57,4 +61,17 @@ export class StudentAccountService {
       throw error;
     }
   }
+  async getAllStudents(): Promise<any[]> {
+  const studentsQuery = query(
+    collection(this.firestore, 'users'),
+    where('role', '==', 'student')
+  );
+
+  const snapshot = await getDocs(studentsQuery);
+
+  return snapshot.docs.map(document => ({
+    uid: document.id,
+    ...document.data()
+  }));
+}
 }

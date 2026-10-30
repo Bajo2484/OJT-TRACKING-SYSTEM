@@ -1,6 +1,11 @@
-
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { StudentAccountService } from '../../services/student-account.service';
+import { AttendanceService } from '../../services/attendance.service';
+import { RequirementsService } from '../../services/requirements.service';
+import { OjtRequirement, OjtSubmission } from '../../services/requirements.service';
+import Swal from 'sweetalert2';
 
 type ProgressStatus =
   | 'In Progress'
@@ -20,54 +25,114 @@ interface StudentProgress {
 @Component({
   selector: 'app-progress-monitoring',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DecimalPipe],
   templateUrl: './progress-monitoring.html',
   styleUrl: './progress-monitoring.css'
 })
-export class ProgressMonitoring {
+export class ProgressMonitoring implements OnInit {
+    private studentAccountService = inject(StudentAccountService);
+  private attendanceService = inject(AttendanceService);
+  private requirementsService = inject(RequirementsService);
+  private cdr = inject(ChangeDetectorRef);
+
   searchText = '';
   selectedStatus = 'All Statuses';
+  selectedStudent: StudentProgress | null = null;
+  showDetailsModal = false;
+  isLoading = false;
+  loadError = '';
 
-  // Temporary sample records for the UI.
-  // We will connect this to Firebase later.
-  students: StudentProgress[] = [
-    {
-      studentId: '2026-001',
-      fullName: 'Juan Dela Cruz',
-      requiredHours: 500,
-      completedHours: 360,
-      completedRequirements: 3,
-      totalRequirements: 4,
-      status: 'In Progress'
-    },
-    {
-      studentId: '2026-002',
-      fullName: 'Maria Santos',
-      requiredHours: 500,
-      completedHours: 500,
-      completedRequirements: 4,
-      totalRequirements: 4,
-      status: 'Completed'
-    },
-    {
-      studentId: '2026-003',
-      fullName: 'Pedro Reyes',
-      requiredHours: 500,
-      completedHours: 180,
-      completedRequirements: 2,
-      totalRequirements: 5,
-      status: 'Needs Follow-up'
-    },
-    {
-      studentId: '2026-004',
-      fullName: 'Ana Garcia',
-      requiredHours: 500,
-      completedHours: 280,
-      completedRequirements: 4,
-      totalRequirements: 4,
-      status: 'In Progress'
+    students: StudentProgress[] = [];
+
+      ngOnInit(): void {
+    this.loadProgressData();
+  }
+
+  async loadProgressData(): Promise<void> {
+  this.isLoading = true;
+  this.loadError = '';
+
+  Swal.fire({
+    title: 'Loading Progress Monitoring',
+    text: 'Please wait while we fetch student records...',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+      Swal.showLoading();
     }
-  ];
+  });
+
+  try {
+    const [students, attendance, requirements, submissions] =
+      await Promise.all([
+        this.studentAccountService.getAllStudents(),
+        this.attendanceService.getAllAttendance(),
+        this.requirementsService.getRequirements(),
+        this.requirementsService.getAllSubmissions()
+      ]);
+
+    this.students = students.map(student => {
+      const studentAttendance = attendance.filter(
+        record => record.studentUid === student.uid
+      );
+
+      const completedHours = studentAttendance
+        .filter(record => record.status === 'Completed')
+        .reduce((total, record) => total + record.hours, 0);
+
+      const studentSubmissions = submissions.filter(
+        submission => submission.studentUid === student.uid
+      );
+
+      const completedRequirements = studentSubmissions.filter(
+        submission => submission.status === 'Approved'
+      ).length;
+
+      const hasRevision = studentSubmissions.some(
+        submission => submission.status === 'Needs Revision'
+      );
+
+      const totalRequirements = requirements.length;
+      const requiredHours = 486;
+
+      let status: ProgressStatus;
+
+      if (
+        completedHours >= requiredHours &&
+        completedRequirements >= totalRequirements
+      ) {
+        status = 'Completed';
+      } else if (hasRevision) {
+        status = 'Needs Follow-up';
+      } else {
+        status = 'In Progress';
+      }
+
+      return {
+        studentId: student.studentId,
+        fullName: student.fullName,
+        requiredHours,
+        completedHours: Math.round(completedHours * 100) / 100,
+        completedRequirements,
+        totalRequirements,
+        status
+      };
+    });
+
+  } catch (error) {
+    console.error('Error loading progress data:', error);
+    this.loadError = 'Unable to load student progress. Please try again.';
+
+  } finally {
+    this.isLoading = false;
+
+    // Close the loading SweetAlert.
+    Swal.close();
+
+    // Force Angular to refresh the displayed data.
+    this.cdr.detectChanges();
+  }
+}
 
   // Search students and filter by progress status.
   get filteredStudents(): StudentProgress[] {
@@ -121,21 +186,20 @@ export class ProgressMonitoring {
   }
 
   // Display a summary of the student's OJT progress.
-  viewDetails(student: StudentProgress): void {
-    alert(
-      `OJT Progress Details\n\n` +
-      `Student ID: ${student.studentId}\n` +
-      `Student Name: ${student.fullName}\n` +
-      `Completed Hours: ${student.completedHours}\n` +
-      `Required Hours: ${student.requiredHours}\n` +
-      `Remaining Hours: ${Math.max(
-        0,
-        student.requiredHours - student.completedHours
-      )}\n` +
-      `OJT Hours Progress: ${this.getProgressPercentage(student)}%\n` +
-      `Requirements: ${student.completedRequirements} of ` +
-      `${student.totalRequirements} completed\n` +
-      `Status: ${student.status}`
+    viewDetails(student: StudentProgress): void {
+    this.selectedStudent = student;
+    this.showDetailsModal = true;
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedStudent = null;
+  }
+
+  getRemainingHours(student: StudentProgress): number {
+    return Math.max(
+      0,
+      student.requiredHours - student.completedHours
     );
   }
 }

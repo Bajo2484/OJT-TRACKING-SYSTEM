@@ -14,7 +14,9 @@
 
     <!-- Total OJT Students -->
     <div class="summary-card">
-      <div class="card-icon students-icon">♙</div>
+      <div class="card-icon students-icon">
+        <lucide-icon name="users" [size]="24" [strokeWidth]="2"></lucide-icon>
+      </div>
       <div>
         <p>Total OJT Students</p>
         <h3>{{ totalOJTStudents }}</h3>
@@ -23,7 +25,9 @@
 
     <!-- Students Behind Schedule -->
     <div class="summary-card">
-      <div class="card-icon behind-icon">◷</div>
+      <div class="card-icon behind-icon">
+        <lucide-icon name="clock" [size]="24" [strokeWidth]="2"></lucide-icon>
+      </div>
       <div>
         <p>Students Behind Schedule</p>
         <h3>{{ studentsBehindSchedule }}</h3>
@@ -32,7 +36,9 @@
 
     <!-- Incomplete Requirements -->
     <div class="summary-card">
-      <div class="card-icon requirements-icon">☷</div>
+      <div class="card-icon requirements-icon">
+        <lucide-icon name="file-text" [size]="24" [strokeWidth]="2"></lucide-icon>
+      </div>
       <div>
         <p>Incomplete Requirements</p>
         <h3>{{ incompleteRequirements }}</h3>
@@ -41,7 +47,9 @@
 
     <!-- Overall Progress -->
     <div class="summary-card">
-      <div class="card-icon progress-icon">▦</div>
+      <div class="card-icon progress-icon">
+        <lucide-icon name="trending-up" [size]="24" [strokeWidth]="2"></lucide-icon>
+      </div>
       <div>
         <p>Overall Progress</p>
         <h3>{{ overallProgress }}%</h3>

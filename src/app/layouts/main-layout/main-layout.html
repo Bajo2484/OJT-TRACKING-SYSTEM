@@ -29,7 +29,14 @@
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }">
 
-          <span class="menu-icon">{{ item.icon }}</span>
+          <span class="menu-icon">
+            <lucide-icon
+              [name]="item.icon"
+              [size]="20"
+              [strokeWidth]="2">
+            </lucide-icon>
+          </span>
+
           <span>{{ item.label }}</span>
 
         </a>
@@ -79,7 +86,14 @@
           type="button"
           (click)="logout()">
 
-          <span class="logout-icon">↪</span>
+          <span class="logout-icon">
+            <lucide-icon
+              name="log-out"
+              [size]="18"
+              [strokeWidth]="2">
+            </lucide-icon>
+          </span>
+
           <span>Log Out</span>
 
         </button>

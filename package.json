@@ -20,6 +20,7 @@
     "firebase": "^13.1.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.9",
+    "lucide-angular": "^1.0.0",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.26.25",
     "tslib": "^2.3.0",

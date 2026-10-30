@@ -55,6 +55,36 @@ export class AttendanceService {
     });
   }
 
+async getAllAttendance() {
+  const attendanceQuery = query(
+    collection(db, 'attendance'),
+    orderBy('timeIn', 'desc')
+  );
+
+  const snapshot = await getDocs(attendanceQuery);
+
+  return snapshot.docs.map(item => {
+    const data = item.data();
+
+    return {
+      id: item.id,
+      studentUid: String(data['studentUid'] ?? ''),
+      studentId: String(data['studentId'] ?? ''),
+      date: String(data['date'] ?? ''),
+      timeIn: data['timeIn']
+        ? (data['timeIn'] as Timestamp).toDate()
+        : null,
+      timeOut: data['timeOut']
+        ? (data['timeOut'] as Timestamp).toDate()
+        : null,
+      hours: Number(data['hours'] ?? 0),
+      status: data['status'] === 'Completed'
+        ? 'Completed'
+        : 'In Progress'
+    };
+  });
+}
+
   
 async recordTimeIn(studentId: string) {
   const user = auth.currentUser;

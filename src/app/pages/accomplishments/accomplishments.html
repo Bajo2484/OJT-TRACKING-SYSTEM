@@ -8,12 +8,6 @@
       <p>Review and monitor recorded OJT activities and accomplishments.</p>
     </div>
 
-    <div class="header-actions">
-      <button class="btn btn-secondary" type="button">
-        <span>↓</span>
-        Export Report
-      </button>
-    </div>
   </section>
 
   <!-- SUMMARY CARDS -->
@@ -302,13 +296,46 @@
       </div>
 
       <footer class="modal-footer">
-        <span>OJT ProgressTrack · Accomplishment Review</span>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="closeDetails()"
-        >Close</button>
-      </footer>
+  <span>OJT ProgressTrack · Accomplishment Review</span>
+
+  <div class="modal-actions">
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="downloadReport(record)"
+    >
+      ↓ Download PDF
+    </button>
+
+    @if (record.status === 'For Review') {
+      <button
+        type="button"
+        class="btn btn-success"
+        (click)="approveReport()"
+      >
+        ✓ Approve
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-warning"
+        (click)="requestRevision()"
+      >
+        Request Revision
+      </button>
+    }
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="closeDetails()"
+    >
+      Close
+    </button>
+
+  </div>
+</footer>
     </section>
   </div>
 }

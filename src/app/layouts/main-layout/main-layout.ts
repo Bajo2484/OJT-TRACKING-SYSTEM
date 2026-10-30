@@ -8,6 +8,18 @@ import {
 } from '@angular/router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../services/firebase';
+import {
+  LucideAngularModule,
+  LUCIDE_ICONS,
+  LucideIconProvider,
+  LayoutDashboard,
+  Users,
+  Clock,
+  ClipboardList,
+  FileText,
+  ChartNoAxesCombined,
+  LogOut
+} from 'lucide-angular';
 
 @Component({
   selector: 'app-main-layout',
@@ -15,7 +27,23 @@ import { auth } from '../../services/firebase';
   imports: [
     RouterLink,
     RouterLinkActive,
-    RouterOutlet
+    RouterOutlet,
+    LucideAngularModule
+  ],
+  providers: [
+    {
+      provide: LUCIDE_ICONS,
+      multi: true,
+      useValue: new LucideIconProvider({
+        LayoutDashboard,
+        Users,
+        Clock,
+        ClipboardList,
+        FileText,
+        ChartNoAxesCombined,
+        LogOut
+      })
+    }
   ],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css'
@@ -24,12 +52,12 @@ export class MainLayout {
   constructor(private router: Router) {}
 
   menuItems = [
-    { label: 'Dashboard', icon: '▦', route: '/coordinator/dashboard' },
-    { label: 'OJT Students', icon: '♙', route: '/coordinator/ojt-students' },
-    { label: 'OJT Hours', icon: '◷', route: '/coordinator/ojt-hours' },
-    { label: 'Accomplishments', icon: '☷', route: '/coordinator/accomplishments' },
-    { label: 'Requirements', icon: '▤', route: '/coordinator/requirements' },
-    { label: 'Progress Monitoring', icon: '▥', route: '/coordinator/progress-monitoring' }
+    { label: 'Dashboard', icon: 'layout-dashboard', route: '/coordinator/dashboard' },
+    { label: 'OJT Students', icon: 'users', route: '/coordinator/ojt-students' },
+    { label: 'OJT Hours', icon: 'clock', route: '/coordinator/ojt-hours' },
+    { label: 'Accomplishments', icon: 'clipboard-list', route: '/coordinator/accomplishments' },
+    { label: 'Requirements', icon: 'file-text', route: '/coordinator/requirements' },
+    { label: 'Progress Monitoring', icon: 'chart-no-axes-combined', route: '/coordinator/progress-monitoring' }
   ];
 
   async logout(): Promise<void> {

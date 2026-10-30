@@ -8,57 +8,286 @@
       <p>Monitor student internship hours and overall progress.</p>
     </div>
 
-    <div class="header-actions">
-      <button class="btn btn-secondary" type="button">
-        <span>↓</span>
-        Export Report
-      </button>
-    </div>
-  </section>
+    <button
+  class="btn btn-secondary"
+  type="button"
+  (click)="exportReport()"
+>
+  <span>↓</span>
+  Export PDF
+</button>
+   
+</section>
 
   <!-- SUMMARY CARDS -->
   <section class="summary-grid">
 
-    <!-- Students with OJT Records -->
+    <!-- Total OJT Students -->
     <div class="summary-card">
       <div class="card-icon students-icon">♙</div>
       <div class="card-info">
-        <p>Students with OJT Records</p>
+        <p>Total OJT Students</p>
         <h3>{{ totalStudents }}</h3>
         <span>Students being monitored</span>
       </div>
     </div>
 
-    <!-- Approved Hours -->
+    <!-- Total Completed Hours -->
     <div class="summary-card">
       <div class="card-icon hours-icon">◷</div>
       <div class="card-info">
-        <p>Total Approved Hours</p>
-        <h3>{{ totalApprovedHours }}</h3>
-        <span>Hours completed and approved</span>
+        <p>Total Completed Hours</p>
+        <h3>{{ totalCompletedHours }}</h3>
+        <span>Hours recorded and completed</span>
       </div>
     </div>
 
-    <!-- On Track -->
+    <!-- Students Completed -->
     <div class="summary-card">
       <div class="card-icon ontrack-icon">✓</div>
       <div class="card-info">
-        <p>On Track</p>
-        <h3>{{ studentsOnTrack }}</h3>
-        <span>Meeting expected progress</span>
+        <p>Students Completed</p>
+        <h3>{{ studentsCompleted }}</h3>
+        <span>Reached the required 486 hours</span>
       </div>
     </div>
 
-    <!-- Needs Review -->
+    <!-- Students In Progress -->
     <div class="summary-card">
       <div class="card-icon review-icon">!</div>
       <div class="card-info">
-        <p>Needs Review</p>
-        <h3>{{ studentsNeedingReview }}</h3>
-        <span>Hours requiring attention</span>
+        <p>Students In Progress</p>
+        <h3>{{ studentsInProgress }}</h3>
+        <span>Still completing OJT hours</span>
       </div>
     </div>
 
   </section>
+
+  <!-- STUDENT HOURS OVERVIEW -->
+  <section class="student-hours-section">
+
+    <div class="section-header">
+      <div>
+        <h3>Student Hours Overview</h3>
+        <p>Track each student's completed and remaining OJT hours.</p>
+      </div>
+
+      <div class="student-count">
+        {{ filteredStudentHours.length }} Students
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="table-toolbar">
+      <div class="search-box">
+        <span>⌕</span>
+        <input
+          type="text"
+          placeholder="Search by Student ID or Name..."
+          [value]="searchText"
+          (input)="searchText = $any($event.target).value"
+        />
+      </div>
+    </div>
+
+    <!-- STUDENT HOURS TABLE -->
+    <div class="table-container">
+      <table class="student-hours-table">
+
+        <thead>
+          <tr>
+            <th>STUDENT</th>
+            <th>COMPLETED HOURS</th>
+            <th>REMAINING HOURS</th>
+            <th>PROGRESS</th>
+            <th>STATUS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (student of filteredStudentHours; track student.studentId) {
+            <tr>
+
+              <td>
+                <div class="student-info">
+                  <strong>{{ student.fullName }}</strong>
+                  <span>{{ student.studentId }}</span>
+                </div>
+              </td>
+
+              <td>
+                <strong class="hours-value">
+                  {{ student.completedHours | number:'1.2-2' }} hrs
+                </strong>
+              </td>
+
+              <td>
+                <span class="remaining-value">
+                  {{ getRemainingHours(student) | number:'1.2-2' }} hrs
+                </span>
+              </td>
+
+              <td>
+                <div class="progress-info">
+                  <span>{{ getProgressPercentage(student) }}%</span>
+
+                  <div class="progress-track">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="getProgressPercentage(student)">
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.completed]="student.progressStatus === 'Completed'"
+                  [class.in-progress]="student.progressStatus === 'In Progress'">
+                  {{ student.progressStatus }}
+                </span>
+              </td>
+
+              <td>
+                <button
+                  class="view-btn"
+                  type="button"
+                  (click)="viewHours(student)">
+                  View Details
+                </button>
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <strong>No students found</strong>
+                <span>No student records match your search.</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+
+  </section>
+
+  <!-- STUDENT DETAILS MODAL -->
+  @if (showDetailsModal && selectedStudent) {
+    <div class="modal-overlay" (click)="closeDetailsModal()">
+
+      <div class="details-modal" (click)="$event.stopPropagation()">
+
+        <!-- MODAL HEADER -->
+        <div class="modal-header">
+          <div>
+            <h3>OJT Hours Details</h3>
+            <p>Student internship progress and attendance history</p>
+          </div>
+
+          <button
+            type="button"
+            class="close-btn"
+            (click)="closeDetailsModal()">
+            &times;
+          </button>
+        </div>
+
+        <!-- STUDENT INFORMATION -->
+        <div class="student-details">
+
+          <h4>{{ selectedStudent.fullName }}</h4>
+          <p>{{ selectedStudent.studentId }}</p>
+
+          <div class="hours-summary">
+
+            <div>
+              <span>Required Hours</span>
+              <strong>{{ selectedStudent.requiredHours }} hrs</strong>
+            </div>
+
+            <div>
+              <span>Completed Hours</span>
+              <strong>
+                {{ selectedStudent.completedHours | number:'1.2-2' }} hrs
+              </strong>
+            </div>
+
+            <div>
+              <span>Remaining Hours</span>
+              <strong>
+                {{ getRemainingHours(selectedStudent) | number:'1.2-2' }} hrs
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- PROGRESS -->
+          <div class="detail-progress">
+
+            <div class="progress-label">
+              <span>Overall Progress</span>
+              <strong>{{ getProgressPercentage(selectedStudent) }}%</strong>
+            </div>
+
+            <div class="progress-track">
+              <div
+                class="progress-fill"
+                [style.width.%]="getProgressPercentage(selectedStudent)">
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ATTENDANCE HISTORY -->
+        <div class="attendance-history">
+
+          <h4>Attendance History</h4>
+
+          @for (record of getStudentAttendanceHistory(selectedStudent); track record.id) {
+
+            <div class="attendance-record">
+
+              <div>
+                <strong>{{ record.date }}</strong>
+
+                <span>
+                  Time In:
+                  {{ record.timeIn ? (record.timeIn | date:'shortTime') : '—' }}
+                </span>
+
+                <span>
+                  Time Out:
+                  {{ record.timeOut ? (record.timeOut | date:'shortTime') : '—' }}
+                </span>
+              </div>
+
+              <div class="attendance-hours">
+                <strong>
+                  {{ record.hours | number:'1.2-2' }} hrs
+                </strong>
+                <span>{{ record.status }}</span>
+              </div>
+
+            </div>
+
+          } @empty {
+            <p class="no-attendance">
+              No attendance records found.
+            </p>
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+  }
 
 </div>

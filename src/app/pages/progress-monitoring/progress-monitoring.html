@@ -9,6 +9,22 @@
     </div>
   </section>
 
+    @if (isLoading) {
+    <div class="loading-message">
+      Loading student progress records...
+    </div>
+  }
+
+  @if (loadError) {
+    <div class="error-message">
+      {{ loadError }}
+
+      <button type="button" (click)="loadProgressData()">
+        Try Again
+      </button>
+    </div>
+  }
+
   <!-- SUMMARY CARDS -->
   <section class="summary-grid">
 
@@ -173,6 +189,107 @@
     </div>
 
   </section>
+
+@if (showDetailsModal && selectedStudent) {
+  <div class="modal-overlay" (click)="closeDetailsModal()">
+
+    <div
+      class="progress-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="modal-header">
+        <div>
+          <h3>Student Progress Details</h3>
+          <p>Overview of the student's OJT performance</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeDetailsModal()"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="student-info">
+          <h4>{{ selectedStudent.fullName }}</h4>
+          <span>{{ selectedStudent.studentId }}</span>
+        </div>
+
+        <div class="modal-status">
+          <span
+            class="status-badge"
+            [class.status-completed]="selectedStudent.status === 'Completed'"
+            [class.status-progress]="selectedStudent.status === 'In Progress'"
+            [class.status-followup]="selectedStudent.status === 'Needs Follow-up'"
+          >
+            {{ selectedStudent.status }}
+          </span>
+        </div>
+
+        <div class="modal-progress-section">
+          <div class="modal-section-heading">
+            <h4>OJT Hours Progress</h4>
+            <strong>{{ getProgressPercentage(selectedStudent) }}%</strong>
+          </div>
+
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [class.progress-complete]="getProgressPercentage(selectedStudent) === 100"
+              [style.width.%]="getProgressPercentage(selectedStudent)"
+            ></div>
+          </div>
+
+          <div class="hours-summary">
+            <div>
+              <span>Completed Hours</span>
+              <strong>{{ selectedStudent.completedHours | number:'1.0-2' }}</strong>
+            </div>
+
+            <div>
+              <span>Required Hours</span>
+              <strong>{{ selectedStudent.requiredHours }}</strong>
+            </div>
+
+            <div>
+              <span>Remaining Hours</span>
+              <strong>{{ getRemainingHours(selectedStudent) | number:'1.0-2' }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-requirements-section">
+          <h4>Requirements Progress</h4>
+
+          <div class="requirements-summary">
+            <strong>
+              {{ selectedStudent.completedRequirements }}
+              / {{ selectedStudent.totalRequirements }}
+            </strong>
+            <span>Approved Requirements</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="close-button"
+          (click)="closeDetailsModal()"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
 
   <footer class="page-footer">
     OJT ProgressTrack — Internship Progress and Requirement Monitoring
