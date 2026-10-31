@@ -23,13 +23,31 @@
 <section class="summary-bar" aria-label="Requirements summary">
 
   <div class="summary-progress">
+  <div class="progress-heading">
     <strong>Requirements Overview</strong>
-    <span>Track your document submission progress in one place.</span>
-
-    <div class="progress-track">
-      <div class="progress-fill"></div>
-    </div>
+    <strong class="progress-percentage">{{ progressPercentage }}%</strong>
   </div>
+
+  <span>Track your document submission progress in one place.</span>
+
+  <div
+    class="progress-track"
+    role="progressbar"
+    [attr.aria-valuenow]="progressPercentage"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-label]="'Requirements submitted: ' + progressPercentage + '%'"
+  >
+    <div
+      class="progress-fill"
+      [style.width.%]="progressPercentage"
+    ></div>
+  </div>
+
+  <small>
+    {{ submittedCount }} of {{ requirements.length }} requirements submitted
+  </small>
+</div>
 
   <div class="summary-item">
     <div class="summary-label">

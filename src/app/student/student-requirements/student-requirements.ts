@@ -2,6 +2,7 @@ import { auth } from '../../services/firebase';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { NotificationService } from '../../services/notification.service';
 import {
   RequirementsService,
   OjtRequirement,
@@ -53,16 +54,29 @@ awaitingReviewCount = 0;
 actionRequiredCount = 0;
 notSubmittedCount = 0;
 
+get submittedCount(): number {
+  return this.requirements.filter(
+    requirement => this.hasSubmission(requirement)
+  ).length;
+}
+
+get progressPercentage(): number {
+  return this.requirements.length > 0
+    ? Math.round((this.submittedCount / this.requirements.length) * 100)
+    : 0;
+}
+
   showSubmissionModal = false;
   selectedRequirement: OjtRequirement | null = null;
   selectedFile: File | null = null;
   isSubmitting = false;
 
   constructor(
-    private requirementsService: RequirementsService,
-    private requirementsCache: RequirementsCacheService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  private requirementsService: RequirementsService,
+  private requirementsCache: RequirementsCacheService,
+  private cdr: ChangeDetectorRef,
+  private notificationService: NotificationService
+) {}
 
   async ngOnInit(): Promise<void> {
     await this.loadRequirements();
@@ -398,8 +412,6 @@ downloadChecklist(): void {
 }
 
 
-
-
 async submitDocument(): Promise<void> {
   if (!this.selectedRequirement || !this.selectedFile) {
     await Swal.fire({
@@ -414,6 +426,11 @@ async submitDocument(): Promise<void> {
   const requirement = this.selectedRequirement;
   const file = this.selectedFile;
   const studentUid = auth.currentUser?.uid;
+  const studentName =
+    auth.currentUser?.displayName ||
+    auth.currentUser?.email ||
+    'Student';
+
   const maxFileSize = 100 * 1024; // 100 KB
 
   if (!studentUid) {
@@ -439,7 +456,6 @@ async submitDocument(): Promise<void> {
   this.isSubmitting = true;
 
   try {
-    // Show loading while the document is being submitted.
     Swal.fire({
       title: 'Submitting Document',
       text: 'Please wait while we save your requirement.',
@@ -481,6 +497,7 @@ async submitDocument(): Promise<void> {
       }
     );
 
+    // SAVE REQUIREMENT SUBMISSION
     await this.requirementsService.addSubmission({
       studentUid: studentUid,
       requirementId: requirement.id ?? '',
@@ -492,7 +509,25 @@ async submitDocument(): Promise<void> {
       status: 'Submitted'
     });
 
-    // Refresh submissions from Firebase.
+    // CREATE COORDINATOR NOTIFICATION
+    try {
+      await this.notificationService.createNotification({
+        studentUid: studentUid,
+        studentName: studentName,
+        type: 'requirement',
+        title: 'New Requirement Submitted',
+        message: `${studentName} submitted ${requirement.name}.`,
+        relatedId: requirement.id
+      });
+
+    } catch (notificationError) {
+      console.error(
+        'Failed to create requirement notification:',
+        notificationError
+      );
+    }
+
+    // REFRESH STUDENT SUBMISSIONS
     const updatedSubmissions =
       await this.requirementsService.getSubmissionsForStudent(studentUid);
 
@@ -505,21 +540,21 @@ async submitDocument(): Promise<void> {
 
     Swal.close();
 
-await Swal.fire({
-  icon: 'success',
-  title: 'Document Submitted Successfully!',
-  text: 'Your requirement has been submitted and is awaiting review.',
-  confirmButtonText: 'OK',
-  confirmButtonColor: '#1c2f4d',
-  allowOutsideClick: false,
-  allowEscapeKey: false
-});
+    await Swal.fire({
+      icon: 'success',
+      title: 'Document Submitted Successfully!',
+      text: 'Your requirement has been submitted and is awaiting review.',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#1c2f4d',
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    });
 
-// Close the modal after the student clicks OK.
-this.showSubmissionModal = false;
-this.selectedRequirement = null;
-this.selectedFile = null;
-this.cdr.detectChanges();
+    this.showSubmissionModal = false;
+    this.selectedRequirement = null;
+    this.selectedFile = null;
+
+    this.cdr.detectChanges();
 
   } catch (error) {
     console.error('Failed to submit requirement:', error);
@@ -538,7 +573,5 @@ this.cdr.detectChanges();
     this.isSubmitting = false;
   }
 }
-
-
 
 }

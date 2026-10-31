@@ -73,6 +73,151 @@
 
       <div class="topbar-right">
 
+        <!-- NOTIFICATION -->
+        <div class="notification-wrapper">
+
+          <!-- NOTIFICATION BUTTON -->
+          <button
+            class="notification-button"
+            type="button"
+            (click)="toggleNotifications()">
+
+            <lucide-icon
+              name="bell"
+              [size]="21"
+              [strokeWidth]="2">
+            </lucide-icon>
+
+            @if (unreadCount > 0) {
+              <span class="notification-badge">
+                {{ unreadCount }}
+              </span>
+            }
+
+          </button>
+
+          <!-- NOTIFICATION PANEL -->
+          @if (showNotifications) {
+            <div class="notification-panel">
+
+              <!-- PANEL HEADER -->
+              <div class="notification-header">
+
+                <div>
+                  <h3>Notifications</h3>
+                  <p>You have {{ unreadCount }} unread notifications</p>
+                </div>
+
+                <button
+                  type="button"
+                  class="notification-close"
+                  (click)="toggleNotifications()">
+
+                  <lucide-icon
+                    name="x"
+                    [size]="18">
+                  </lucide-icon>
+
+                </button>
+
+              </div>
+
+              <!-- EMPTY STATE -->
+              @if (notifications.length === 0) {
+
+                <div class="notification-empty">
+
+                  <lucide-icon
+                    name="bell"
+                    [size]="28">
+                  </lucide-icon>
+
+                  <h4>No notifications yet</h4>
+                  <p>Student activities and updates will appear here.</p>
+
+                </div>
+
+              } @else {
+
+                <!-- NOTIFICATION LIST -->
+                <div class="notification-list">
+
+                  @for (notification of notifications; track notification.id) {
+
+                    <div
+                      class="notification-item"
+                      [class.unread]="!notification.isRead"
+                      (click)="markNotificationAsRead(notification)">
+
+                      <!-- NOTIFICATION ICON -->
+                      <div class="notification-item-icon">
+
+                        @switch (notification.type) {
+
+                          @case ('requirement') {
+                            <lucide-icon
+                              name="file-text"
+                              [size]="18">
+                            </lucide-icon>
+                          }
+
+                          @case ('accomplishment') {
+                            <lucide-icon
+                              name="clipboard-list"
+                              [size]="18">
+                            </lucide-icon>
+                          }
+
+                          @case ('placement') {
+                            <lucide-icon
+                              name="users"
+                              [size]="18">
+                            </lucide-icon>
+                          }
+
+                          @case ('hours') {
+                            <lucide-icon
+                              name="clock"
+                              [size]="18">
+                            </lucide-icon>
+                          }
+
+                        }
+
+                      </div>
+
+                      <!-- NOTIFICATION DETAILS -->
+                      <div class="notification-item-content">
+
+                        <h4>{{ notification.title }}</h4>
+
+                        <p>{{ notification.message }}</p>
+
+                        <span>
+                          {{ notification.createdAt.toDate().toLocaleString() }}
+                        </span>
+
+                      </div>
+
+                      <!-- UNREAD INDICATOR -->
+                      @if (!notification.isRead) {
+                        <span class="unread-indicator"></span>
+                      }
+
+                    </div>
+
+                  }
+
+                </div>
+
+              }
+
+            </div>
+          }
+
+        </div>
+
+        <!-- ADMIN PROFILE -->
         <div class="admin-avatar">C</div>
 
         <div class="admin-info">

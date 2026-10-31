@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 import { auth } from '../../services/firebase';
 import {
   AccomplishmentService,
@@ -253,87 +254,166 @@ clearForm(): void {
 }
 
 
-    async submitReport(): Promise<void> {
-    const student = auth.currentUser;
+   
+async submitReport(): Promise<void> {
+  if (this.isSaving) return;
 
-    if (!student) {
-      this.saveError = 'Please log in before submitting your report.';
-      return;
-    }
+  const student = auth.currentUser;
 
-    if (
-      !this.weekStarting ||
-      !this.weekEnding ||
-      !this.title.trim() ||
-      !this.tasksCompleted.trim() ||
-      !this.skillsLearned.trim()
-    ) {
-      this.saveError = 'Please complete all required fields.';
-      return;
-    }
-
-    if (this.weekEnding < this.weekStarting) {
-      this.saveError = 'Week ending cannot be earlier than week starting.';
-      return;
-    }
-
-    this.isSaving = true;
-    this.saveError = '';
-
-    try {
-      
-const reportData: OjtAccomplishment = {
-  studentUid: student.uid,
-  logType: 'weekly',
-  weekStarting: this.weekStarting,
-  weekEnding: this.weekEnding,
-  title: this.title.trim(),
-  tasksCompleted: this.tasksCompleted.trim(),
-  skillsLearned: this.skillsLearned.trim(),
-  challenges: this.challenges.trim(),
-  status: 'Submitted',
-
-  ...(this.selectedEvidence
-    ? {
-        evidenceBase64: this.evidenceBase64,
-        evidenceFileName: this.evidenceFileName,
-        evidenceMimeType: this.evidenceMimeType
-      }
-    : {})
-};
-
-
-      let reportId = this.editingReportId;
-
-      if (reportId) {
-        await this.accomplishmentService.updateReport(
-          reportId,
-          {
-            ...reportData,
-            submittedAt: new Date()
-          }
-        );
-      } else {
-        reportId = await this.accomplishmentService.createReport({
-          ...reportData,
-          status: 'Draft'
-        });
-
-        await this.accomplishmentService.submitReport(reportId);
-      }
-
-      this.clearForm();
-      this.showAddForm = false;
-      await this.loadReports();
-
-    } catch (error) {
-      console.error('Failed to submit accomplishment report:', error);
-      this.saveError = 'Unable to submit your report. Please try again.';
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }
+  if (!student) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'Login Required',
+      text: 'Please log in before submitting your report.',
+      confirmButtonColor: '#19365c'
+    });
+    return;
   }
+
+  if (
+    !this.weekStarting ||
+    !this.weekEnding ||
+    !this.title.trim() ||
+    !this.tasksCompleted.trim() ||
+    !this.skillsLearned.trim()
+  ) {
+    this.saveError = 'Please complete all required fields.';
+
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Incomplete Information',
+      text: 'Please complete all required fields before submitting.',
+      confirmButtonColor: '#19365c'
+    });
+    return;
+  }
+
+  if (this.weekEnding < this.weekStarting) {
+    this.saveError = 'Week ending cannot be earlier than week starting.';
+
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Reporting Period',
+      text: 'Week ending cannot be earlier than week starting.',
+      confirmButtonColor: '#19365c'
+    });
+    return;
+  }
+
+  if (this.evidenceError) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Invalid Supporting Evidence',
+      text: this.evidenceError,
+      confirmButtonColor: '#19365c'
+    });
+    return;
+  }
+
+  // CONFIRMATION
+  const result = await Swal.fire({
+    icon: 'question',
+    title: 'Submit Accomplishment Report?',
+    text: 'Are you sure you want to submit this weekly report to your OJT coordinator for review?',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, submit report',
+    cancelButtonText: 'Review first',
+    confirmButtonColor: '#19365c',
+    cancelButtonColor: '#64748b',
+    reverseButtons: true
+  });
+
+  if (!result.isConfirmed) return;
+
+  this.isSaving = true;
+  this.saveError = '';
+
+  // LOADING ALERT
+  Swal.fire({
+    title: 'Submitting Report...',
+    text: 'Please wait while your accomplishment report is being submitted.',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  try {
+    const reportData: OjtAccomplishment = {
+      studentUid: student.uid,
+      logType: 'weekly',
+      weekStarting: this.weekStarting,
+      weekEnding: this.weekEnding,
+      title: this.title.trim(),
+      tasksCompleted: this.tasksCompleted.trim(),
+      skillsLearned: this.skillsLearned.trim(),
+      challenges: this.challenges.trim(),
+      status: 'Submitted',
+
+      ...(this.selectedEvidence || this.evidenceBase64
+        ? {
+            evidenceBase64: this.evidenceBase64,
+            evidenceFileName: this.evidenceFileName,
+            evidenceMimeType: this.evidenceMimeType
+          }
+        : {})
+    };
+
+    let reportId = this.editingReportId;
+
+    if (reportId) {
+      await this.accomplishmentService.updateReport(
+        reportId,
+        {
+          ...reportData,
+          submittedAt: new Date()
+        }
+      );
+    } else {
+      reportId = await this.accomplishmentService.createReport({
+        ...reportData,
+        status: 'Draft'
+      });
+
+      await this.accomplishmentService.submitReport(reportId);
+    }
+
+    this.clearForm();
+    this.showAddForm = false;
+    await this.loadReports();
+
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'Report Submitted!',
+      text: 'Your weekly accomplishment report has been successfully submitted to your OJT coordinator for review.',
+      confirmButtonText: 'Okay',
+      confirmButtonColor: '#19365c'
+    });
+
+  } catch (error) {
+    console.error('Failed to submit accomplishment report:', error);
+
+    this.saveError = 'Unable to submit your report. Please try again.';
+
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Submission Failed',
+      text: 'Something went wrong while submitting your report. Please try again.',
+      confirmButtonText: 'Okay',
+      confirmButtonColor: '#19365c'
+    });
+
+  } finally {
+    this.isSaving = false;
+    this.cdr.detectChanges();
+  }
+}
+
 
   
 editReport(report: OjtAccomplishment): void {

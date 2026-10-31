@@ -1,4 +1,6 @@
 import Swal from 'sweetalert2';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { auth, db } from '../../services/firebase';
 import { AttendanceService, } from '../../services/attendance.service';
@@ -42,6 +44,12 @@ export class StudentHours implements OnInit {
   readonly requiredHours = 486;
   studentId = '';
 
+  studentName = '';
+course = '';
+section = '';
+
+isGeneratingDTR = false;
+
   attendanceHistory: AttendanceRecord[] = [];
   todayRecord: AttendanceRecord | null = null;
 
@@ -80,7 +88,14 @@ async ngOnInit(): Promise<void> {
       return;
     }
 
-    this.studentId = String(profileSnapshot.data()['studentId'] ?? '');
+   const profile = profileSnapshot.data();
+
+this.studentId = String(profile['studentId'] ?? '');
+this.studentName = String(
+  profile['fullName'] ?? profile['name'] ?? ''
+);
+this.course = String(profile['course'] ?? '');
+this.section = String(profile['section'] ?? '');
 
     // Fetch the latest attendance from Firebase
     await this.loadAttendance();
@@ -321,6 +336,277 @@ this.pendingHours = this.attendanceHistory
   }
 }
 
+async downloadDTR(): Promise<void> {
+
+  if (this.isGeneratingDTR) return;
+
+  const completedRecords = this.attendanceHistory
+    .filter(record =>
+      record.timeIn !== null &&
+      record.timeOut !== null &&
+      record.status === 'Completed'
+    )
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (completedRecords.length === 0) {
+    await Swal.fire({
+      icon: 'info',
+      title: 'No Completed Records',
+      text: 'There are no completed attendance records available for your DTR.'
+    });
+    return;
+  }
+
+  this.isGeneratingDTR = true;
+
+  try {
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const navy = [24, 48, 82] as [number, number, number];
+    const gray = [105, 116, 130] as [number, number, number];
+
+    const totalHours = completedRecords.reduce(
+      (total, record) => total + record.hours,
+      0
+    );
+
+    // HEADER
+    pdf.setFillColor(...navy);
+    pdf.rect(0, 0, pageWidth, 34, 'F');
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(17);
+    pdf.text('OJT PROGRESSTRACK', 14, 15);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.text('STUDENT INTERNSHIP ATTENDANCE RECORD', 14, 23);
+
+    // DOCUMENT TITLE
+    pdf.setTextColor(35, 48, 65);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.text('DAILY TIME RECORD', 14, 46);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(...gray);
+    pdf.text(
+      'Complete attendance record from the start of internship',
+      14,
+      52
+    );
+
+    // STUDENT INFORMATION
+    pdf.setDrawColor(220, 225, 232);
+    pdf.roundedRect(14, 60, pageWidth - 28, 34, 2, 2, 'S');
+
+    pdf.setTextColor(50, 60, 75);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+
+    pdf.text('STUDENT NAME', 19, 69);
+    pdf.text('STUDENT ID', 110, 69);
+    pdf.text('COURSE / SECTION', 19, 84);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+
+    pdf.text(this.studentName || 'Not available', 19, 75);
+    pdf.text(this.studentId || 'Not available', 110, 75);
+
+    pdf.text(
+      [this.course, this.section].filter(Boolean).join(' - ') || 'Not available',
+      19,
+      90
+    );
+
+    // ATTENDANCE TABLE
+    autoTable(pdf, {
+      startY: 103,
+      head: [[
+        'NO.',
+        'DATE',
+        'TIME IN',
+        'TIME OUT',
+        'RENDERED HOURS'
+      ]],
+
+      body: completedRecords.map((record, index) => [
+        String(index + 1),
+        this.formatDate(record.date),
+        this.formatTime(record.timeIn),
+        this.formatTime(record.timeOut),
+        `${record.hours.toFixed(2)} hrs`
+      ]),
+
+      theme: 'grid',
+
+      styles: {
+        font: 'helvetica',
+        fontSize: 8,
+        cellPadding: 3,
+        textColor: [50, 60, 75],
+        lineColor: [220, 225, 232],
+        lineWidth: 0.2
+      },
+
+      headStyles: {
+        fillColor: navy,
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+
+      columnStyles: {
+        0: { halign: 'center', cellWidth: 12 },
+        1: { cellWidth: 42 },
+        2: { halign: 'center' },
+        3: { halign: 'center' },
+        4: { halign: 'center' }
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+        bottom: 20
+      },
+
+      showHead: 'everyPage'
+    });
+
+    // TOTAL HOURS SUMMARY
+    let finalY = (pdf as any).lastAutoTable.finalY + 10;
+
+    if (finalY + 35 > pageHeight - 20) {
+      pdf.addPage();
+      finalY = 25;
+    }
+
+    pdf.setFillColor(242, 246, 250);
+    pdf.roundedRect(14, finalY, pageWidth - 28, 27, 2, 2, 'F');
+
+    pdf.setTextColor(...navy);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.text('TOTAL RENDERED HOURS', 20, finalY + 10);
+
+    pdf.setFontSize(17);
+    pdf.text(
+      `${totalHours.toFixed(2)} HOURS`,
+      20,
+      finalY + 20
+    );
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(...gray);
+    pdf.text(
+      `Required OJT Hours: ${this.requiredHours} hours`,
+      pageWidth - 20,
+      finalY + 16,
+      { align: 'right' }
+    );
+
+    // SIGNATURE SECTION
+    const signatureY = finalY + 52;
+
+    if (signatureY + 35 > pageHeight - 20) {
+      pdf.addPage();
+      this.addDtrSignatures(pdf, 35, pageWidth);
+    } else {
+      this.addDtrSignatures(pdf, signatureY, pageWidth);
+    }
+
+    // PAGE NUMBERS
+    const totalPages = pdf.getNumberOfPages();
+
+    for (let page = 1; page <= totalPages; page++) {
+      pdf.setPage(page);
+
+      pdf.setDrawColor(220, 225, 232);
+      pdf.line(14, pageHeight - 14, pageWidth - 14, pageHeight - 14);
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.setTextColor(...gray);
+
+      pdf.text(
+        `OJT ProgressTrack | Daily Time Record`,
+        14,
+        pageHeight - 8
+      );
+
+      pdf.text(
+        `Page ${page} of ${totalPages}`,
+        pageWidth - 14,
+        pageHeight - 8,
+        { align: 'right' }
+      );
+    }
+
+    const filename = `DTR_${this.studentId || 'Student'}.pdf`;
+
+    pdf.save(filename);
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'DTR Generated!',
+      text: 'Your Daily Time Record PDF has been downloaded.',
+      confirmButtonText: 'Okay'
+    });
+
+  } catch (error) {
+
+    console.error('DTR generation failed:', error);
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'PDF Generation Failed',
+      text: 'Unable to generate your DTR. Please try again.'
+    });
+
+  } finally {
+    this.isGeneratingDTR = false;
+    this.cdr.detectChanges();
+  }
+}
+
+
+// SIGNATURE SECTION
+private addDtrSignatures(
+  pdf: jsPDF,
+  startY: number,
+  pageWidth: number
+): void {
+
+  const positions = [14, 79, 144];
+
+  const labels = [
+    'STUDENT SIGNATURE',
+    'COMPANY SUPERVISOR',
+    'OJT COORDINATOR'
+  ];
+
+  positions.forEach((x, index) => {
+
+    pdf.setDrawColor(100, 110, 125);
+    pdf.line(x, startY + 15, x + 50, startY + 15);
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.setTextColor(50, 60, 75);
+
+    pdf.text(labels[index], x, startY + 21);
+
+  });
+
+}
 
 
   formatTime(date: Date | null): string {

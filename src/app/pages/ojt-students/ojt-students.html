@@ -54,14 +54,25 @@
       </div>
     </div>
 
-    <div class="summary-card">
-      <div class="card-icon followup-icon">!</div>
-      <div class="card-info">
-        <p>Needs Follow-up</p>
-        <h3>{{ studentsNeedingFollowUp }}</h3>
-        <span>Students needing attention</span>
-      </div>
-    </div>
+    <div
+  class="summary-card followup-card"
+  [class.active-followup]="showFollowUpOnly"
+  role="button"
+  tabindex="0"
+  (click)="toggleFollowUpFilter()"
+  (keydown.enter)="toggleFollowUpFilter()"
+  (keydown.space)="toggleFollowUpFilter(); $event.preventDefault()"
+>
+  <div class="card-icon followup-icon">!</div>
+
+  <div class="card-info">
+    <p>Needs Follow-up</p>
+    <h3>{{ studentsNeedingFollowUp }}</h3>
+    <span>
+      {{ showFollowUpOnly ? 'Showing students needing attention' : 'Click to view students needing attention' }}
+    </span>
+  </div>
+</div>
 
   </section>
 

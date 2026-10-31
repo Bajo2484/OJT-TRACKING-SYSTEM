@@ -1,5 +1,8 @@
-
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import {
+  NotificationService,
+  OjtNotification
+} from '../../services/notification.service';
 import {
   Router,
   RouterLink,
@@ -17,8 +20,10 @@ import {
   Clock,
   ClipboardList,
   FileText,
-  ChartNoAxesCombined,
-  LogOut
+          ChartNoAxesCombined,
+        LogOut,
+        Bell,
+        X
 } from 'lucide-angular';
 
 @Component({
@@ -40,16 +45,65 @@ import {
         Clock,
         ClipboardList,
         FileText,
-        ChartNoAxesCombined,
-        LogOut
+          ChartNoAxesCombined,
+  LogOut,
+  Bell,
+  X
+        
       })
     }
   ],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css'
 })
-export class MainLayout {
-  constructor(private router: Router) {}
+export class MainLayout implements OnInit, OnDestroy {
+
+  notifications: OjtNotification[] = [];
+  unreadCount = 0;
+
+  private unsubscribeNotifications?: () => void;
+
+  constructor(
+    private router: Router,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.unsubscribeNotifications =
+      this.notificationService.listenToNotifications(notifications => {
+
+        this.notifications = notifications;
+
+        this.unreadCount = notifications.filter(
+          notification => !notification.isRead
+        ).length;
+
+        this.cdr.detectChanges();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeNotifications?.();
+  }
+
+    showNotifications = false;
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  async markNotificationAsRead(notification: OjtNotification): Promise<void> {
+  if (!notification.id || notification.isRead) {
+    return;
+  }
+
+  try {
+    await this.notificationService.markAsRead(notification.id);
+  } catch (error) {
+    console.error('Failed to mark notification as read:', error);
+  }
+}
 
   menuItems = [
     { label: 'Dashboard', icon: 'layout-dashboard', route: '/coordinator/dashboard' },

@@ -14,7 +14,7 @@ import { Component, inject, OnInit,ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StudentAccountService } from '../../services/student-account.service';
 import { StudentCacheService } from '../../services/student-cache.service';
-
+import { RequirementsService, OjtSubmission } from '../../services/requirements.service';
 
 interface OjtStudent {
   uid?: string;
@@ -49,7 +49,7 @@ export class OjtStudents implements OnInit {
   private studentAccountService = inject(StudentAccountService);
   private studentCache = inject(StudentCacheService);
   private cdr = inject(ChangeDetectorRef);
- 
+  private requirementsService = inject(RequirementsService);
 
 async onStudentFileSelected(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
@@ -244,16 +244,43 @@ async onStudentFileSelected(event: Event): Promise<void> {
   
   }
 
+ async loadFollowUpCount(): Promise<void> {
+  try {
+    const submissions = await this.requirementsService.getAllSubmissions();
+
+    this.followUpStudentUids = new Set(
+      submissions
+        .filter(submission => submission.status === 'Needs Revision')
+        .map(submission => submission.studentUid)
+    );
+
+    this.studentsNeedingFollowUp = this.students.filter(student =>
+      student.placementStatus === 'Correction Requested' ||
+      (student.uid !== undefined &&
+        this.followUpStudentUids.has(student.uid))
+    ).length;
+
+    this.cdr.detectChanges();
+
+  } catch (error) {
+    console.error('Error loading follow-up count:', error);
+  }
   
+}toggleFollowUpFilter(): void {
+  this.showFollowUpOnly = !this.showFollowUpOnly;
+}
 
 async loadStudents(): Promise<void> {
   // Use cached records only if they were already loaded.
   if (this.studentCache.isLoaded) {
-    this.students = [...this.studentCache.students];
-    this.totalStudents = this.students.length;
-    this.cdr.detectChanges();
-    return;
-  }
+  this.students = this.studentCache.students;
+  this.totalStudents = this.students.length;
+
+  await this.loadFollowUpCount();
+
+  this.cdr.detectChanges();
+  return;
+}
 
   this.isLoadingStudents = true;
 
@@ -308,6 +335,8 @@ const loadedStudents: OjtStudent[] = snapshot.docs.map(document => {
     this.students = loadedStudents;
     this.totalStudents = loadedStudents.length;
 
+    await this.loadFollowUpCount();
+
     // Update cache after fetching succeeds.
     this.studentCache.students = [...loadedStudents];
     this.studentCache.isLoaded = true;
@@ -342,6 +371,8 @@ const loadedStudents: OjtStudent[] = snapshot.docs.map(document => {
   // Search and filter
   searchText = '';
   selectedSection = '';
+  showFollowUpOnly = false;
+  followUpStudentUids = new Set<string>();
 
   // Student records
   students: OjtStudent[] = [];
@@ -594,22 +625,29 @@ const loadedStudents: OjtStudent[] = snapshot.docs.map(document => {
     )].sort();
   }
 
-  // Filter student records by ID, name, or section
-  get filteredStudents(): OjtStudent[] {
-    const search = this.searchText.trim().toLowerCase();
+  // Filter student records by ID, name, section, or follow-up status
+get filteredStudents(): OjtStudent[] {
+  const search = this.searchText.trim().toLowerCase();
 
-    return this.students.filter(student => {
-      const matchesSearch =
-        student.studentId.toLowerCase().includes(search) ||
-        student.fullName.toLowerCase().includes(search);
+  return this.students.filter(student => {
+    const matchesSearch =
+      student.studentId.toLowerCase().includes(search) ||
+      student.fullName.toLowerCase().includes(search);
 
-      const matchesSection =
-        !this.selectedSection ||
-        student.section === this.selectedSection;
+    const matchesSection =
+      !this.selectedSection ||
+      student.section === this.selectedSection;
 
-      return matchesSearch && matchesSection;
-    });
-  }
+    const hasFollowUp =
+      student.placementStatus === 'Correction Requested' ||
+      this.followUpStudentUids.has(student.uid ?? '');
+
+    const matchesFollowUp =
+      !this.showFollowUpOnly || hasFollowUp;
+
+    return matchesSearch && matchesSection && matchesFollowUp;
+  });
+}
 
   // View student details
   async viewStudent(student: OjtStudent): Promise<void> {
