@@ -2,6 +2,7 @@ import { auth } from '../../services/firebase';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NotificationService } from '../../services/notification.service';
 import {
   RequirementsService,
@@ -70,12 +71,19 @@ get progressPercentage(): number {
   selectedRequirement: OjtRequirement | null = null;
   selectedFile: File | null = null;
   isSubmitting = false;
+  showViewModal = false;
+selectedSubmission: OjtSubmission | null = null;
+previewUrl = '';
+safePreviewUrl: SafeResourceUrl | null = null;
+isPreviewable = false;
+selectedSubmissionDate = 'Date unavailable';
 
   constructor(
   private requirementsService: RequirementsService,
   private requirementsCache: RequirementsCacheService,
   private cdr: ChangeDetectorRef,
-  private notificationService: NotificationService
+  private notificationService: NotificationService,
+  private sanitizer: DomSanitizer
 ) {}
 
   async ngOnInit(): Promise<void> {
@@ -241,24 +249,85 @@ viewSubmission(requirement: OjtRequirement): void {
   );
 
   if (!submission) {
-    alert('No submitted file found.');
+    Swal.fire({
+      icon: 'info',
+      title: 'No Submitted File',
+      text: 'No uploaded document was found for this requirement.'
+    });
     return;
   }
 
-  const byteCharacters = atob(submission.fileDataBase64);
-  const byteNumbers = new Array(byteCharacters.length);
+  this.closeViewModal();
 
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  try {
+    const byteCharacters = atob(submission.fileDataBase64);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const fileBlob = new Blob([byteNumbers], {
+      type: submission.fileType
+    });
+
+    this.previewUrl = URL.createObjectURL(fileBlob);
+    this.safePreviewUrl =
+      this.sanitizer.bypassSecurityTrustResourceUrl(this.previewUrl);
+
+    this.selectedSubmission = submission;
+
+    this.isPreviewable =
+      submission.fileType === 'application/pdf' ||
+      submission.fileType.startsWith('image/');
+
+    const submittedAt = (submission as any).submittedAt;
+
+    if (submittedAt) {
+      const date = submittedAt.toDate
+        ? submittedAt.toDate()
+        : new Date(submittedAt);
+
+      this.selectedSubmissionDate = date.toLocaleString();
+    } else {
+      this.selectedSubmissionDate = 'Date unavailable';
+    }
+
+    this.showViewModal = true;
+    this.cdr.detectChanges();
+
+  } catch (error) {
+    console.error('Unable to preview submitted document:', error);
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Unable to Open Document',
+      text: 'The submitted file could not be opened.'
+    });
+  }
+}
+
+closeViewModal(): void {
+  this.showViewModal = false;
+
+  if (this.previewUrl) {
+    URL.revokeObjectURL(this.previewUrl);
   }
 
-  const byteArray = new Uint8Array(byteNumbers);
-  const fileBlob = new Blob([byteArray], {
-    type: submission.fileType
-  });
+  this.previewUrl = '';
+  this.safePreviewUrl = null;
+  this.selectedSubmission = null;
+  this.isPreviewable = false;
+  this.selectedSubmissionDate = 'Date unavailable';
+}
 
-  const fileUrl = URL.createObjectURL(fileBlob);
-  window.open(fileUrl, '_blank', 'noopener');
+downloadViewedSubmission(): void {
+  if (!this.selectedSubmission || !this.previewUrl) return;
+
+  const link = document.createElement('a');
+  link.href = this.previewUrl;
+  link.download = this.selectedSubmission.fileName;
+  link.click();
 }
 
 
@@ -273,132 +342,264 @@ downloadChecklist(): void {
   }
 
   const pdf = new jsPDF({
-  orientation: 'landscape',
-  unit: 'mm',
-  format: 'a4'
-});
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
 
   const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
 
-  // Header
-  pdf.setFillColor(28, 47, 77);
-  pdf.rect(0, 0, pageWidth, 36, 'F');
+  const navy: [number, number, number] = [28, 47, 77];
+  const yellow: [number, number, number] = [213, 169, 48];
+  const dark: [number, number, number] = [43, 53, 68];
+  const muted: [number, number, number] = [105, 116, 130];
 
-  pdf.setTextColor(255, 255, 255);
+  const student = auth.currentUser;
+  const studentName = student?.displayName || 'Student';
+  const studentEmail = student?.email || 'Not available';
+
+  // =====================================
+  // HEADER
+  // =====================================
+
+  pdf.setTextColor(...navy);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(18);
-  pdf.text('OJT Requirements Checklist', 14, 16);
+  pdf.setFontSize(15);
+  pdf.text('OJT PROGRESSTRACK', margin, 17);
 
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(9);
-  pdf.text('OJT ProgressTrack | Student Copy', 14, 25);
-
-  // Summary
-  const submittedCount = this.requirements.filter(
-    requirement => this.hasSubmission(requirement)
-  ).length;
-
-  const pendingCount = this.requirements.length - submittedCount;
-
-  pdf.setTextColor(40, 50, 65);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(11);
-  pdf.text('Checklist Summary', 14, 48);
-
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.text(`Total Requirements: ${this.requirements.length}`, 14, 57);
-  pdf.text(`Submitted: ${submittedCount}`, 14, 64);
-  pdf.text(`Not Yet Submitted: ${pendingCount}`, 14, 71);
+  pdf.setFontSize(7);
+  pdf.setTextColor(...muted);
   pdf.text(
-    `Generated: ${new Date().toLocaleDateString()}`,
-    14,
-    78
+    'INTERNSHIP REQUIREMENT MONITORING SYSTEM',
+    margin,
+    22
   );
 
-  // Requirements table
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(8);
+  pdf.setTextColor(...navy);
+  pdf.text('STUDENT COPY', pageWidth - margin, 17, {
+    align: 'right'
+  });
+
+  pdf.setDrawColor(...navy);
+  pdf.setLineWidth(0.8);
+  pdf.line(margin, 27, pageWidth - margin, 27);
+
+  pdf.setDrawColor(...yellow);
+  pdf.setLineWidth(1.2);
+  pdf.line(margin, 29, margin + 35, 29);
+
+  // =====================================
+  // DOCUMENT TITLE
+  // =====================================
+
+  pdf.setTextColor(...navy);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(18);
+  pdf.text('STUDENT REQUIREMENTS CHECKLIST', margin, 42);
+
+  pdf.setTextColor(...muted);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(8);
+  pdf.text(
+    'Official record of internship document requirements',
+    margin,
+    48
+  );
+
+  // =====================================
+  // STUDENT INFORMATION
+  // =====================================
+
+  pdf.setTextColor(...navy);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(9);
+  pdf.text('STUDENT INFORMATION', margin, 62);
+
+  pdf.setDrawColor(215, 221, 229);
+  pdf.setLineWidth(0.3);
+  pdf.line(margin, 65, pageWidth - margin, 65);
+
+  const infoY = 73;
+  const secondRowY = 86;
+
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(7);
+  pdf.setTextColor(...muted);
+
+  pdf.text('STUDENT NAME', margin, infoY);
+  pdf.text('ACCOUNT EMAIL', 112, infoY);
+  pdf.text('COURSE / SECTION', 220, infoY);
+  pdf.text('STUDENT ID', margin, secondRowY);
+  pdf.text('DATE GENERATED', 112, secondRowY);
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(9);
+  pdf.setTextColor(...dark);
+
+  pdf.text(studentName, margin, infoY + 5);
+  pdf.text(studentEmail, 112, infoY + 5);
+  pdf.text('Not specified', 220, infoY + 5);
+  pdf.text('Not specified', margin, secondRowY + 5);
+  pdf.text(new Date().toLocaleDateString(), 112, secondRowY + 5);
+
+  // =====================================
+  // REQUIREMENTS TABLE
+  // =====================================
+
+  pdf.setTextColor(...navy);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(9);
+  pdf.text('REQUIREMENTS LIST', margin, 104);
+
+  pdf.setDrawColor(215, 221, 229);
+  pdf.line(margin, 107, pageWidth - margin, 107);
+
   const tableRows = this.requirements.map((requirement, index) => {
     const submission = this.submissions.find(
       item => item.requirementId === requirement.id
     );
 
-    const dueDate = requirement.dueDate
-      ? String(requirement.dueDate)
-      : 'Not specified';
-
     return [
-      String(index + 1),
+      String(index + 1).padStart(2, '0'),
       requirement.name,
       requirement.expectedFileName || 'Not specified',
-      dueDate,
+      requirement.dueDate
+        ? String(requirement.dueDate)
+        : 'Not specified',
       submission ? 'Submitted' : 'Not Yet Submitted',
-      '[   ]'
+      '________________'
     ];
   });
 
   autoTable(pdf, {
-    startY: 86,
+    startY: 112,
     head: [[
-      '#',
-      'Requirement',
-      'Expected Filename',
-      'Due Date',
-      'Status',
-      'Done'
+      'NO.',
+      'REQUIREMENT',
+      'EXPECTED FILE NAME',
+      'DUE DATE',
+      'SUBMISSION STATUS',
+      'CHECK / REMARKS'
     ]],
     body: tableRows,
-    theme: 'grid',
-    headStyles: {
-      fillColor: [28, 47, 77],
-      textColor: [255, 255, 255],
-      fontStyle: 'bold'
+    theme: 'plain',
+    margin: {
+      left: margin,
+      right: margin,
+      bottom: 23
     },
     styles: {
       font: 'helvetica',
       fontSize: 8,
-      cellPadding: 3,
-      overflow: 'linebreak'
+      textColor: dark,
+      cellPadding: 4,
+      lineColor: [220, 225, 232],
+      lineWidth: 0.2,
+      overflow: 'linebreak',
+      valign: 'middle',
+      minCellHeight: 12
+    },
+    headStyles: {
+      fillColor: navy,
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 7,
+      cellPadding: 4,
+      halign: 'left'
+    },
+    alternateRowStyles: {
+      fillColor: [248, 249, 251]
     },
     columnStyles: {
-  0: { cellWidth: 12 },
-  1: { cellWidth: 55 },
-  2: { cellWidth: 75 },
-  3: { cellWidth: 35 },
-  4: { cellWidth: 45 },
-  5: { cellWidth: 20, halign: 'center' }
-},
-    margin: {
-  left: 10,
-  right: 10
-}
+      0: { cellWidth: 13, halign: 'center' },
+      1: { cellWidth: 62, fontStyle: 'bold' },
+      2: { cellWidth: 65 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 45, halign: 'center' },
+      5: { cellWidth: 44, halign: 'center' }
+    },
+    didParseCell: (data) => {
+      if (data.section === 'body' && data.column.index === 4) {
+        const isSubmitted = data.cell.raw === 'Submitted';
+
+        data.cell.styles.textColor = isSubmitted
+          ? [35, 120, 80]
+          : [165, 112, 30];
+
+        data.cell.styles.fontStyle = 'bold';
+      }
+    }
   });
 
-  // Footer on each page
+  // =====================================
+  // REMINDER
+  // =====================================
+
+  const finalY = (pdf as any).lastAutoTable.finalY + 12;
+
+  if (finalY < pageHeight - 24) {
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.setTextColor(...navy);
+    pdf.text('REMINDER', margin, finalY);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.setTextColor(...muted);
+    pdf.text(
+      'Please ensure that all required documents are submitted within their specified deadlines.',
+      margin,
+      finalY + 6
+    );
+  }
+
+  // =====================================
+  // FOOTER ON EVERY PAGE
+  // =====================================
+
   const pageCount = pdf.getNumberOfPages();
 
   for (let page = 1; page <= pageCount; page++) {
     pdf.setPage(page);
 
-    const pageHeight = pdf.internal.pageSize.getHeight();
+    pdf.setDrawColor(215, 221, 229);
+    pdf.setLineWidth(0.3);
+    pdf.line(
+      margin,
+      pageHeight - 16,
+      pageWidth - margin,
+      pageHeight - 16
+    );
 
-    pdf.setDrawColor(210, 215, 223);
-    pdf.line(14, pageHeight - 15, pageWidth - 14, pageHeight - 15);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(7);
+    pdf.setTextColor(...navy);
+    pdf.text('OJT PROGRESSTRACK', margin, pageHeight - 10);
 
-    pdf.setTextColor(100, 110, 125);
-    pdf.setFontSize(8);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(...muted);
     pdf.text(
-      'OJT ProgressTrack - Requirements Checklist',
-      14,
-      pageHeight - 9
+      'Student Requirements Checklist',
+      margin + 35,
+      pageHeight - 10
     );
 
     pdf.text(
       `Page ${page} of ${pageCount}`,
-      pageWidth - 14,
-      pageHeight - 9,
+      pageWidth - margin,
+      pageHeight - 10,
       { align: 'right' }
     );
   }
+
+  // =====================================
+  // DOWNLOAD
+  // =====================================
 
   pdf.save('OJT_Requirements_Checklist.pdf');
 
@@ -410,6 +611,7 @@ downloadChecklist(): void {
     showConfirmButton: false
   });
 }
+
 
 
 async submitDocument(): Promise<void> {
@@ -509,23 +711,24 @@ async submitDocument(): Promise<void> {
       status: 'Submitted'
     });
 
-    // CREATE COORDINATOR NOTIFICATION
-    try {
-      await this.notificationService.createNotification({
-        studentUid: studentUid,
-        studentName: studentName,
-        type: 'requirement',
-        title: 'New Requirement Submitted',
-        message: `${studentName} submitted ${requirement.name}.`,
-        relatedId: requirement.id
-      });
+  // CREATE COORDINATOR NOTIFICATION
+try {
+  await this.notificationService.createNotification({
+    studentUid: studentUid,
+    studentName: studentName,
+    recipientRole: 'coordinator',
+    type: 'requirement',
+    title: 'New Requirement Submitted',
+    message: `${studentName} submitted ${requirement.name}.`,
+    relatedId: requirement.id
+  });
 
-    } catch (notificationError) {
-      console.error(
-        'Failed to create requirement notification:',
-        notificationError
-      );
-    }
+} catch (notificationError) {
+  console.error(
+    'Failed to create requirement notification:',
+    notificationError
+  );
+}
 
     // REFRESH STUDENT SUBMISSIONS
     const updatedSubmissions =

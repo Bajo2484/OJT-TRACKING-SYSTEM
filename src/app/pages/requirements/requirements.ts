@@ -3,6 +3,7 @@ import { RequirementsCacheService } from '../../services/requirements-cache.serv
 import { RequirementsService, OjtRequirement } from '../../services/requirements.service';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../services/notification.service';
 
 import {
   collection,
@@ -12,9 +13,6 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../../services/firebase';
-
-
-
 
 interface StudentRequirement {
   uid: string;
@@ -69,7 +67,8 @@ async ngOnInit(): Promise<void> {
    constructor(
   private requirementsService: RequirementsService,
   private requirementsCache: RequirementsCacheService,
-  private cdr: ChangeDetectorRef
+  private cdr: ChangeDetectorRef,
+   private notificationService: NotificationService
 ) {}
 
   showAddForm = false;
@@ -404,13 +403,36 @@ async reviewSubmission(
 
   try {
     await this.requirementsService.reviewSubmission(
-      submission.id,
-      decision,
-      feedback
-    );
+  submission.id,
+  decision,
+  feedback
+);
 
-    submission.status = decision;
-    submission.feedback = feedback;
+submission.status = decision;
+submission.feedback = feedback;
+
+// CREATE STUDENT NOTIFICATION
+try {
+  const student = this.selectedStudent;
+
+  if (student) {
+    await this.notificationService.createNotification({
+      studentUid: student.uid,
+      studentName: student.fullName,
+      recipientRole: 'student',
+      type: 'requirement',
+      title: decision === 'Approved'
+        ? 'Requirement Approved'
+        : 'Revision Requested',
+      message: decision === 'Approved'
+        ? `Your submitted requirement "${submission.requirementName}" has been approved.`
+        : `Your submitted requirement "${submission.requirementName}" needs revision. Feedback: ${feedback}`,
+      relatedId: submission.id
+    });
+  }
+} catch (notificationError) {
+  console.error('Failed to create student notification:', notificationError);
+}
 
     await this.loadStudents();
 

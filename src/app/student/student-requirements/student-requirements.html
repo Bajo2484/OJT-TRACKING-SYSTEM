@@ -366,3 +366,106 @@
       </section>
     </div>
   }
+
+  <!-- VIEW SUBMITTED DOCUMENT MODAL -->
+@if (showViewModal && selectedSubmission) {
+  <div class="modal-overlay view-document-overlay" (click)="closeViewModal()">
+    <section class="view-document-modal" (click)="$event.stopPropagation()">
+
+      <!-- MODAL HEADER -->
+      <header class="view-document-header">
+        <div class="document-header-info">
+          <span class="document-header-label">OJT PROGRESSTRACK</span>
+          <h2>Submitted Document</h2>
+          <p>Review your uploaded requirement file.</p>
+        </div>
+
+        <button
+          type="button"
+          class="view-close-btn"
+          (click)="closeViewModal()"
+          aria-label="Close document viewer">
+          &times;
+        </button>
+      </header>
+
+      <!-- DOCUMENT DETAILS -->
+      <div class="view-document-details">
+        <div class="document-title-info">
+          <span class="detail-label">SUBMITTED FILE</span>
+          <h3>{{ selectedSubmission.requirementName }}</h3>
+          <p>{{ selectedSubmission.fileName }}</p>
+        </div>
+
+        <span class="document-status">
+          <i class="bi bi-check-circle-fill"></i>
+          {{ selectedSubmission.status }}
+        </span>
+      </div>
+
+      <!-- DOCUMENT PREVIEW -->
+      <div class="document-preview-container">
+
+        @if (selectedSubmission.fileType === 'application/pdf') {
+          <iframe
+            class="document-pdf-preview"
+            [src]="safePreviewUrl"
+            title="Submitted PDF Preview">
+          </iframe>
+        }
+        @else if (selectedSubmission.fileType.startsWith('image/')) {
+          <div class="document-image-preview">
+            <img
+              [src]="previewUrl"
+              [alt]="selectedSubmission.fileName">
+          </div>
+        }
+        @else {
+          <div class="document-file-placeholder">
+            <i class="bi bi-file-earmark-word"></i>
+            <h3>Preview Not Available</h3>
+            <p>This file format cannot be previewed here. Download the file to view its contents.</p>
+          </div>
+        }
+
+      </div>
+
+      <!-- FILE INFORMATION -->
+      <div class="document-file-info">
+        <div>
+          <span>File Type</span>
+          <strong>{{ selectedSubmission.fileType }}</strong>
+        </div>
+
+        <div>
+          <span>File Size</span>
+          <strong>{{ (selectedSubmission.fileSize / 1024).toFixed(1) }} KB</strong>
+        </div>
+
+        <div>
+          <span>Date Submitted</span>
+          <strong>{{ selectedSubmissionDate }}</strong>
+        </div>
+      </div>
+
+      <!-- MODAL ACTIONS -->
+      <footer class="view-document-actions">
+        <button
+          type="button"
+          class="document-download-btn"
+          (click)="downloadViewedSubmission()">
+          <i class="bi bi-download"></i>
+          Download File
+        </button>
+
+        <button
+          type="button"
+          class="document-close-btn"
+          (click)="closeViewModal()">
+          Close
+        </button>
+      </footer>
+
+    </section>
+  </div>
+}

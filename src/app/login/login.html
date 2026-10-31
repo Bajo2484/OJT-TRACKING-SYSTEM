@@ -1,156 +1,96 @@
 <div class="login-page">
-  <aside class="brand-panel">
-    <div class="brand">
-      <div class="brand-icon">✓</div>
-      <div>
-        <span class="brand-small">OJT</span>
-        <h2>ProgressTrack</h2>
-      </div>
+  <main class="login-card">
+
+    <div class="logo-container">
+      <img
+        src="/images/logo.jpg"
+        alt="OJT ProgressTrack Logo"
+        class="system-logo"
+      />
     </div>
 
-    <div class="brand-content">
-      <p class="eyebrow">COLLEGE OF INFORMATION TECHNOLOGY</p>
-      <h1>Your internship.<br />One clear record.</h1>
-
-      <p class="brand-description">
-        OJT ProgressTrack: A Web-Based Internship
-        Progress and Requirement Monitoring System.
-      </p>
-
-      <div class="feature">
-        <span class="feature-icon">◷</span>
-        <div>
-          <h3>Track approved internship hours</h3>
-          <p>A clear view of attendance and remaining hours.</p>
-        </div>
-      </div>
-
-      <div class="feature">
-        <span class="feature-icon">▤</span>
-        <div>
-          <h3>Document meaningful progress</h3>
-          <p>Daily and weekly accomplishments in one place.</p>
-        </div>
-      </div>
-
-      <div class="feature">
-        <span class="feature-icon">✓</span>
-        <div>
-          <h3>Keep requirements organized</h3>
-          <p>Role-scoped records and document review.</p>
-        </div>
-      </div>
+    <div class="system-heading">
+      <h1>OJT ProgressTrack</h1>
+      <p>COLLEGE OF INFORMATION TECHNOLOGY</p>
     </div>
 
-    <div class="brand-footer">
-      <strong>Academic Internship Portal</strong>
-      <p>Academic Year 2026–2027 · First Semester</p>
-      <p>College Final Project · Demonstration System</p>
+    <div class="login-heading">
+      <h2>Welcome Back</h2>
+      <p>Log in to manage your internship progress and requirements.</p>
     </div>
-  </aside>
 
-  <main class="form-panel">
-    <header class="topbar">
-      <span>Student &amp; coordinator access</span>
-      <a href="mailto:ojt-support@example.com">ⓘ Help desk</a>
-    </header>
+    <form (submit)="onLogin($event)">
 
-    <section class="login-container">
-      <div class="lock-icon">♙</div>
+      <label for="identifier">Student ID or Email Address</label>
 
-      <h1>Welcome back</h1>
-      <p class="subtitle">
-        Log in to manage your internship progress and requirements.
-      </p>
+      <div class="input-wrap">
+        <input
+          id="identifier"
+          name="identifier"
+          type="text"
+          placeholder="Enter your Student ID or email"
+          autocomplete="username"
+          required
+        />
+      </div>
 
-      <form (submit)="onLogin($event)">
-        <label for="identifier">Student ID or email address</label>
+      <label for="password">Password</label>
 
-        <div class="input-wrap">
-          <input
-            id="identifier"
-            name="identifier"
-            type="text"
-            placeholder="Enter your Student ID or email"
-            autocomplete="username"
-            required
-          />
-          <span class="input-icon">✉</span>
-        </div>
-
-        <label for="password">Password</label>
-
-        <div class="input-wrap">
-          <input
-            id="password"
-            name="password"
-            [type]="showPassword ? 'text' : 'password'"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-            required
-          />
-
-          <button
-            class="password-toggle"
-            type="button"
-            (click)="togglePassword()"
-            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-          >
-            {{ showPassword ? 'Hide' : 'Show' }}
-          </button>
-        </div>
-
-        <div class="form-options">
-          <label class="remember">
-            <input type="checkbox" />
-            <span>Use a trusted device</span>
-          </label>
-
-          <a href="mailto:ojt-support@example.com">
-            Forgot password?
-          </a>
-        </div>
+      <div class="input-wrap">
+        <input
+          id="password"
+          name="password"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        />
 
         <button
-          class="login-button"
-          type="submit"
-          [disabled]="isLoading"
+          class="password-toggle"
+          type="button"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
         >
-          {{ isLoading ? 'Logging in...' : 'Login' }}
-
-          @if (!isLoading) {
-            <span>→</span>
-          }
+          {{ showPassword ? 'Hide' : 'Show' }}
         </button>
-
-        @if (message) {
-          <p class="form-message" role="status">
-            {{ message }}
-          </p>
-        }
-      </form>
-
-      <div class="notice">
-        <span>ⓘ</span>
-        <div>
-          <strong>Restricted access</strong>
-          <p>
-            For authorized OJT students and coordinators only.
-            Use your assigned account. Contact your coordinator
-            for access.
-          </p>
-        </div>
       </div>
 
-      <p class="privacy-note">
-        No public registration. Do not share your credentials.
-        Always log out when using a shared device.
-      </p>
-    </section>
+      <div class="form-options">
+        <span>Student & Coordinator Access</span>
+        <a href="mailto:ojt-support@example.com">Need help?</a>
+      </div>
 
-    <footer class="page-footer">
-      <span>© 2026 OJT ProgressTrack</span>
-      <span>Privacy notice · Support</span>
+      <button
+        class="login-button"
+        type="submit"
+        [disabled]="isLoading"
+      >
+        {{ isLoading ? 'Logging in...' : 'Sign In' }}
+
+        @if (!isLoading) {
+          <span>→</span>
+        }
+      </button>
+
+      @if (message) {
+        <p class="form-message" role="status">
+          {{ message }}
+        </p>
+      }
+    </form>
+
+    <div class="login-notice">
+      <strong>Restricted Access</strong>
+      <p>
+        This portal is exclusively for authorized OJT students
+        and coordinators. Please use your assigned account.
+      </p>
+    </div>
+
+    <footer class="login-footer">
+      © 2026 OJT ProgressTrack. All Rights Reserved.
     </footer>
+
   </main>
 </div>

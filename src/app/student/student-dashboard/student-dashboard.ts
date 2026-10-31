@@ -132,9 +132,10 @@ export class StudentDashboard implements OnInit {
       this.message = 'Unable to load your OJT progress. Please try again.';
     } finally {
       this.isLoading = false;
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
+
 
   async loadDashboardDetails(): Promise<void> {
     const student = auth.currentUser;
@@ -189,7 +190,7 @@ export class StudentDashboard implements OnInit {
       console.error('Unable to load student dashboard details:', error);
       this.message = 'Some dashboard information could not be loaded. Please refresh and try again.';
     } finally {
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
 

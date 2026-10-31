@@ -49,7 +49,6 @@
         <span>Profile &amp; Placement</span>
       </a>
 
-
     </nav>
 
     <div class="sidebar-footer">
@@ -69,29 +68,108 @@
       </div>
 
       <div class="topbar-actions">
-        <button type="button" class="notification-btn" aria-label="Notifications">
-          ♧
+
+        <!-- NOTIFICATIONS -->
+        <div class="notification-wrapper">
+
+          <button
+            type="button"
+            class="notification-btn"
+            (click)="toggleNotifications()"
+            [attr.aria-expanded]="showNotifications"
+            aria-label="Notifications">
+
+           <lucide-icon name="bell" [size]="20"></lucide-icon>
+
+            <span class="notification-badge" *ngIf="unreadCount > 0">
+              {{ unreadCount > 99 ? '99+' : unreadCount }}
+            </span>
+
+          </button>
+
+          <!-- NOTIFICATION DROPDOWN -->
+          <div class="notification-dropdown" *ngIf="showNotifications">
+
+            <div class="notification-header">
+              <div>
+                <h3>Notifications</h3>
+                <span>{{ unreadCount }} unread notifications</span>
+              </div>
+
+              <button
+                type="button"
+                class="mark-all-btn"
+                *ngIf="unreadCount > 0"
+                (click)="markAllNotificationsAsRead()">
+                Mark all as read
+              </button>
+            </div>
+
+            <div class="notification-list" *ngIf="notifications.length > 0">
+
+              <div
+                class="notification-item"
+                *ngFor="let notification of notifications"
+                [class.unread]="!notification.isRead"
+                (click)="markNotificationAsRead(notification)">
+
+                <div class="notification-icon">
+                 <lucide-icon
+  [name]="
+    notification.type === 'requirement' ? 'file-text' :
+    notification.type === 'accomplishment' ? 'book-open' :
+    notification.type === 'placement' ? 'briefcase' :
+    'clock'
+  "
+  [size]="19">
+</lucide-icon>
+                </div>
+
+                <div class="notification-details">
+                  <strong>{{ notification.title }}</strong>
+                  <p>{{ notification.message }}</p>
+                  <span>
+                    {{ notification.createdAt.toDate() | date:'MMM d, y • h:mm a' }}
+                  </span>
+                </div>
+
+                <span class="unread-dot" *ngIf="!notification.isRead"></span>
+
+              </div>
+
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div class="notification-empty" *ngIf="notifications.length === 0">
+              <lucide-icon name="bell-off" [size]="28"></lucide-icon>
+              <strong>No notifications yet</strong>
+              <span>You're all caught up!</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- STUDENT USER -->
+        <div class="student-user">
+          <div class="user-avatar">S</div>
+
+          <div class="user-details">
+            <strong>OJT Student</strong>
+            <span>Student Account</span>
+          </div>
+        </div>
+
+        <!-- LOGOUT -->
+        <button
+          type="button"
+          class="logout-btn"
+          (click)="logout()"
+          aria-label="Log out of your account"
+          title="Log out">
+          <span aria-hidden="true">↪</span>
+          <span>Logout</span>
         </button>
-
-       
-<div class="student-user">
-  <div class="user-avatar">S</div>
-
-  <div class="user-details">
-    <strong>OJT Student</strong>
-    <span>Student Account</span>
-  </div>
-</div>
-
-<button
-  type="button"
-  class="logout-btn"
-  (click)="logout()"
-  aria-label="Log out of your account"
-  title="Log out">
-  <span aria-hidden="true">↪</span>
-  <span>Logout</span>
-</button>
 
       </div>
     </header>
