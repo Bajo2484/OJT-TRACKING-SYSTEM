@@ -1,5 +1,16 @@
 
-<div class="student-layout">
+<div
+  class="student-layout"
+  [class.sidebar-expanded]="sidebarExpanded"
+  [class.menu-open]="menuOpen">
+
+  <!-- MOBILE OVERLAY -->
+  <button
+    type="button"
+    class="sidebar-overlay"
+    aria-label="Close navigation menu"
+    (click)="closeMenu()">
+  </button>
 
   <!-- SIDEBAR -->
   <aside class="student-sidebar">
@@ -13,9 +24,20 @@
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <p class="section-label">INTERNSHIP PORTAL</p>
-      <p class="portal-role">OJT Student</p>
+    <div class="sidebar-heading">
+      <div class="sidebar-section">
+        <p class="section-label">INTERNSHIP PORTAL</p>
+        <p class="portal-role">OJT Student</p>
+      </div>
+
+      <button
+        type="button"
+        class="sidebar-collapse-btn"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
+        [title]="sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'">
+        {{ sidebarExpanded ? '‹' : '›' }}
+      </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -24,29 +46,46 @@
         routerLink="/student/dashboard"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-link">
+        class="nav-link"
+        (click)="closeMenu()">
         <span class="nav-icon">▦</span>
-        <span>Overview</span>
+        <span class="nav-text">Overview</span>
       </a>
 
-      <a routerLink="/student/hours" routerLinkActive="active" class="nav-link">
+      <a
+        routerLink="/student/hours"
+        routerLinkActive="active"
+        class="nav-link"
+        (click)="closeMenu()">
         <span class="nav-icon">◷</span>
-        <span>Internship Hours</span>
+        <span class="nav-text">Internship Hours</span>
       </a>
 
-      <a routerLink="/student/accomplishments" routerLinkActive="active" class="nav-link">
+      <a
+        routerLink="/student/accomplishments"
+        routerLinkActive="active"
+        class="nav-link"
+        (click)="closeMenu()">
         <span class="nav-icon">▤</span>
-        <span>Accomplishments</span>
+        <span class="nav-text">Accomplishments</span>
       </a>
 
-      <a routerLink="/student/requirements" routerLinkActive="active" class="nav-link">
+      <a
+        routerLink="/student/requirements"
+        routerLinkActive="active"
+        class="nav-link"
+        (click)="closeMenu()">
         <span class="nav-icon">▣</span>
-        <span>Requirements</span>
+        <span class="nav-text">Requirements</span>
       </a>
 
-      <a routerLink="/student/profile" routerLinkActive="active" class="nav-link">
+      <a
+        routerLink="/student/profile"
+        routerLinkActive="active"
+        class="nav-link"
+        (click)="closeMenu()">
         <span class="nav-icon">♙</span>
-        <span>Profile &amp; Placement</span>
+        <span class="nav-text">Profile &amp; Placement</span>
       </a>
 
     </nav>
@@ -63,8 +102,23 @@
 
     <!-- TOPBAR -->
     <header class="student-topbar">
-      <div class="topbar-page-title">
-        <span>Student Portal</span>
+
+      <div class="topbar-left">
+
+        <!-- MOBILE HAMBURGER -->
+        <button
+          type="button"
+          class="menu-toggle"
+          (click)="toggleMenu()"
+          [attr.aria-expanded]="menuOpen"
+          aria-label="Toggle navigation menu">
+          {{ menuOpen ? '✕' : '☰' }}
+        </button>
+
+        <div class="topbar-page-title">
+          <span>Student Portal</span>
+        </div>
+
       </div>
 
       <div class="topbar-actions">
@@ -79,7 +133,7 @@
             [attr.aria-expanded]="showNotifications"
             aria-label="Notifications">
 
-           <lucide-icon name="bell" [size]="20"></lucide-icon>
+            <lucide-icon name="bell" [size]="20"></lucide-icon>
 
             <span class="notification-badge" *ngIf="unreadCount > 0">
               {{ unreadCount > 99 ? '99+' : unreadCount }}
@@ -114,15 +168,15 @@
                 (click)="markNotificationAsRead(notification)">
 
                 <div class="notification-icon">
-                 <lucide-icon
-  [name]="
-    notification.type === 'requirement' ? 'file-text' :
-    notification.type === 'accomplishment' ? 'book-open' :
-    notification.type === 'placement' ? 'briefcase' :
-    'clock'
-  "
-  [size]="19">
-</lucide-icon>
+                  <lucide-icon
+                    [name]="
+                      notification.type === 'requirement' ? 'file-text' :
+                      notification.type === 'accomplishment' ? 'book-open' :
+                      notification.type === 'placement' ? 'briefcase' :
+                      'clock'
+                    "
+                    [size]="19">
+                  </lucide-icon>
                 </div>
 
                 <div class="notification-details">
@@ -150,15 +204,47 @@
 
         </div>
 
-        <!-- STUDENT USER -->
-        <div class="student-user">
-          <div class="user-avatar">S</div>
+        
+<!-- STUDENT USER MENU -->
+<div class="student-user-wrapper">
 
-          <div class="user-details">
-            <strong>OJT Student</strong>
-            <span>Student Account</span>
-          </div>
-        </div>
+  <button
+    type="button"
+    class="student-user"
+    (click)="toggleProfileMenu()"
+    [attr.aria-expanded]="showProfileMenu"
+    aria-label="Open student account menu">
+
+    <div class="user-avatar">S</div>
+
+    <div class="user-details">
+      <strong>OJT Student</strong>
+      <span>Student Account</span>
+    </div>
+
+    <span class="user-chevron">
+      {{ showProfileMenu ? '⌃' : '⌄' }}
+    </span>
+
+  </button>
+
+  <!-- ACCOUNT DROPDOWN -->
+  <div class="student-profile-dropdown" *ngIf="showProfileMenu">
+
+    <button
+      type="button"
+      class="student-dropdown-item"
+      (click)="navigateToSettings()">
+
+      <span class="dropdown-icon">⚙</span>
+      <span>Settings</span>
+
+    </button>
+
+  </div>
+
+</div>
+
 
         <!-- LOGOUT -->
         <button

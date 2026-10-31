@@ -1,3 +1,4 @@
+
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import {
   NotificationService,
@@ -20,10 +21,16 @@ import {
   Clock,
   ClipboardList,
   FileText,
-          ChartNoAxesCombined,
-        LogOut,
-        Bell,
-        X
+  ChartNoAxesCombined,
+  LogOut,
+  Bell,
+  X,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+  UserRound,
+  Settings,
+  ChevronDown
 } from 'lucide-angular';
 
 @Component({
@@ -45,11 +52,13 @@ import {
         Clock,
         ClipboardList,
         FileText,
-          ChartNoAxesCombined,
-  LogOut,
-  Bell,
-  X
-        
+        ChartNoAxesCombined,
+        LogOut,
+        Bell,
+        X,
+        Menu,
+        ChevronLeft,
+        ChevronRight
       })
     }
   ],
@@ -60,6 +69,13 @@ export class MainLayout implements OnInit, OnDestroy {
 
   notifications: OjtNotification[] = [];
   unreadCount = 0;
+
+  showNotifications = false;
+    showProfileMenu = false;
+
+  // SIDEBAR STATES
+  sidebarExpanded = true;
+  menuOpen = false;
 
   private unsubscribeNotifications?: () => void;
 
@@ -87,23 +103,55 @@ export class MainLayout implements OnInit, OnDestroy {
     this.unsubscribeNotifications?.();
   }
 
-    showNotifications = false;
+  // SIDEBAR METHODS
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
 
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
+    // PROFILE MENU METHODS
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
+    this.showNotifications = false;
+  }
+
+  closeProfileMenu(): void {
+    this.showProfileMenu = false;
+  }
+
+  navigateToProfile(): void {
+    this.closeProfileMenu();
+    this.router.navigate(['/coordinator/profile']);
+  }
+
+  navigateToSettings(): void {
+    this.closeProfileMenu();
+    this.router.navigate(['/coordinator/settings']);
+  }
+
+  toggleSidebar(): void {
+    this.sidebarExpanded = !this.sidebarExpanded;
+  }
+
+  // NOTIFICATION METHODS
   toggleNotifications(): void {
     this.showNotifications = !this.showNotifications;
   }
 
   async markNotificationAsRead(notification: OjtNotification): Promise<void> {
-  if (!notification.id || notification.isRead) {
-    return;
-  }
+    if (!notification.id || notification.isRead) {
+      return;
+    }
 
-  try {
-    await this.notificationService.markAsRead(notification.id);
-  } catch (error) {
-    console.error('Failed to mark notification as read:', error);
+    try {
+      await this.notificationService.markAsRead(notification.id);
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
   }
-}
 
   menuItems = [
     { label: 'Dashboard', icon: 'layout-dashboard', route: '/coordinator/dashboard' },

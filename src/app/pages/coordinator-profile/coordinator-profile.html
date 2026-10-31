@@ -1,0 +1,154 @@
+
+<div class="profile-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-heading">
+    <div>
+      <span class="page-eyebrow">ACCOUNT MANAGEMENT</span>
+      <h1>My Profile</h1>
+      <p>Manage your coordinator account information.</p>
+    </div>
+
+    <button class="back-button" type="button" (click)="goBack()">
+      <lucide-icon name="arrow-left" [size]="17"></lucide-icon>
+      <span>Back to Dashboard</span>
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loader"></div>
+      <p>Loading your profile...</p>
+    </div>
+  }
+
+  <!-- ERROR -->
+  @if (!isLoading && loadError) {
+    <div class="error-state">
+      <lucide-icon name="shield-check" [size]="24"></lucide-icon>
+      <h3>Unable to load profile</h3>
+      <p>{{ loadError }}</p>
+    </div>
+  }
+
+  @if (!isLoading && !loadError) {
+
+    <!-- PROFILE HERO -->
+    <section class="profile-hero">
+
+      <div class="hero-content">
+        <div class="profile-avatar">
+          {{ initials }}
+        </div>
+
+        <div class="hero-info">
+          <span class="profile-label">COORDINATOR ACCOUNT</span>
+          <h2>{{ fullName }}</h2>
+
+          <div class="hero-meta">
+            <span class="role-tag">
+              <lucide-icon name="shield-check" [size]="14"></lucide-icon>
+              Administrator
+            </span>
+
+            <span class="account-status">
+              <span class="status-dot"></span>
+              Active Account
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-decoration">
+        <lucide-icon name="user-round" [size]="115"></lucide-icon>
+      </div>
+
+    </section>
+
+    <!-- PROFILE CONTENT -->
+    <section class="profile-content">
+
+      <div class="section-heading">
+        <div>
+          <h3>Personal Information</h3>
+          <p>Your registered coordinator account details.</p>
+        </div>
+
+        <span class="section-icon">
+          <lucide-icon name="user-round" [size]="19"></lucide-icon>
+        </span>
+      </div>
+
+      <div class="information-grid">
+
+        <!-- FULL NAME -->
+        <div class="information-item">
+          <div class="information-icon">
+            <lucide-icon name="user-round" [size]="19"></lucide-icon>
+          </div>
+
+          <div class="information-details">
+            <span>Full Name</span>
+            <h4>{{ fullName }}</h4>
+          </div>
+        </div>
+
+        <!-- EMAIL -->
+        <div class="information-item">
+          <div class="information-icon">
+            <lucide-icon name="mail" [size]="19"></lucide-icon>
+          </div>
+
+          <div class="information-details">
+            <span>Email Address</span>
+            <h4>{{ email }}</h4>
+          </div>
+        </div>
+
+        <!-- ROLE -->
+        <div class="information-item">
+          <div class="information-icon">
+            <lucide-icon name="shield-check" [size]="19"></lucide-icon>
+          </div>
+
+          <div class="information-details">
+            <span>Account Role</span>
+            <h4>Administrator</h4>
+          </div>
+        </div>
+
+        <!-- ACCOUNT TYPE -->
+        <div class="information-item">
+          <div class="information-icon">
+            <lucide-icon name="user-round" [size]="19"></lucide-icon>
+          </div>
+
+          <div class="information-details">
+            <span>Portal Access</span>
+            <h4>Coordinator Portal</h4>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECURITY NOTE -->
+      <div class="security-note">
+        <div class="security-icon">
+          <lucide-icon name="shield-check" [size]="20"></lucide-icon>
+        </div>
+
+        <div>
+          <h4>Account Information Protected</h4>
+          <p>
+            Your coordinator role and account access are managed securely
+            by the system.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+  }
+
+</div>

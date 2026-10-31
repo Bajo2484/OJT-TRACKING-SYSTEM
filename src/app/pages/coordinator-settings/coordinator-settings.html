@@ -1,0 +1,263 @@
+
+<div class="settings-page">
+
+  <!-- HEADER -->
+  <header class="settings-header">
+    <div>
+      <span class="page-eyebrow">ACCOUNT MANAGEMENT</span>
+      <h1>Settings</h1>
+      <p>Manage your security and notification preferences.</p>
+    </div>
+
+    <div class="settings-header-icon">
+      <lucide-icon name="settings" [size]="22"></lucide-icon>
+    </div>
+  </header>
+
+  <!-- LANDSCAPE SETTINGS GRID -->
+  <div class="settings-grid">
+
+    <!-- ACCOUNT SECURITY -->
+    <section class="settings-card security-card">
+
+      <div class="card-heading">
+        <div class="heading-icon">
+          <lucide-icon name="shield-check" [size]="20"></lucide-icon>
+        </div>
+
+        <div>
+          <h2>Account Security</h2>
+          <p>Keep your coordinator account protected.</p>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <div class="section-heading">
+        <div>
+          <h3>Change Password</h3>
+          <p>Enter your current password and choose a new one.</p>
+        </div>
+        <span class="section-label">PASSWORD</span>
+      </div>
+
+      <form class="password-form" (ngSubmit)="changePassword()">
+
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+
+          <div class="password-input-wrapper">
+            <input
+              id="currentPassword"
+              [type]="showCurrentPassword ? 'text' : 'password'"
+              name="currentPassword"
+              [(ngModel)]="currentPassword"
+              placeholder="Enter current password"
+              autocomplete="current-password"
+              required
+            />
+
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="showCurrentPassword = !showCurrentPassword"
+              [attr.aria-label]="showCurrentPassword ? 'Hide password' : 'Show password'">
+
+              <lucide-icon
+                [name]="showCurrentPassword ? 'eye-off' : 'eye'"
+                [size]="17">
+              </lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="password-row">
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+
+            <div class="password-input-wrapper">
+              <input
+                id="newPassword"
+                [type]="showNewPassword ? 'text' : 'password'"
+                name="newPassword"
+                [(ngModel)]="newPassword"
+                placeholder="Enter new password"
+                autocomplete="new-password"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="showNewPassword = !showNewPassword"
+                [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
+
+                <lucide-icon
+                  [name]="showNewPassword ? 'eye-off' : 'eye'"
+                  [size]="17">
+                </lucide-icon>
+              </button>
+            </div>
+            <span class="field-hint">Minimum 6 characters</span>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+
+            <div class="password-input-wrapper">
+              <input
+                id="confirmPassword"
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                name="confirmPassword"
+                [(ngModel)]="confirmPassword"
+                placeholder="Confirm new password"
+                autocomplete="new-password"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="showConfirmPassword = !showConfirmPassword"
+                [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
+
+                <lucide-icon
+                  [name]="showConfirmPassword ? 'eye-off' : 'eye'"
+                  [size]="17">
+                </lucide-icon>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        @if (passwordError) {
+          <div class="password-error">
+            <lucide-icon name="alert-circle" [size]="16"></lucide-icon>
+            <span>{{ passwordError }}</span>
+          </div>
+        }
+
+        <div class="password-actions">
+          <span class="password-security-note">
+            <lucide-icon name="lock-keyhole" [size]="14"></lucide-icon>
+            Your password is securely managed.
+          </span>
+
+          <button
+            type="submit"
+            class="save-password-button"
+            [disabled]="isChangingPassword">
+
+            @if (isChangingPassword) {
+              <span class="button-spinner"></span>
+              <span>Updating...</span>
+            } @else {
+              <lucide-icon name="lock-keyhole" [size]="15"></lucide-icon>
+              <span>Update Password</span>
+            }
+
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+    <!-- NOTIFICATION PREFERENCES -->
+    <section class="settings-card notification-card">
+
+      <div class="card-heading">
+        <div class="heading-icon">
+          <lucide-icon name="bell" [size]="20"></lucide-icon>
+        </div>
+
+        <div>
+          <h2>Notifications</h2>
+          <p>Manage your system alerts.</p>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <div class="notification-content">
+
+        <div class="notification-top">
+          <span class="section-label">PREFERENCES</span>
+
+          <span
+            class="notification-status"
+            [class.status-enabled]="notificationsEnabled"
+            [class.status-disabled]="!notificationsEnabled">
+
+            <span class="status-dot"></span>
+            {{ notificationsEnabled ? 'Enabled' : 'Disabled' }}
+
+          </span>
+        </div>
+
+        <div class="notification-option">
+
+          <div class="notification-icon">
+            <lucide-icon name="bell-ring" [size]="21"></lucide-icon>
+          </div>
+
+          <div class="notification-information">
+            <h3>System Notifications</h3>
+            <p>
+              Receive updates about OJT student activities,
+              submissions, and important system alerts.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="notification-control">
+
+          <div>
+            <span class="control-title">Receive Notifications</span>
+            <span class="control-description">
+              Turn system notifications on or off.
+            </span>
+          </div>
+
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [(ngModel)]="notificationsEnabled"
+              (change)="toggleNotifications()"
+              aria-label="Toggle system notifications"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+
+        </div>
+
+      </div>
+
+      <div class="notification-footer">
+        <lucide-icon name="info" [size]="15"></lucide-icon>
+        <span>Your preference is saved on this browser.</span>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- SECURITY FOOTER -->
+  <div class="settings-footer">
+    <div class="footer-icon">
+      <lucide-icon name="shield-check" [size]="19"></lucide-icon>
+    </div>
+
+    <div>
+      <h4>Account Protection</h4>
+      <p>
+        Keep your login credentials private and use a strong password
+        to protect your coordinator account.
+      </p>
+    </div>
+  </div>
+
+</div>

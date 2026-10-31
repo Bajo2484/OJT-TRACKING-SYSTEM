@@ -11,12 +11,15 @@ import { StudentHours } from './student/student-hours/student-hours';
 import { StudentAccomplishments } from './student/student-accomplishments/student-accomplishments';
 import { StudentRequirements } from './student/student-requirements/student-requirements';
 import { StudentProfile } from './student/student-profile/student-profile';
+import { StudentSettings } from './student/student-settings/student-settings';
 
 import { OjtStudents } from './pages/ojt-students/ojt-students';
 import { OjtHours } from './pages/ojt-hours/ojt-hours';
 import { Accomplishments } from './pages/accomplishments/accomplishments';
 import { Requirements } from './pages/requirements/requirements';
 import { ProgressMonitoring } from './pages/progress-monitoring/progress-monitoring';
+import { CoordinatorProfile } from './pages/coordinator-profile/coordinator-profile';
+import { CoordinatorSettings } from './pages/coordinator-settings/coordinator-settings';
 
 export const routes: Routes = [
   // Login page
@@ -50,7 +53,10 @@ export const routes: Routes = [
         path: 'profile',
         component: StudentProfile
       },
-     
+      {
+        path: 'settings',
+        component: StudentSettings
+      },
       {
         path: '',
         redirectTo: 'dashboard',
@@ -87,6 +93,14 @@ export const routes: Routes = [
       {
         path: 'progress-monitoring',
         component: ProgressMonitoring
+      },
+      {
+        path: 'profile',
+        component: CoordinatorProfile
+      },
+      {
+        path: 'settings',
+        component: CoordinatorSettings
       },
       {
         path: '',
