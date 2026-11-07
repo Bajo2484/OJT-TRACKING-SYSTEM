@@ -1,3 +1,4 @@
+
 import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,10 +8,7 @@ import { RequirementsService } from '../../services/requirements.service';
 import { OjtRequirement, OjtSubmission } from '../../services/requirements.service';
 import Swal from 'sweetalert2';
 
-type ProgressStatus =
-  | 'In Progress'
-  | 'Completed'
-  | 'Needs Follow-up';
+type ProgressStatus = 'In Progress' | 'Completed' | 'Needs Follow-up';
 
 interface StudentProgress {
   studentId: string;
@@ -30,7 +28,7 @@ interface StudentProgress {
   styleUrl: './progress-monitoring.css'
 })
 export class ProgressMonitoring implements OnInit {
-    private studentAccountService = inject(StudentAccountService);
+  private studentAccountService = inject(StudentAccountService);
   private attendanceService = inject(AttendanceService);
   private requirementsService = inject(RequirementsService);
   private cdr = inject(ChangeDetectorRef);
@@ -42,97 +40,97 @@ export class ProgressMonitoring implements OnInit {
   isLoading = false;
   loadError = '';
 
-    students: StudentProgress[] = [];
+  students: StudentProgress[] = [];
 
-      ngOnInit(): void {
+  ngOnInit(): void {
     this.loadProgressData();
   }
 
   async loadProgressData(): Promise<void> {
-  this.isLoading = true;
-  this.loadError = '';
+    this.isLoading = true;
+    this.loadError = '';
 
-  Swal.fire({
-    title: 'Loading Progress Monitoring',
-    text: 'Please wait while we fetch student records...',
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
-  });
-
-  try {
-    const [students, attendance, requirements, submissions] =
-      await Promise.all([
-        this.studentAccountService.getAllStudents(),
-        this.attendanceService.getAllAttendance(),
-        this.requirementsService.getRequirements(),
-        this.requirementsService.getAllSubmissions()
-      ]);
-
-    this.students = students.map(student => {
-      const studentAttendance = attendance.filter(
-        record => record.studentUid === student.uid
-      );
-
-      const completedHours = studentAttendance
-        .filter(record => record.status === 'Completed')
-        .reduce((total, record) => total + record.hours, 0);
-
-      const studentSubmissions = submissions.filter(
-        submission => submission.studentUid === student.uid
-      );
-
-      const completedRequirements = studentSubmissions.filter(
-        submission => submission.status === 'Approved'
-      ).length;
-
-      const hasRevision = studentSubmissions.some(
-        submission => submission.status === 'Needs Revision'
-      );
-
-      const totalRequirements = requirements.length;
-      const requiredHours = 486;
-
-      let status: ProgressStatus;
-
-      if (
-        completedHours >= requiredHours &&
-        completedRequirements >= totalRequirements
-      ) {
-        status = 'Completed';
-      } else if (hasRevision) {
-        status = 'Needs Follow-up';
-      } else {
-        status = 'In Progress';
+    Swal.fire({
+      title: 'Loading Progress Monitoring',
+      text: 'Please wait while we fetch student records...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
       }
-
-      return {
-        studentId: student.studentId,
-        fullName: student.fullName,
-        requiredHours,
-        completedHours: Math.round(completedHours * 100) / 100,
-        completedRequirements,
-        totalRequirements,
-        status
-      };
     });
 
-  } catch (error) {
-    console.error('Error loading progress data:', error);
-    this.loadError = 'Unable to load student progress. Please try again.';
+    try {
+      const [students, attendance, requirements, submissions] =
+        await Promise.all([
+          this.studentAccountService.getAllStudents(),
+          this.attendanceService.getAllAttendance(),
+          this.requirementsService.getRequirements(),
+          this.requirementsService.getAllSubmissions()
+        ]);
 
-  } finally {
-    this.isLoading = false;
+      this.students = students.map(student => {
+        const studentAttendance = attendance.filter(
+          record => record.studentUid === student.uid
+        );
 
-    // Close the loading SweetAlert.
-    Swal.close();
+        // Count completed whole hours only. Ignore remaining minutes.
+        const completedHours = studentAttendance
+          .filter(record => record.status === 'Completed')
+          .reduce(
+            (total, record) => total + Math.floor(Number(record.hours) || 0),
+            0
+          );
 
-    // Force Angular to refresh the displayed data.
-    this.cdr.detectChanges();
+        const studentSubmissions = submissions.filter(
+          submission => submission.studentUid === student.uid
+        );
+
+        const completedRequirements = studentSubmissions.filter(
+          submission => submission.status === 'Approved'
+        ).length;
+
+        const hasRevision = studentSubmissions.some(
+          submission => submission.status === 'Needs Revision'
+        );
+
+        const totalRequirements = requirements.length;
+        const requiredHours = 486;
+
+        let status: ProgressStatus;
+
+        if (
+          completedHours >= requiredHours &&
+          completedRequirements >= totalRequirements
+        ) {
+          status = 'Completed';
+        } else if (hasRevision) {
+          status = 'Needs Follow-up';
+        } else {
+          status = 'In Progress';
+        }
+
+        return {
+          studentId: student.studentId,
+          fullName: student.fullName,
+          requiredHours,
+          completedHours,
+          completedRequirements,
+          totalRequirements,
+          status
+        };
+      });
+
+    } catch (error) {
+      console.error('Error loading progress data:', error);
+      this.loadError = 'Unable to load student progress. Please try again.';
+
+    } finally {
+      this.isLoading = false;
+      Swal.close();
+      this.cdr.detectChanges();
+    }
   }
-}
 
   // Search students and filter by progress status.
   get filteredStudents(): StudentProgress[] {
@@ -173,7 +171,7 @@ export class ProgressMonitoring implements OnInit {
     ).length;
   }
 
-  // Calculate progress using completed OJT hours.
+  // Calculate progress using completed whole OJT hours.
   getProgressPercentage(student: StudentProgress): number {
     if (student.requiredHours <= 0) {
       return 0;
@@ -186,7 +184,7 @@ export class ProgressMonitoring implements OnInit {
   }
 
   // Display a summary of the student's OJT progress.
-    viewDetails(student: StudentProgress): void {
+  viewDetails(student: StudentProgress): void {
     this.selectedStudent = student;
     this.showDetailsModal = true;
   }

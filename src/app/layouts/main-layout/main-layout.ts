@@ -58,7 +58,8 @@ import {
         X,
         Menu,
         ChevronLeft,
-        ChevronRight
+        ChevronRight,
+        ChevronDown
       })
     }
   ],
@@ -155,10 +156,10 @@ export class MainLayout implements OnInit, OnDestroy {
 
   menuItems = [
     { label: 'Dashboard', icon: 'layout-dashboard', route: '/coordinator/dashboard' },
-    { label: 'OJT Students', icon: 'users', route: '/coordinator/ojt-students' },
-    { label: 'OJT Hours', icon: 'clock', route: '/coordinator/ojt-hours' },
-    { label: 'Accomplishments', icon: 'clipboard-list', route: '/coordinator/accomplishments' },
-    { label: 'Requirements', icon: 'file-text', route: '/coordinator/requirements' },
+    { label: 'Manage OJT Students', icon: 'users', route: '/coordinator/ojt-students' },
+    { label: 'Manage OJT Hours', icon: 'clock', route: '/coordinator/ojt-hours' },
+    { label: 'Student Accomplishments', icon: 'clipboard-list', route: '/coordinator/accomplishments' },
+    { label: 'Manage Requirements', icon: 'file-text', route: '/coordinator/requirements' },
     { label: 'Progress Monitoring', icon: 'chart-no-axes-combined', route: '/coordinator/progress-monitoring' }
   ];
 

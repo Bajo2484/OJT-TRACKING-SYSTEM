@@ -3,7 +3,6 @@
 
   <!-- PAGE HEADER -->
   <section class="page-header">
-
     <div class="page-title">
       <h2>OJT Students</h2>
       <p>Manage and monitor students participating in OJT.</p>
@@ -11,77 +10,60 @@
 
     <!-- IMPORT AND ADD STUDENT BUTTONS -->
     <div class="header-actions">
+      <button class="btn btn-primary" type="button" (click)="studentFileInput.click()">
+        <span>↑</span>
+        Import Students
+      </button>
 
-  <button
-    class="btn btn-primary"
-    type="button"
-    (click)="studentFileInput.click()"
-  >
-    <span>↑</span>
-    Import Students
-  </button>
+      <button class="btn btn-secondary" type="button" (click)="openAddStudent()">
+        <span>+</span>
+        Add Student
+      </button>
+    </div>
 
-  <button
-    class="btn btn-secondary"
-    type="button"
-    (click)="openAddStudent()"
-  >
-    <span>+</span>
-    Add Student
-  </button>
-
-</div>
-
-<input
-  #studentFileInput
-  type="file"
-  accept=".csv,.xlsx,.xls"
-  (change)="onStudentFileSelected($event)"
-  style="display: none;"
-/>
-
+    <input #studentFileInput type="file" accept=".csv,.xlsx,.xls" (change)="onStudentFileSelected($event)" style="display: none;" />
   </section>
 
   <!-- SUMMARY CARDS -->
   <section class="summary-grid">
-
     <div class="summary-card">
       <div class="card-icon students-icon">♙</div>
       <div class="card-info">
         <p>Total Students</p>
         <h3>{{ totalStudents }}</h3>
-        <span>Registered OJT students</span>
+        <span>Active registered OJT students</span>
       </div>
     </div>
 
     <div
-  class="summary-card followup-card"
-  [class.active-followup]="showFollowUpOnly"
-  role="button"
-  tabindex="0"
-  (click)="toggleFollowUpFilter()"
-  (keydown.enter)="toggleFollowUpFilter()"
-  (keydown.space)="toggleFollowUpFilter(); $event.preventDefault()"
->
-  <div class="card-icon followup-icon">!</div>
-
-  <div class="card-info">
-    <p>Needs Follow-up</p>
-    <h3>{{ studentsNeedingFollowUp }}</h3>
-    <span>
-      {{ showFollowUpOnly ? 'Showing students needing attention' : 'Click to view students needing attention' }}
-    </span>
-  </div>
-</div>
-
+      class="summary-card followup-card"
+      [class.active-followup]="showFollowUpOnly"
+      [class.disabled-followup]="showArchivedStudents"
+      role="button"
+      tabindex="0"
+      [attr.aria-disabled]="showArchivedStudents"
+      (click)="!showArchivedStudents && toggleFollowUpFilter()"
+      (keydown.enter)="!showArchivedStudents && toggleFollowUpFilter()"
+      (keydown.space)="!showArchivedStudents && toggleFollowUpFilter(); $event.preventDefault()"
+    >
+      <div class="card-icon followup-icon">!</div>
+      <div class="card-info">
+        <p>Needs Follow-up</p>
+        <h3>{{ studentsNeedingFollowUp }}</h3>
+        <span>
+          @if (showArchivedStudents) {
+            Available in Active Students view
+          } @else {
+            {{ showFollowUpOnly ? 'Showing students needing attention' : 'Click to view students needing attention' }}
+          }
+        </span>
+      </div>
+    </div>
   </section>
 
-  <!-- ADD STUDENT MODAL OVERLAY -->
+  <!-- ADD / EDIT STUDENT MODAL -->
   @if (showAddStudentForm) {
-    <div
-      class="modal-overlay"
-      (click)="closeAddStudent()"
-    >
+    <div class="modal-overlay" (click)="closeAddStudent()">
       <section
         class="modal-card"
         role="dialog"
@@ -99,14 +81,7 @@
             <p>Enter the student's information and login credentials.</p>
           </div>
 
-          <button
-            class="modal-close"
-            type="button"
-            aria-label="Close form"
-            (click)="closeAddStudent()"
-          >
-            ×
-          </button>
+          <button class="modal-close" type="button" aria-label="Close form" (click)="closeAddStudent()">×</button>
         </div>
 
         <!-- STUDENT INFORMATION -->
@@ -114,7 +89,6 @@
           <h4>Student Information</h4>
 
           <div class="form-fields">
-
             <label>
               Student ID *
               <input
@@ -130,12 +104,7 @@
 
             <label>
               First Name *
-              <input
-                type="text"
-                [(ngModel)]="newStudent.firstName"
-                placeholder="Enter first name"
-                required
-              />
+              <input type="text" [(ngModel)]="newStudent.firstName" placeholder="Enter first name" required />
             </label>
 
             <label>
@@ -151,106 +120,58 @@
 
             <label>
               Course / Program *
-              <input
-                type="text"
-                [(ngModel)]="newStudent.course"
-                placeholder="Enter course or program"
-                required
-              />
+              <input type="text" [(ngModel)]="newStudent.course" placeholder="Enter course or program" required />
             </label>
 
             <label>
               Year Level *
-              <select
-                [(ngModel)]="newStudent.yearLevel"
-                required
-              >
+              <select [(ngModel)]="newStudent.yearLevel" required>
                 <option value="">Select year level</option>
                 <option value="1st Year">1st Year</option>
                 <option value="2nd Year">2nd Year</option>
                 <option value="3rd Year">3rd Year</option>
                 <option value="4th Year">4th Year</option>
-                <option value="5th Year">5th Year</option>
               </select>
             </label>
 
             <label>
               Section *
-              <input
-                type="text"
-                [(ngModel)]="newStudent.section"
-                placeholder="Enter section"
-                required
-              />
+              <input type="text" [(ngModel)]="newStudent.section" placeholder="Enter section" required />
             </label>
-
           </div>
         </div>
 
         <!-- LOGIN CREDENTIALS -->
-        <div
-          class="modal-section"
-          [hidden]="editingStudentId !== null"
-        >
+        <div class="modal-section" [hidden]="editingStudentId !== null">
           <h4>Login Credentials</h4>
 
           <div class="form-fields">
-
             <label>
               Username
-              <input
-                type="text"
-                [value]="newStudent.studentId"
-                readonly
-                placeholder="Based on Student ID"
-              />
-              <span class="field-hint">
-                The Student ID will be used as the username.
-              </span>
+              <input type="text" [value]="newStudent.studentId" readonly placeholder="Based on Student ID" />
+              <span class="field-hint">The Student ID will be used as the username.</span>
             </label>
 
             <label>
               Temporary Password *
-              <input
-                type="text"
-                [value]="newStudent.password"
-                readonly
-                placeholder="Automatically generated"
-                autocomplete="off"
-                required
-              />
-              <span class="field-hint">
-                Automatically generated using lowercase last name + Student ID.
-              </span>
+              <input type="text" [value]="newStudent.password" readonly placeholder="Automatically generated" autocomplete="off" required />
+              <span class="field-hint">Automatically generated using lowercase last name + Student ID.</span>
             </label>
-
           </div>
 
           <p class="security-note">
-            The password will be handled through Firebase Authentication
-            when account creation is implemented.
+            The student account will be created through Firebase Authentication.
+            Provide the generated login credentials securely to the student.
           </p>
         </div>
 
         <!-- MODAL ACTIONS -->
         <div class="modal-actions">
+          <button class="btn btn-secondary" type="button" (click)="closeAddStudent()">Cancel</button>
 
-          <button
-            class="btn btn-secondary"
-            type="button"
-            (click)="closeAddStudent()"
-          >
-            Cancel
-          </button>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            (click)="saveStudent()"
-          >
+          <button class="btn btn-primary" type="button" (click)="saveStudent()">
             {{ editingStudentId !== null ? 'Save Changes' : 'Create Student' }}
           </button>
-
         </div>
 
       </section>
@@ -260,43 +181,55 @@
   <!-- STUDENT RECORDS -->
   <section class="records-panel">
 
+    <!-- PANEL HEADER -->
     <div class="panel-header">
       <div>
-        <h3>Student Records</h3>
-        <p>View and manage registered OJT student records.</p>
+        <h3>{{ showArchivedStudents ? 'Archived Students' : 'Student Records' }}</h3>
+        <p>
+          {{ showArchivedStudents
+            ? 'Manage archived records and restore or permanently delete students.'
+            : 'View and manage registered OJT student records.' }}
+        </p>
       </div>
+
+      <!-- VIEW ARCHIVED / ACTIVE BUTTON -->
+      <button
+        class="archive-toggle-button"
+        type="button"
+        (click)="toggleArchivedView()"
+        [attr.aria-label]="showArchivedStudents ? 'View active students' : 'View archived students'"
+      >
+        <span>{{ showArchivedStudents ? '♙' : '▣' }}</span>
+        {{ showArchivedStudents
+          ? 'View Active Students'
+          : 'View Archived (' + archivedStudents.length + ')' }}
+      </button>
     </div>
 
     <!-- SEARCH AND FILTER -->
     <div class="table-toolbar">
-
       <div class="search-box">
         <span class="search-icon">⌕</span>
         <input
           type="text"
-          placeholder="Search Student ID or name..."
+          [placeholder]="showArchivedStudents ? 'Search archived Student ID or name...' : 'Search Student ID or name...'"
           aria-label="Search students"
           [(ngModel)]="searchText"
+(ngModelChange)="resetPagination()"
         />
       </div>
 
-      <select
-        class="section-filter"
-        aria-label="Filter by section"
-        [(ngModel)]="selectedSection"
-      >
+      <select class="section-filter" aria-label="Filter by section" [(ngModel)]="selectedSection" (ngModelChange)="resetPagination()">
         <option value="">All Sections</option>
         @for (section of sections; track section) {
           <option [value]="section">{{ section }}</option>
         }
       </select>
-
     </div>
 
     <!-- STUDENT TABLE -->
     <div class="table-container">
       <table>
-
         <thead>
           <tr>
             <th>Student ID</th>
@@ -309,16 +242,10 @@
         </thead>
 
         <tbody>
-          @for (student of filteredStudents; track student.studentId) {
+          @for (student of paginatedStudents; track student.studentId) {
             <tr>
-              <td class="student-id">
-                {{ student.studentId }}
-              </td>
-
-              <td class="student-name">
-                {{ student.fullName }}
-              </td>
-
+              <td class="student-id">{{ student.studentId }}</td>
+              <td class="student-name">{{ student.fullName }}</td>
               <td>{{ student.section }}</td>
 
               <td>
@@ -344,50 +271,99 @@
                 </span>
               </td>
 
+              <!-- STUDENT ACTIONS -->
               <td class="actions-cell">
-                <button
-                  class="view-button"
-                  type="button"
-                  (click)="viewStudent(student)"
-                >
-                  View Details
-                </button>
+                @if (!showArchivedStudents) {
+                  <!-- ACTIVE STUDENT ACTIONS -->
+                  <button class="view-button" type="button" (click)="viewStudent(student)">
+                    View Details
+                  </button>
 
-                <button
-                  class="edit-button"
-                  type="button"
-                  (click)="editStudent(student)"
-                >
-                  Edit
-                </button>
+                  <button class="edit-button" type="button" (click)="editStudent(student)">
+                    Edit
+                  </button>
 
-                <button
-                  class="remove-button"
-                  type="button"
-                  (click)="removeStudent(student)"
-                >
-                  Remove
-                </button>
+                  <button class="remove-button" type="button" (click)="archiveStudent(student)">
+                    Archive
+                  </button>
+                } @else {
+                  <!-- ARCHIVED STUDENT ACTIONS -->
+                  <button class="edit-button" type="button" (click)="restoreStudent(student)">
+                    Restore
+                  </button>
+
+                  <button class="remove-button" type="button" (click)="deleteStudentPermanently(student)">
+                    Delete Permanently
+                  </button>
+                }
               </td>
             </tr>
           } @empty {
             <tr>
               <td colspan="6" class="empty-state">
-                <div class="empty-icon">♙</div>
-                <h4>No student records found</h4>
-                <p>Import a student list or add a student to get started.</p>
+                <div class="empty-icon">{{ showArchivedStudents ? '▣' : '♙' }}</div>
+
+                <h4>
+                  {{ showArchivedStudents ? 'No Archived Students' : 'No Student Records Found' }}
+                </h4>
+
+                <p>
+                  {{ showArchivedStudents
+                    ? 'There are currently no archived student records.'
+                    : 'Import a student list or add a student to get started.' }}
+                </p>
               </td>
             </tr>
           }
         </tbody>
-
       </table>
     </div>
 
-    <!-- TABLE FOOTER -->
-    <div class="table-footer">
-      <span>Showing {{ filteredStudents.length }} student(s)</span>
+    <!-- TABLE FOOTER / PAGINATION -->
+<div class="table-footer">
+  <span class="record-count">
+    Showing <strong>{{ startRecord }}–{{ endRecord }}</strong>
+    of <strong>{{ filteredStudents.length }}</strong>
+    {{ showArchivedStudents ? 'archived' : 'active' }} student(s)
+  </span>
+
+  @if (totalPages > 1) {
+    <div class="pagination">
+
+      <button
+        class="page-button"
+        type="button"
+        (click)="previousPage()"
+        [disabled]="currentPage === 1"
+        aria-label="Previous page"
+      >
+        ‹
+      </button>
+
+      @for (page of pageNumbers; track page) {
+        <button
+          class="page-button"
+          type="button"
+          [class.active-page]="currentPage === page"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      }
+
+      <button
+        class="page-button"
+        type="button"
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+        aria-label="Next page"
+      >
+        ›
+      </button>
+
     </div>
+  }
+</div>
 
   </section>
 

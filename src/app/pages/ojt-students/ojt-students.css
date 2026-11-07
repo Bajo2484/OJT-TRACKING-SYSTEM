@@ -2,7 +2,7 @@
 * { box-sizing: border-box; }
 button, input, select { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
-.ojt-students-page { width: 100%; max-width: 1700px; margin: 0 auto; color: #24344b; animation: pageEnter 0.4s ease both; }
+
 
 .page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 30px; padding: 27px 30px; background: linear-gradient(115deg, #142d4d 0%, #1d416a 72%, #28537e 100%); border: 1px solid rgba(255, 255, 255, 0.12); border-left: 6px solid #f5c542; border-radius: 17px; box-shadow: 0 12px 30px rgba(20, 45, 77, 0.15); position: relative; overflow: hidden; }
 .page-header::after { content: ""; position: absolute; width: 210px; height: 210px; right: 14%; top: -145px; border: 30px solid rgba(255, 255, 255, 0.045); border-radius: 50%; pointer-events: none; }
@@ -89,6 +89,9 @@ td.actions-cell { min-width: 245px; text-align: center; white-space: normal; }
 .page-footer { padding: 12px 0 6px; color: #738399; font-size: 13px; text-align: center; line-height: 1.7; }
 
 .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; background: rgba(10, 24, 43, 0.68); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); animation: overlayFadeIn 0.22s ease both; }
+.modal-overlay {
+  z-index: 1000;
+}
 .modal-card { width: 100%; max-width: 720px; max-height: calc(100vh - 48px); overflow-x: hidden; overflow-y: auto; background: #ffffff; border: 1px solid #dce5ef; border-radius: 17px; box-shadow: 0 28px 85px rgba(3, 15, 31, 0.32); animation: modalSlideIn 0.26s ease both; }
 .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 27px 29px; background: linear-gradient(115deg, #163251 0%, #234c75 100%); border-bottom: 4px solid #f5c542; }
 .modal-header > div { min-width: 0; }
@@ -125,3 +128,235 @@ td.actions-cell { min-width: 245px; text-align: center; white-space: normal; }
 .followup-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(23, 54, 93, 0.12); }
 .followup-card:focus-visible { outline: 2px solid #17365d; outline-offset: 3px; }
 .followup-card.active-followup { border: 2px solid #17365d; background: #f0f5fb; }
+
+
+/* ========================= ADD STUDENT MODAL - COMPACT FIX ========================= */
+
+.ojt-students-page .modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+  background: rgba(8, 20, 36, 0.78) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.ojt-students-page .modal-card {
+  width: 100%;
+  max-width: 590px;
+  max-height: 88vh;
+  max-height: 88dvh;
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  opacity: 1 !important;
+  border: 1px solid #dce5ef;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(3, 15, 31, 0.35);
+}
+
+.ojt-students-page .modal-header {
+  padding: 19px 23px;
+  background: linear-gradient(115deg, #163251, #234c75) !important;
+  border-bottom: 3px solid #f5c542;
+}
+
+.ojt-students-page .modal-header h3 {
+  margin-bottom: 5px;
+  font-size: 19px;
+}
+
+.ojt-students-page .modal-header p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ojt-students-page .modal-close {
+  width: 33px;
+  height: 33px;
+  font-size: 23px;
+}
+
+.ojt-students-page .modal-section {
+  padding: 17px 23px;
+  background: #ffffff !important;
+}
+
+.ojt-students-page .modal-section h4 {
+  margin-bottom: 13px;
+  font-size: 14px;
+}
+
+.ojt-students-page .form-fields {
+  gap: 13px 16px;
+}
+
+.ojt-students-page .form-fields label {
+  gap: 6px;
+  font-size: 12px;
+}
+
+.ojt-students-page .form-fields input,
+.ojt-students-page .form-fields select {
+  height: 40px;
+  padding: 0 11px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.ojt-students-page .field-hint {
+  font-size: 10px;
+}
+
+.ojt-students-page .security-note {
+  margin-top: 13px;
+  padding: 11px 13px;
+  font-size: 11px;
+}
+
+.ojt-students-page .modal-actions {
+  gap: 9px;
+  padding: 14px 23px;
+  background: #f7f9fc !important;
+}
+
+.ojt-students-page .modal-actions .btn {
+  min-height: 39px;
+  min-width: 115px;
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* MOBILE MODAL */
+@media (max-width: 700px) {
+  .ojt-students-page .modal-overlay {
+    align-items: center;
+    padding: 10px;
+  }
+
+  .ojt-students-page .modal-card {
+    width: 100%;
+    max-width: 460px;
+    max-height: 92vh;
+    max-height: 92dvh;
+    margin: auto;
+    border-radius: 12px;
+  }
+
+  .ojt-students-page .modal-header {
+    padding: 16px 18px;
+  }
+
+  .ojt-students-page .modal-header h3 {
+    font-size: 17px;
+  }
+
+  .ojt-students-page .modal-section {
+    padding: 15px 18px;
+  }
+
+  .ojt-students-page .form-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .ojt-students-page .modal-actions {
+    padding: 13px 18px;
+  }
+}
+
+@media (max-width: 380px) {
+  .ojt-students-page .modal-actions {
+    flex-direction: row;
+  }
+
+  .ojt-students-page .modal-actions .btn {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.archive-toggle-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid #d6c49b;
+  border-radius: 9px;
+  background: #fffaf0;
+  color: #70532b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.archive-toggle-button:hover {
+  background: #f3e8cf;
+  border-color: #b9914b;
+  transform: translateY(-1px);
+}
+
+.archive-toggle-button span {
+  font-size: 16px;
+}
+
+.disabled-followup {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .archive-toggle-button {
+    width: 100%;
+  }
+}
+.swal2-container {
+  z-index: 20000 !important;
+}
+
+
+/* ========================= STUDENT RECORDS PAGINATION ========================= */
+
+.record-count { color: #62758c; font-size: 13px; font-weight: 550; line-height: 1.6; }
+.record-count strong { color: #183554; font-weight: 800; }
+
+.pagination { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
+
+.page-button { display: inline-flex; align-items: center; justify-content: center; min-width: 39px; height: 39px; padding: 0 11px; border: 1px solid #d8e2ef; border-radius: 9px; background: #ffffff; color: #294461; font-family: inherit; font-size: 14px; font-weight: 750; cursor: pointer; transition: all 0.2s ease; }
+
+.page-button:hover:not(:disabled):not(.active-page) { background: #fff5d6; border-color: #e5c45e; color: #183554; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(23, 48, 79, 0.08); }
+
+.page-button.active-page { background: linear-gradient(135deg, #17365d, #28537e); border-color: #17365d; color: #ffffff; box-shadow: 0 4px 11px rgba(23, 54, 93, 0.2), inset 0 -3px 0 #f5c542; }
+
+.page-button:disabled { background: #f1f4f8; border-color: #e3e9f0; color: #a7b1bf; cursor: not-allowed; opacity: 0.7; }
+
+.page-button:focus-visible { outline: 3px solid #f5c542; outline-offset: 3px; }
+
+@media (max-width: 700px) {
+  .table-footer { align-items: center; justify-content: center; gap: 13px; padding: 17px; }
+  .record-count { width: 100%; text-align: center; }
+  .pagination { justify-content: center; width: 100%; gap: 6px; }
+  .page-button { min-width: 37px; height: 37px; }
+}
+
+@media (max-width: 380px) {
+  .pagination { gap: 5px; }
+  .page-button { min-width: 34px; height: 35px; padding: 0 8px; font-size: 13px; }
+}

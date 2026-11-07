@@ -9,15 +9,14 @@
     </div>
 
     <button
-  class="btn btn-secondary"
-  type="button"
-  (click)="exportReport()"
->
-  <span>↓</span>
-  Export PDF
-</button>
-   
-</section>
+      class="btn btn-secondary"
+      type="button"
+      (click)="exportReport()"
+    >
+      <span>↓</span>
+      Export PDF
+    </button>
+  </section>
 
   <!-- SUMMARY CARDS -->
   <section class="summary-grid">
@@ -29,16 +28,6 @@
         <p>Total OJT Students</p>
         <h3>{{ totalStudents }}</h3>
         <span>Students being monitored</span>
-      </div>
-    </div>
-
-    <!-- Total Completed Hours -->
-    <div class="summary-card">
-      <div class="card-icon hours-icon">◷</div>
-      <div class="card-info">
-        <p>Total Completed Hours</p>
-        <h3>{{ totalCompletedHours }}</h3>
-        <span>Hours recorded and completed</span>
       </div>
     </div>
 
@@ -119,13 +108,13 @@
 
               <td>
                 <strong class="hours-value">
-                  {{ student.completedHours | number:'1.2-2' }} hrs
+                  {{ student.completedHours }} hrs
                 </strong>
               </td>
 
               <td>
                 <span class="remaining-value">
-                  {{ getRemainingHours(student) | number:'1.2-2' }} hrs
+                  {{ getRemainingHours(student) }} hrs
                 </span>
               </td>
 
@@ -213,14 +202,14 @@
             <div>
               <span>Completed Hours</span>
               <strong>
-                {{ selectedStudent.completedHours | number:'1.2-2' }} hrs
+                {{ selectedStudent.completedHours }} hrs
               </strong>
             </div>
 
             <div>
               <span>Remaining Hours</span>
               <strong>
-                {{ getRemainingHours(selectedStudent) | number:'1.2-2' }} hrs
+                {{ getRemainingHours(selectedStudent) }} hrs
               </strong>
             </div>
 
@@ -270,7 +259,7 @@
 
               <div class="attendance-hours">
                 <strong>
-                  {{ record.hours | number:'1.2-2' }} hrs
+                  {{ record.hours }} hrs
                 </strong>
                 <span>{{ record.status }}</span>
               </div>

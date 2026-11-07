@@ -1,5 +1,5 @@
 
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, afterNextRender, inject, ChangeDetectorRef } from '@angular/core';
 import Swal from 'sweetalert2';
 import { StudentAccountService } from '../services/student-account.service';
 import { AttendanceService } from '../services/attendance.service';
@@ -17,7 +17,6 @@ import {
   ClipboardList,
   Activity
 } from 'lucide-angular';
-
 
 @Component({
   selector: 'app-coordinator-dashboard',
@@ -39,7 +38,7 @@ import {
   templateUrl: './coordinator-dashboard.html',
   styleUrl: './coordinator-dashboard.css',
 })
-export class CoordinatorDashboardComponent implements OnInit {
+export class CoordinatorDashboardComponent {
   private studentAccountService = inject(StudentAccountService);
   private attendanceService = inject(AttendanceService);
   private requirementsService = inject(RequirementsService);
@@ -71,9 +70,7 @@ export class CoordinatorDashboardComponent implements OnInit {
   async loadStudents(): Promise<void> {
     try {
       const students = await this.studentAccountService.getAllStudents();
-
       this.totalOJTStudents = students.length;
-
     } catch (error) {
       console.error('Error loading OJT students:', error);
     }
@@ -89,9 +86,13 @@ export class CoordinatorDashboardComponent implements OnInit {
           record => record.studentUid === student.uid
         );
 
+        // Count completed whole hours only. Ignore remaining minutes.
         const completedHours = studentAttendance
           .filter(record => record.status === 'Completed')
-          .reduce((total, record) => total + record.hours, 0);
+          .reduce(
+            (total, record) => total + Math.floor(Number(record.hours) || 0),
+            0
+          );
 
         return {
           fullName: student.fullName,
@@ -111,7 +112,7 @@ export class CoordinatorDashboardComponent implements OnInit {
         ? Math.round((totalCompletedHours / totalRequiredHours) * 1000) / 10
         : 0;
 
-      console.log('Total completed hours:', totalCompletedHours);
+      console.log('Total completed whole hours:', totalCompletedHours);
       console.log('Overall progress:', this.overallProgress);
 
     } catch (error) {
@@ -179,7 +180,13 @@ export class CoordinatorDashboardComponent implements OnInit {
     }
   }
 
-  async ngOnInit(): Promise<void> {
+  constructor() {
+    afterNextRender(() => {
+      void this.loadDashboardData();
+    });
+  }
+
+  private async loadDashboardData(): Promise<void> {
     Swal.fire({
       title: 'Loading Dashboard',
       text: 'Please wait while we fetch the latest data...',
@@ -198,7 +205,7 @@ export class CoordinatorDashboardComponent implements OnInit {
         this.loadRecentActivities()
       ]);
 
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
 
     } finally {
       Swal.close();

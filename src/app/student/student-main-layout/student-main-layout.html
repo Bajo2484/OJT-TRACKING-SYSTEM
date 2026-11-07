@@ -16,7 +16,43 @@
   <aside class="student-sidebar">
 
     <div class="sidebar-brand">
-      <div class="brand-icon">✓</div>
+      <div class="brand-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- Progress P -->
+          <path
+            d="M15 9H34C45 9 51 16 51 26C51 36 44 42 34 42H25V55"
+            stroke="#FFFFFF"
+            stroke-width="7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+          <!-- Rising progress bars -->
+          <path d="M13 39V31" stroke="#F5C542" stroke-width="6" stroke-linecap="round"/>
+          <path d="M24 34V23" stroke="#F5C542" stroke-width="6" stroke-linecap="round"/>
+          <path d="M35 29V15" stroke="#F5C542" stroke-width="6" stroke-linecap="round"/>
+
+          <!-- Progress curve -->
+          <path
+            d="M7 43C15 49 27 48 38 38"
+            stroke="#F5C542"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+
+          <!-- Completion check -->
+          <circle cx="46" cy="48" r="10" fill="#F5C542"/>
+          <path
+            d="M41 48L45 52L52 44"
+            stroke="#142747"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+        </svg>
+      </div>
 
       <div class="brand-text">
         <span>OJT</span>
@@ -204,47 +240,45 @@
 
         </div>
 
-        
-<!-- STUDENT USER MENU -->
-<div class="student-user-wrapper">
+        <!-- STUDENT USER MENU -->
+        <div class="student-user-wrapper">
 
-  <button
-    type="button"
-    class="student-user"
-    (click)="toggleProfileMenu()"
-    [attr.aria-expanded]="showProfileMenu"
-    aria-label="Open student account menu">
+          <button
+            type="button"
+            class="student-user"
+            (click)="toggleProfileMenu()"
+            [attr.aria-expanded]="showProfileMenu"
+            aria-label="Open student account menu">
 
-    <div class="user-avatar">S</div>
+            <div class="user-avatar">S</div>
 
-    <div class="user-details">
-      <strong>OJT Student</strong>
-      <span>Student Account</span>
-    </div>
+            <div class="user-details">
+              <strong>OJT Student</strong>
+              <span>Student Account</span>
+            </div>
 
-    <span class="user-chevron">
-      {{ showProfileMenu ? '⌃' : '⌄' }}
-    </span>
+            <span class="user-chevron">
+              {{ showProfileMenu ? '⌃' : '⌄' }}
+            </span>
 
-  </button>
+          </button>
 
-  <!-- ACCOUNT DROPDOWN -->
-  <div class="student-profile-dropdown" *ngIf="showProfileMenu">
+          <!-- ACCOUNT DROPDOWN -->
+          <div class="student-profile-dropdown" *ngIf="showProfileMenu">
 
-    <button
-      type="button"
-      class="student-dropdown-item"
-      (click)="navigateToSettings()">
+            <button
+              type="button"
+              class="student-dropdown-item"
+              (click)="navigateToSettings()">
 
-      <span class="dropdown-icon">⚙</span>
-      <span>Settings</span>
+              <span class="dropdown-icon">⚙</span>
+              <span>Settings</span>
 
-    </button>
+            </button>
 
-  </div>
+          </div>
 
-</div>
-
+        </div>
 
         <!-- LOGOUT -->
         <button
