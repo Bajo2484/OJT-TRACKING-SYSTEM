@@ -1,3 +1,4 @@
+
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -99,7 +100,7 @@ export class StudentDashboard implements OnInit {
   ): void {
     this.recordedHours = records
       .filter(record => record.timeIn !== null && record.timeOut !== null)
-      .reduce((total, record) => total + record.hours, 0);
+      .reduce((total, record) => total + Math.floor(record.hours), 0);
 
     this.remainingHours = Math.max(
       0,

@@ -1,1 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+/* Keep SweetAlert above all application modals */
+.swal2-container {
+  z-index: 99999 !important;
+}

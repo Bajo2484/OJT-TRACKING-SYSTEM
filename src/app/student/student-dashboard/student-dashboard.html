@@ -1,3 +1,4 @@
+
 <div class="student-dashboard">
 
 <section class="page-heading welcome-banner">
@@ -34,7 +35,7 @@
     <article class="summary-card">
       <div class="card-icon blue">◷</div>
       <p class="card-label">Recorded OJT Hours</p>
-      <h2>{{ isLoading ? '...' : recordedHours.toFixed(2) }} <span>hrs</span></h2>
+      <h2>{{ isLoading ? '...' : recordedHours }} <span>hrs</span></h2>
       <p class="card-note">Completed attendance hours</p>
     </article>
 
@@ -48,7 +49,7 @@
     <article class="summary-card">
       <div class="card-icon purple">◷</div>
       <p class="card-label">Remaining Hours</p>
-      <h2>{{ isLoading ? '...' : remainingHours.toFixed(2) }} <span>hrs</span></h2>
+      <h2>{{ isLoading ? '...' : remainingHours }} <span>hrs</span></h2>
       <p class="card-note">Hours left to complete</p>
     </article>
 
@@ -78,7 +79,7 @@
         <div>
           <span class="muted-label">Recorded Hours</span>
           <h3>
-            {{ isLoading ? '...' : recordedHours.toFixed(2) }}
+            {{ isLoading ? '...' : recordedHours }}
             <span>/ {{ requiredHours }} hours</span>
           </h3>
         </div>

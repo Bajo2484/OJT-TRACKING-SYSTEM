@@ -21,8 +21,8 @@
       </div>
 
       <span class="attendance-badge"
-  [class.completed]="!!todayRecord?.timeOut"
- [class.timed-in]="!!todayRecord && !!todayRecord.timeIn && !todayRecord.timeOut">
+        [class.completed]="!!todayRecord?.timeOut"
+        [class.timed-in]="!!todayRecord && !!todayRecord.timeIn && !todayRecord.timeOut">
         {{ todayRecord?.timeOut ? 'Completed' : todayRecord?.timeIn ? 'Timed In' : 'Not Timed In' }}
       </span>
     </div>
@@ -41,7 +41,7 @@
 
       <div class="time-item today-hours-item">
         <span>TODAY'S HOURS</span>
-        <strong>{{ todayHours.toFixed(2) }} <small>hrs</small></strong>
+        <strong>{{ todayHours }} <small>hrs</small></strong>
       </div>
 
     </div>
@@ -98,21 +98,21 @@
       <article class="summary-card recorded-card">
         <div class="summary-icon">✓</div>
         <span>Recorded OJT Hours</span>
-        <strong>{{ recordedHours.toFixed(2) }}</strong>
+        <strong>{{ recordedHours }}</strong>
         <small>Completed attendance hours</small>
       </article>
 
       <article class="summary-card remaining-card">
         <div class="summary-icon">⌛</div>
         <span>Remaining Hours</span>
-        <strong>{{ remainingHours.toFixed(2) }}</strong>
+        <strong>{{ remainingHours }}</strong>
         <small>Hours left to complete</small>
       </article>
 
       <article class="summary-card today-card">
         <div class="summary-icon">◷</div>
         <span>Today's Hours</span>
-        <strong>{{ todayHours.toFixed(2) }}</strong>
+        <strong>{{ todayHours }}</strong>
         <small>Hours recorded today</small>
       </article>
 
@@ -137,7 +137,7 @@
 
     <div class="progress-labels">
       <span>Hours completed</span>
-      <strong>{{ recordedHours.toFixed(2) }} / {{ requiredHours }} hrs</strong>
+      <strong>{{ recordedHours }} / {{ requiredHours }} hrs</strong>
     </div>
 
     <div class="progress-track">
@@ -148,7 +148,7 @@
     </div>
 
     <div class="progress-footer">
-      <span>{{ remainingHours.toFixed(2) }} hours remaining</span>
+      <span>{{ remainingHours }} hours remaining</span>
       <span>Goal: {{ requiredHours }} hours</span>
     </div>
 
@@ -195,7 +195,7 @@
               </span>
 
               <small>
-                {{ record.timeOut ? record.hours.toFixed(2) + ' hours' : 'Duty in progress' }}
+                {{ record.timeOut ? getWholeHours(record.hours) + ' hours' : 'Duty in progress' }}
               </small>
             </div>
 
@@ -216,46 +216,46 @@
 
   </section>
 
-<!-- DTR VERIFICATION -->
-<section class="dtr-panel">
+  <!-- DTR VERIFICATION -->
+  <section class="dtr-panel">
 
-  <div class="dtr-heading">
-    <div>
-      <span class="eyebrow">ATTENDANCE DOCUMENT</span>
-      <h2>Daily Time Record</h2>
-      <p>Generate and download your complete OJT attendance record.</p>
-    </div>
-  </div>
-
-  <div class="dtr-status">
-
-    <span class="dtr-icon">
-      PDF
-    </span>
-
-    <div class="dtr-details">
-      <strong>Complete Daily Time Record</strong>
-      <span>From your first attendance up to your latest completed record.</span>
-      <small>{{ attendanceHistory.length }} attendance record(s) found</small>
+    <div class="dtr-heading">
+      <div>
+        <span class="eyebrow">ATTENDANCE DOCUMENT</span>
+        <h2>Daily Time Record</h2>
+        <p>Generate and download your complete OJT attendance record.</p>
+      </div>
     </div>
 
-    <button
-      type="button"
-      class="btn-download-dtr"
-      (click)="downloadDTR()"
-      [disabled]="isLoading || isGeneratingDTR || attendanceHistory.length === 0">
+    <div class="dtr-status">
 
-      {{ isGeneratingDTR ? 'Generating...' : 'Download PDF' }}
+      <span class="dtr-icon">
+        PDF
+      </span>
 
-    </button>
+      <div class="dtr-details">
+        <strong>Complete Daily Time Record</strong>
+        <span>From your first attendance up to your latest completed record.</span>
+        <small>{{ attendanceHistory.length }} attendance record(s) found</small>
+      </div>
 
-  </div>
+      <button
+        type="button"
+        class="btn-download-dtr"
+        (click)="downloadDTR()"
+        [disabled]="isLoading || isGeneratingDTR || attendanceHistory.length === 0">
 
-  <p class="dtr-note">
-    Your DTR includes completed attendance records and total rendered hours.
-    Print the document for the required signatures and coordinator verification.
-  </p>
+        {{ isGeneratingDTR ? 'Generating...' : 'Download PDF' }}
 
-</section>
+      </button>
+
+    </div>
+
+    <p class="dtr-note">
+      Your DTR includes completed attendance records and total rendered hours.
+      Print the document for the required signatures and coordinator verification.
+    </p>
+
+  </section>
 
 </div>
