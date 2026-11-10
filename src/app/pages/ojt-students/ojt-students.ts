@@ -79,7 +79,9 @@ pageSize = 5;
   isLoadingStudents = false;
 
   // Track which student is being edited
-  editingStudentId: string | null = null;
+ // Track which student is being edited
+editingStudentId: string | null = null;
+editingStudentUid: string | null = null;
 
   newStudent = {
     studentId: '',
@@ -433,26 +435,37 @@ pageSize = 5;
   }
 
   // Edit existing student.
-  editStudent(student: OjtStudent): void {
-    const nameParts = student.fullName.trim().split(/\s+/);
-    const firstName = nameParts.shift() ?? '';
-    const lastName = nameParts.join(' ');
-
-    this.editingStudentId = student.studentId;
-
-    this.newStudent = {
-      studentId: student.studentId,
-      firstName,
-      lastName,
-      fullName: student.fullName,
-      section: student.section,
-      course: student.course ?? '',
-      yearLevel: student.yearLevel ?? '',
-      password: ''
-    };
-
-    this.showAddStudentForm = true;
+editStudent(student: OjtStudent): void {
+  if (!student.uid) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Student Record Not Ready',
+      text: 'Please reload the student list, then try again.',
+      confirmButtonColor: '#17365d'
+    });
+    return;
   }
+
+  const nameParts = student.fullName.trim().split(/\s+/);
+  const firstName = nameParts.shift() ?? '';
+  const lastName = nameParts.join(' ');
+
+  this.editingStudentId = student.studentId;
+  this.editingStudentUid = student.uid;
+
+  this.newStudent = {
+    studentId: student.studentId,
+    firstName,
+    lastName,
+    fullName: student.fullName,
+    section: student.section,
+    course: student.course ?? '',
+    yearLevel: student.yearLevel ?? '',
+    password: ''
+  };
+
+  this.showAddStudentForm = true;
+}
 
   // Automatically generate temporary password.
   updateStudentCredentials(): void {
@@ -463,21 +476,22 @@ pageSize = 5;
   }
 
   // Close Add/Edit Student modal.
-  closeAddStudent(): void {
-    this.showAddStudentForm = false;
-    this.editingStudentId = null;
+ closeAddStudent(): void {
+  this.showAddStudentForm = false;
+  this.editingStudentId = null;
+  this.editingStudentUid = null;
 
-    this.newStudent = {
-      studentId: '',
-      firstName: '',
-      lastName: '',
-      fullName: '',
-      section: '',
-      course: '',
-      yearLevel: '',
-      password: ''
-    };
-  }
+  this.newStudent = {
+    studentId: '',
+    firstName: '',
+    lastName: '',
+    fullName: '',
+    section: '',
+    course: '',
+    yearLevel: '',
+    password: ''
+  };
+}
 
   // Save new student or update existing student.
   async saveStudent(): Promise<void> {
@@ -507,105 +521,119 @@ pageSize = 5;
       return;
     }
 
-    // EDIT EXISTING STUDENT
-    if (this.editingStudentId !== null) {
-      const editingStudentId = this.editingStudentId;
+// EDIT EXISTING STUDENT
+if (this.editingStudentId !== null) {
+  const editingStudentId = this.editingStudentId;
+  const editingStudentUid = this.editingStudentUid;
 
-      // Temporarily hide the Edit modal without resetting the form.
-      this.showAddStudentForm = false;
-      this.cdr.detectChanges();
+  if (!editingStudentUid) {
+    await Swal.fire({
+      icon: 'error',
+      title: 'Student Record Not Found',
+      text: 'Unable to identify this student record. Please reload and try again.',
+      confirmButtonColor: '#17365d'
+    });
+    return;
+  }
 
-      // Show confirmation after the Edit modal is removed from the view.
-      const confirmation = await Swal.fire({
-        icon: 'question',
-        title: 'Update Student Information?',
-        text: `Are you sure you want to update ${fullName}'s information?`,
-        showCancelButton: true,
-        confirmButtonText: 'Yes, Update',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#17365d'
-      });
+  // Check if the new Student ID is already used by another student.
+  const duplicateStudentId = [
+    ...this.students,
+    ...this.archivedStudents
+  ].some(student =>
+    student.uid !== editingStudentUid &&
+    student.studentId.trim().toLowerCase() === studentId.toLowerCase()
+  );
 
-      // If cancelled, reopen the Edit modal with its entered information.
-      if (!confirmation.isConfirmed) {
-        this.showAddStudentForm = true;
-        this.cdr.detectChanges();
-        return;
-      }
+  if (duplicateStudentId) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Student ID Already Exists',
+      text: 'This Student ID is already assigned to another student.',
+      confirmButtonColor: '#17365d'
+    });
+    return;
+  }
 
-      // Show loading SweetAlert.
-      Swal.fire({
-        title: 'Updating Student...',
-        text: 'Please wait while the student information is being saved.',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        showConfirmButton: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
+  this.showAddStudentForm = false;
+  this.cdr.detectChanges();
 
-      try {
-        const studentQuery = query(
-          collection(db, 'users'),
-          where('role', '==', 'student'),
-          where('studentId', '==', editingStudentId)
-        );
+  const confirmation = await Swal.fire({
+    icon: 'question',
+    title: 'Update Student Information?',
+    html: `
+      <div style="text-align:left; line-height:1.8;">
+        <p><b>Student:</b> ${fullName}</p>
+        <p><b>Previous Student ID:</b> ${editingStudentId}</p>
+        <p><b>New Student ID:</b> ${studentId}</p>
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Update',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#17365d'
+  });
 
-        const snapshot = await getDocs(studentQuery);
+  if (!confirmation.isConfirmed) {
+    this.showAddStudentForm = true;
+    this.cdr.detectChanges();
+    return;
+  }
 
-        if (snapshot.empty) {
-          throw new Error('Student record not found in Firebase.');
-        }
-
-        const studentDoc = snapshot.docs[0];
-
-        await updateDoc(doc(db, 'users', studentDoc.id), {
-          firstName,
-          lastName,
-          fullName,
-          section,
-          course,
-          yearLevel
-        });
-
-        // Refresh student records.
-        this.studentCache.isLoaded = false;
-        await this.loadStudents();
-
-        // Reset the form only after a successful update.
-        this.closeAddStudent();
-
-        Swal.close();
-
-        await Swal.fire({
-          icon: 'success',
-          title: 'Student Updated!',
-          text: 'Student information has been updated successfully.',
-          confirmButtonColor: '#17365d'
-        });
-
-      } catch (error) {
-        console.error('Failed to update student:', error);
-
-        Swal.close();
-
-        await Swal.fire({
-          icon: 'error',
-          title: 'Update Failed',
-          text: 'Unable to update student information. Please try again.',
-          confirmButtonColor: '#17365d'
-        });
-
-        // Reopen the Edit modal if updating fails.
-        // The entered information is preserved.
-        this.showAddStudentForm = true;
-        this.cdr.detectChanges();
-      }
-
-      return;
+  Swal.fire({
+    title: 'Updating Student...',
+    text: 'Please wait while the student information is being saved.',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading();
     }
+  });
 
+  try {
+    // Update using Firebase UID so changing Student ID will not affect the document reference.
+    await updateDoc(doc(db, 'users', editingStudentUid), {
+      studentId,
+      firstName,
+      lastName,
+      fullName,
+      section,
+      course,
+      yearLevel
+    });
+
+    this.studentCache.isLoaded = false;
+    await this.loadStudents();
+
+    this.closeAddStudent();
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'Student Updated!',
+      text: 'Student information and Student ID have been updated successfully.',
+      confirmButtonColor: '#17365d'
+    });
+
+  } catch (error) {
+    console.error('Failed to update student:', error);
+
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Update Failed',
+      text: 'Unable to update student information. Please try again.',
+      confirmButtonColor: '#17365d'
+    });
+
+    this.showAddStudentForm = true;
+    this.cdr.detectChanges();
+  }
+
+  return;
+}
        // ADD NEW STUDENT
     if (!password.trim()) {
       await Swal.fire({

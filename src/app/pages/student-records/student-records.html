@@ -1,0 +1,339 @@
+
+<div class="student-records-page">
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="breadcrumb">
+        Coordinator Workspace&nbsp; / &nbsp;Requirements&nbsp; / &nbsp;Student Records
+      </div>
+      <h1>Student Requirement Records</h1>
+      <p>Monitor student submissions, check completion progress, and review uploaded requirements.</p>
+    </div>
+
+    <a href="/coordinator/requirements" class="back-button">
+      <span class="back-icon">←</span>
+      Back to Requirements
+    </a>
+  </header>
+
+  <!-- RECORDS CARD -->
+  <section class="records-card">
+
+    <div class="records-heading">
+      <div>
+        <h2>Student Records</h2>
+        <p>View and manage submitted internship requirements.</p>
+      </div>
+
+      <div class="record-count">
+        {{ filteredStudents.length }} Student{{ filteredStudents.length !== 1 ? 's' : '' }}
+      </div>
+    </div>
+
+    <!-- SEARCH AND FILTER -->
+    <div class="records-toolbar">
+
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          (ngModelChange)="currentPage = 1"
+          placeholder="Search student name or ID..."
+        />
+      </div>
+
+      <div class="filter-box">
+        <label for="statusFilter">Status</label>
+        <select
+          id="statusFilter"
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="currentPage = 1">
+          <option value="All Statuses">All Statuses</option>
+          <option value="Complete">Complete</option>
+          <option value="Submitted">Submitted</option>
+          <option value="Incomplete">Incomplete</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- STUDENT TABLE -->
+    <div class="table-wrapper">
+      <table class="student-table">
+        <thead>
+          <tr>
+            <th>STUDENT</th>
+            <th>STUDENT ID</th>
+            <th>REQUIREMENT PROGRESS</th>
+            <th>STATUS</th>
+            <th class="action-heading">ACTION</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (student of paginatedStudents; track student.uid) {
+            <tr>
+              <td>
+                <div class="student-info">
+                  <div class="student-avatar">
+                    {{ student.fullName.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="student-details">
+                    <strong>{{ student.fullName }}</strong>
+                    <span>OJT Student</span>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span class="student-id">
+                  {{ student.studentId || 'Not assigned' }}
+                </span>
+              </td>
+
+              <td>
+                <div class="progress-info">
+                  <strong>
+                    {{ student.completedRequirements }} / {{ student.totalRequirements }}
+                  </strong>
+                  <span>{{ getProgressPercentage(student) }}%</span>
+                </div>
+
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="getProgressPercentage(student)">
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <span
+                  class="status-badge"
+                  [class.complete]="student.status === 'Complete'"
+                  [class.submitted]="student.status === 'Submitted'"
+                  [class.incomplete]="student.status === 'Incomplete'">
+                  {{ student.status }}
+                </span>
+              </td>
+
+              <td class="action-cell">
+                <button
+                  type="button"
+                  class="view-button"
+                  (click)="viewDetails(student)">
+                  View Details
+                  <span>→</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <div class="empty-icon">⌕</div>
+                  <h3>No Student Records Found</h3>
+                  <p>
+                    @if (searchText || selectedStatus !== 'All Statuses') {
+                      No students match your search or selected filter.
+                    } @else {
+                      There are currently no registered OJT students.
+                    }
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION FOOTER -->
+    <div class="table-footer">
+
+      <span class="pagination-info">
+        Showing <strong>{{ startRecord }}–{{ endRecord }}</strong>
+        of <strong>{{ filteredStudents.length }}</strong> student records
+      </span>
+
+      @if (totalPages > 1) {
+        <div class="pagination-controls">
+
+          <button
+            type="button"
+            class="page-nav"
+            [disabled]="currentPage === 1"
+            (click)="goToPage(currentPage - 1)">
+            Previous
+          </button>
+
+          @for (page of pageNumbers; track page) {
+            <button
+              type="button"
+              class="page-number"
+              [class.active]="currentPage === page"
+              [attr.aria-current]="currentPage === page ? 'page' : null"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+
+          <button
+            type="button"
+            class="page-nav"
+            [disabled]="currentPage === totalPages"
+            (click)="goToPage(currentPage + 1)">
+            Next
+          </button>
+
+        </div>
+      }
+
+    </div>
+
+  </section>
+</div>
+
+<!-- REVIEW SUBMISSIONS MODAL -->
+@if (showReviewModal) {
+  <div class="modal-backdrop" (click)="closeReviewModal()">
+
+    <section
+      class="review-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reviewModalTitle"
+      (click)="$event.stopPropagation()">
+
+      <!-- MODAL HEADER -->
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">STUDENT REQUIREMENTS</span>
+          <h2 id="reviewModalTitle">Submission Details</h2>
+
+          @if (selectedStudent) {
+            <p>
+              {{ selectedStudent.fullName }}
+              <span class="modal-student-id">
+                • {{ selectedStudent.studentId || 'No Student ID' }}
+              </span>
+            </p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="close-modal"
+          aria-label="Close modal"
+          (click)="closeReviewModal()">
+          ×
+        </button>
+      </div>
+
+      <!-- MODAL CONTENT -->
+      <div class="modal-body">
+
+        @if (isReviewLoading) {
+          <div class="modal-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading student submissions...</p>
+          </div>
+        } @else if (selectedStudentSubmissions.length === 0) {
+          <div class="empty-submissions">
+            <div class="empty-icon">📄</div>
+            <h3>No Submissions Yet</h3>
+            <p>This student has not submitted any requirements.</p>
+          </div>
+        } @else {
+
+          <div class="submission-list">
+            @for (submission of selectedStudentSubmissions; track submission.id) {
+              <article class="submission-card">
+
+                <div class="submission-top">
+                  <div class="file-icon">📄</div>
+
+                  <div class="submission-file-info">
+                    <h3>{{ submission.requirementName || 'Requirement' }}</h3>
+                    <p>{{ submission.fileName }}</p>
+                    <span class="submission-date">
+                      Submitted:
+                      {{ submission.submittedAt?.toDate()?.toLocaleString() || 'Date unavailable' }}
+                    </span>
+                  </div>
+
+                  <span
+                    class="status-badge"
+                    [class.complete]="submission.status === 'Approved'"
+                    [class.submitted]="submission.status === 'Submitted'"
+                    [class.incomplete]="submission.status === 'Needs Revision'">
+                    {{ submission.status }}
+                  </span>
+                </div>
+
+                @if (submission.feedback) {
+                  <div class="feedback-box">
+                    <strong>Coordinator Feedback</strong>
+                    <p>{{ submission.feedback }}</p>
+                  </div>
+                }
+
+                <div class="submission-actions">
+
+                  <button
+                    type="button"
+                    class="file-action"
+                    (click)="viewUploadedFile(submission)">
+                    View File
+                  </button>
+
+                  <button
+                    type="button"
+                    class="file-action"
+                    (click)="downloadUploadedFile(submission)">
+                    Download
+                  </button>
+
+                  @if (submission.status !== 'Approved') {
+                    <div class="review-actions">
+
+                      <button
+                        type="button"
+                        class="revision-button"
+                        (click)="reviewSubmission(submission, 'Needs Revision')">
+                        Request Revision
+                      </button>
+
+                      <button
+                        type="button"
+                        class="approve-button"
+                        (click)="reviewSubmission(submission, 'Approved')">
+                        Approve
+                      </button>
+
+                    </div>
+                  }
+
+                </div>
+              </article>
+            }
+          </div>
+        }
+
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="close-button"
+          (click)="closeReviewModal()">
+          Close
+        </button>
+      </div>
+
+    </section>
+  </div>
+}

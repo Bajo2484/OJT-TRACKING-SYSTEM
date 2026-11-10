@@ -57,9 +57,19 @@
       </div>
 
       <div class="form-options">
-        <span>Student & Coordinator Access</span>
-        <a href="mailto:ojt-support@example.com">Need help?</a>
-      </div>
+  <span>Student & Coordinator Access</span>
+  <button
+    type="button"
+    class="forgot-password-link"
+    (click)="forgotPassword()"
+  >
+    Forgot Password?
+  </button>
+</div>
+
+<div class="help-link">
+  <a href="mailto:ojt-support@example.com">Need help?</a>
+</div>
 
       <button
         class="login-button"

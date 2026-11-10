@@ -89,18 +89,15 @@
           <h4>Student Information</h4>
 
           <div class="form-fields">
-            <label>
-              Student ID *
-              <input
-                type="text"
-                [(ngModel)]="newStudent.studentId"
-                (ngModelChange)="updateStudentCredentials()"
-                [readonly]="editingStudentId !== null"
-                placeholder="Enter Student ID"
-                autocomplete="off"
-                required
-              />
-            </label>
+           <input
+  type="text"
+  [(ngModel)]="newStudent.studentId"
+  (ngModelChange)="updateStudentCredentials()"
+  placeholder="Enter Student ID"
+  autocomplete="off"
+  [readonly]="editingStudentId !== null"
+  required
+/>
 
             <label>
               First Name *

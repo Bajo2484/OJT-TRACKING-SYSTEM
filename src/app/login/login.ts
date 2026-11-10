@@ -24,6 +24,38 @@ export class Login {
     this.showPassword = !this.showPassword;
   }
 
+  async forgotPassword(): Promise<void> {
+  const { value: studentId } = await Swal.fire({
+    title: 'Forgot Password?',
+    text: 'Enter your Student ID to begin password recovery.',
+    input: 'text',
+    inputPlaceholder: 'Enter your Student ID',
+    inputAttributes: {
+      autocapitalize: 'off',
+      autocomplete: 'off'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Continue',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#2563eb',
+    inputValidator: (value) => {
+      if (!value?.trim()) {
+        return 'Please enter your Student ID.';
+      }
+      return null;
+    }
+  });
+
+  if (!studentId) return;
+
+  await Swal.fire({
+    icon: 'info',
+    title: 'Password Recovery',
+    text: 'Password recovery is not yet connected. Please try again once email verification and recovery services are configured.',
+    confirmButtonColor: '#2563eb'
+  });
+}
+
   async onLogin(event: Event): Promise<void> {
     event.preventDefault();
 

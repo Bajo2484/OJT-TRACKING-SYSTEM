@@ -12,7 +12,7 @@ import { StudentAccomplishments } from './student/student-accomplishments/studen
 import { StudentRequirements } from './student/student-requirements/student-requirements';
 import { StudentProfile } from './student/student-profile/student-profile';
 import { StudentSettings } from './student/student-settings/student-settings';
-
+import { StudentRecords } from './pages/student-records/student-records';
 import { OjtStudents } from './pages/ojt-students/ojt-students';
 import { OjtHours } from './pages/ojt-hours/ojt-hours';
 import { Accomplishments } from './pages/accomplishments/accomplishments';
@@ -89,6 +89,10 @@ export const routes: Routes = [
       {
         path: 'requirements',
         component: Requirements
+      },
+      {
+        path: 'requirements/student-records',
+        component: StudentRecords
       },
       {
         path: 'progress-monitoring',

@@ -337,3 +337,37 @@ form > label {
     font-size: 9px;
   }
 }
+/* FORGOT PASSWORD */
+.forgot-password-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #ffe0a3;
+  text-decoration: underline;
+}
+
+.help-link {
+  text-align: center;
+  margin: -10px 0 18px;
+}
+
+.help-link a {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.help-link a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}

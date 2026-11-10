@@ -110,6 +110,27 @@ export class RequirementsService {
     return documentRef.id;
   }
 
+
+  // Update an existing requirement without creating a new document.
+  async updateRequirement(
+    requirementId: string,
+    requirement: Omit<OjtRequirement, 'id' | 'createdAt'>
+  ): Promise<void> {
+    const requirementRef = doc(
+      this.firestore,
+      this.collectionName,
+      requirementId
+    );
+
+    await updateDoc(requirementRef, {
+      name: requirement.name.trim(),
+      description: requirement.description.trim(),
+      dueDate: requirement.dueDate,
+      expectedFileName: (requirement.expectedFileName ?? '').trim()
+    });
+  }
+
+
     // Get submissions belonging to a specific student.
   async getSubmissionsForStudent(
   studentUid: string
