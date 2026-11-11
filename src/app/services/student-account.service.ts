@@ -11,7 +11,8 @@ import {
   collection,
   getDocs,
   query,
-  where
+  where,
+  writeBatch
 } from 'firebase/firestore';
 import {
   studentCreationAuth,
@@ -74,4 +75,65 @@ export class StudentAccountService {
     ...document.data()
   }));
 }
+
+
+async deleteStudentFirestoreRecords(studentUid: string): Promise<void> {
+  const studentRef = doc(this.firestore, 'users', studentUid);
+
+  // Verify that the target is an archived student.
+  const studentSnapshot = await getDocs(
+    query(
+      collection(this.firestore, 'users'),
+      where('__name__', '==', studentUid)
+    )
+  );
+
+  if (studentSnapshot.empty) {
+    throw new Error('Student account not found.');
+  }
+
+  const studentData = studentSnapshot.docs[0].data();
+
+  if (
+    studentData['role'] !== 'student' ||
+    studentData['isArchived'] !== true
+  ) {
+    throw new Error('Only archived student accounts can be deleted.');
+  }
+
+  // Find the student's requirement submissions.
+  const submissionsSnapshot = await getDocs(
+    query(
+      collection(this.firestore, 'requirement-submissions'),
+      where('studentUid', '==', studentUid)
+    )
+  );
+
+  // Find the student's attendance records.
+  const attendanceSnapshot = await getDocs(
+    query(
+      collection(this.firestore, 'attendance'),
+      where('studentUid', '==', studentUid)
+    )
+  );
+
+  // Collect only documents belonging to this student.
+  const documentRefs = [
+    ...submissionsSnapshot.docs.map(item => item.ref),
+    ...attendanceSnapshot.docs.map(item => item.ref),
+    studentRef
+  ];
+
+  // Delete in batches to stay below Firestore's 500-write limit.
+  for (let i = 0; i < documentRefs.length; i += 450) {
+    const batch = writeBatch(this.firestore);
+
+    documentRefs.slice(i, i + 450).forEach(documentRef => {
+      batch.delete(documentRef);
+    });
+
+    await batch.commit();
+  }
+}
+
 }

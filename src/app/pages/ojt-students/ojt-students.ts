@@ -1047,9 +1047,9 @@ resetPagination(): void {
     }
   }
 
-  // Remove archived student from the table and local cache.
+  
+  // Permanently delete an archived student's Firestore records.
   async deleteStudentPermanently(student: OjtStudent): Promise<void> {
-
     if (!student.uid) {
       await Swal.fire({
         icon: 'warning',
@@ -1064,7 +1064,7 @@ resetPagination(): void {
       await Swal.fire({
         icon: 'warning',
         title: 'Archive Required',
-        text: 'Only archived students can be removed from this list.',
+        text: 'Only archived students can be permanently deleted.',
         confirmButtonColor: '#17365d'
       });
       return;
@@ -1074,39 +1074,86 @@ resetPagination(): void {
       icon: 'warning',
       title: 'Delete Student Permanently?',
       html: `
-        <p>Are you sure you want to remove <b>${student.fullName}</b> from the Archived Students table?</p>
-        <p style="font-size:13px; color:#b45309;">
-          This action cannot be undone from this page.
-          The Firebase records will remain and must be deleted manually.
-        </p>
+        <div style="text-align:left; line-height:1.8;">
+          <p>Are you sure you want to permanently delete <b>${student.fullName}</b>?</p>
+          <p>This will permanently delete:</p>
+          <ul>
+            <li>Student profile</li>
+            <li>Requirement submissions</li>
+            <li>Attendance records</li>
+          </ul>
+          <p style="color:#dc2626; font-size:13px;">
+            This action cannot be undone. The Firebase Authentication
+            account will remain temporarily and will be handled separately.
+          </p>
+        </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
+      confirmButtonText: 'Yes, Delete Permanently',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#dc2626'
     });
 
     if (!confirmation.isConfirmed) return;
 
-    // Remove from the archived table.
-    this.archivedStudents = this.archivedStudents.filter(
-      record => record.uid !== student.uid
-    );
-
-    // Also remove from the local student cache.
-    this.studentCache.students = this.studentCache.students.filter(
-      record => record.uid !== student.uid
-    );
-
-    this.cdr.detectChanges();
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Student Removed!',
-      text: `${student.fullName} has been removed from the Archived Students table. Remember to delete the Firebase records manually.`,
-      confirmButtonText: 'Understood',
-      confirmButtonColor: '#17365d'
+    Swal.fire({
+      title: 'Deleting Student Records...',
+      text: 'Please wait while the student records are permanently deleted from Firestore.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
     });
+
+    try {
+      // Delete actual Firestore records.
+      await this.studentAccountService.deleteStudentFirestoreRecords(
+        student.uid
+      );
+
+      // Invalidate cache and reload records from Firebase.
+      this.studentCache.isLoaded = false;
+
+      Swal.close();
+
+      await this.loadStudents();
+
+      this.resetPagination();
+      this.cdr.detectChanges();
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Student Records Deleted!',
+        html: `
+          <p><b>${student.fullName}</b> has been permanently deleted from Firestore.</p>
+          <p style="font-size:13px; color:#64748b;">
+            Student profile, attendance, and requirement submissions
+            have been removed.
+          </p>
+          <p style="font-size:13px; color:#b45309;">
+            Firebase Authentication account is still pending separate deletion.
+          </p>
+        `,
+        confirmButtonText: 'Done',
+        confirmButtonColor: '#17365d'
+      });
+
+    } catch (error) {
+      console.error('Failed to permanently delete student:', error);
+
+      Swal.close();
+
+      await Swal.fire({
+        icon: 'error',
+        title: 'Deletion Failed',
+        text: error instanceof Error
+          ? error.message
+          : 'Unable to delete the student records. Please check your Firebase permissions and try again.',
+        confirmButtonColor: '#17365d'
+      });
+    }
   }
 
   // View student details and review internship placement.
