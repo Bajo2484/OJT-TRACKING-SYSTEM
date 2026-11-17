@@ -1,247 +1,157 @@
 
 <div class="student-dashboard">
 
-<section class="page-heading welcome-banner">
-  <div class="welcome-content">
-    <p class="eyebrow">STUDENT OVERVIEW</p>
-
-    <h1>{{ greeting }}, {{ studentName }}!</h1>
-
-    <p class="page-description">
-      Keep track of your internship journey, monitor your progress,
-      and stay on top of your OJT goals.
-    </p>
-  </div>
-
-  <div class="welcome-date">
-    <div class="date-icon">▦</div>
-
-    <div>
-      <span class="date-label">TODAY</span>
-
-      <strong>
-        {{ currentDate | date:'MMMM d, yyyy' }}
-      </strong>
-
-      <span class="date-day">
-        {{ currentDate | date:'EEEE' }}
-      </span>
+  <!-- WELCOME BANNER -->
+  <section class="page-heading welcome-banner">
+    <div class="welcome-content">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> STUDENT OVERVIEW</span>
+      <h1>{{ greeting }}, <span>{{ studentName }}</span>!</h1>
+      <p class="page-description">Keep track of your internship journey, monitor your progress, and stay on top of your OJT goals.</p>
+      <div class="welcome-date">
+        <span class="date-icon">▦</span>
+        <div><span class="date-label">TODAY</span><strong>{{ currentDate | date:'MMMM d, yyyy' }}</strong><span class="date-day">{{ currentDate | date:'EEEE' }}</span></div>
+      </div>
     </div>
-  </div>
-</section>
+    <div class="welcome-visual">
+      <div class="visual-circle"></div>
+      <div class="visual-ring"></div>
+      <span class="visual-star star-one">✦</span>
+      <span class="visual-star star-two">✧</span>
+      <img src="/images/student-intern.png"
+     alt="Student intern illustration"
+     onerror="this.style.display='none'">
+      <div class="floating-badge"><span class="badge-icon">✦</span><span>Keep it up!</span></div>
+    </div>
+  </section>
 
+  <!-- SUMMARY CARDS -->
   <section class="summary-cards">
-
-    <article class="summary-card">
-      <div class="card-icon blue">◷</div>
+    <article class="summary-card blue-card">
+      <div class="card-top"><div class="card-icon">◷</div><span class="card-tag">ATTENDANCE</span></div>
       <p class="card-label">Recorded OJT Hours</p>
       <h2>{{ isLoading ? '...' : recordedHours }} <span>hrs</span></h2>
       <p class="card-note">Completed attendance hours</p>
+      <div class="card-decoration"></div>
     </article>
-
-    <article class="summary-card">
-      <div class="card-icon orange">◴</div>
+    <article class="summary-card gold-card">
+      <div class="card-top"><div class="card-icon">◎</div><span class="card-tag">YOUR GOAL</span></div>
       <p class="card-label">Required Hours</p>
       <h2>{{ requiredHours }} <span>hrs</span></h2>
       <p class="card-note">Total hours required for OJT</p>
+      <div class="card-decoration"></div>
     </article>
-
-    <article class="summary-card">
-      <div class="card-icon purple">◷</div>
+    <article class="summary-card orange-card">
+      <div class="card-top"><div class="card-icon">⌛</div><span class="card-tag">REMAINING</span></div>
       <p class="card-label">Remaining Hours</p>
       <h2>{{ isLoading ? '...' : remainingHours }} <span>hrs</span></h2>
       <p class="card-note">Hours left to complete</p>
+      <div class="card-decoration"></div>
     </article>
-
-    <article class="summary-card">
-      <div class="card-icon green">✓</div>
+    <article class="summary-card green-card">
+      <div class="card-top"><div class="card-icon">↗</div><span class="card-tag">PERFORMANCE</span></div>
       <p class="card-label">OJT Progress</p>
       <h2>{{ isLoading ? '...' : progressPercentage.toFixed(1) }}<span>%</span></h2>
       <p class="card-note">Based on completed attendance</p>
+      <div class="card-decoration"></div>
     </article>
-
   </section>
 
+  <!-- PROGRESS AND ATTENTION -->
   <section class="dashboard-grid">
-
     <article class="dashboard-panel progress-panel">
       <div class="panel-heading">
-        <div>
-          <h2>Internship Progress</h2>
-          <p>Your overall OJT completion</p>
-        </div>
-        <span class="status-badge">
-          {{ progressPercentage >= 100 ? 'Completed' : 'In Progress' }}
-        </span>
+        <div><span class="panel-eyebrow">YOUR PERFORMANCE</span><h2><span class="heading-icon">▥</span> Internship Progress</h2><p>Your overall OJT completion</p></div>
+        <span class="status-badge"><span class="status-dot"></span>{{ progressPercentage >= 100 ? 'Completed' : 'In Progress' }}</span>
       </div>
-
       <div class="progress-summary">
-        <div>
-          <span class="muted-label">Recorded Hours</span>
-          <h3>
-            {{ isLoading ? '...' : recordedHours }}
-            <span>/ {{ requiredHours }} hours</span>
-          </h3>
-        </div>
-        <strong class="progress-percent">
-          {{ isLoading ? '...' : progressPercentage.toFixed(1) }}%
-        </strong>
+        <div><span class="muted-label">Recorded Hours</span><h3>{{ isLoading ? '...' : recordedHours }} <span>/ {{ requiredHours }} hours</span></h3></div>
+        <strong class="progress-percent">{{ isLoading ? '...' : progressPercentage.toFixed(1) }}%</strong>
       </div>
-
-      <div
-        class="progress-track"
-        role="progressbar"
-        aria-label="Internship progress"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        [attr.aria-valuenow]="progressPercentage">
-        <div
-          class="progress-fill"
-          [style.width.%]="progressPercentage">
-        </div>
+      <div class="progress-track" role="progressbar" aria-label="Internship progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="progressPercentage">
+        <div class="progress-fill" [style.width.%]="progressPercentage"></div>
       </div>
-
-      <p class="panel-note">
-        Your progress updates based on your completed attendance records.
-      </p>
-
-      @if (message) {
-        <p class="panel-note">{{ message }}</p>
-      }
+      <div class="progress-legend"><span><i></i> Completed hours</span><span>{{ requiredHours }} hours required</span></div>
+      <p class="panel-note"><span class="note-icon">ⓘ</span> Your progress updates based on your completed attendance records.</p>
+      @if (message) { <p class="panel-note message-note"><span class="note-icon">✦</span>{{ message }}</p> }
     </article>
 
     <article class="dashboard-panel attention-panel">
       <div class="panel-heading">
-        <div>
-          <h2>Needs Your Attention</h2>
-          <p>Items to check during your internship</p>
-        </div>
+        <div><span class="panel-eyebrow">IMPORTANT REMINDERS</span><h2><span class="heading-icon">♧</span> Needs Your Attention</h2><p>Items to check during your internship</p></div>
+        <span class="heading-decoration">!</span>
       </div>
-
-      <div class="attention-item">
-        <span class="attention-icon">!</span>
-        <div>
-          <h3>OJT Requirements</h3>
-          @if (notSubmittedRequirements > 0) {
-            <p>You have {{ notSubmittedRequirements }} requirement(s) not yet submitted.</p>
-          } @else {
-            <p>All currently listed requirements have a submission.</p>
-          }
+      <div class="attention-list">
+        <div class="attention-item">
+          <span class="attention-icon blue">!</span>
+          <div><h3>OJT Requirements</h3>
+            @if (notSubmittedRequirements > 0) { <p>You have {{ notSubmittedRequirements }} requirement(s) not yet submitted.</p> }
+            @else { <p>All currently listed requirements have a submission.</p> }
+          </div>
+          <span class="attention-arrow">›</span>
         </div>
-      </div>
-
-      <div class="attention-item">
-        <span class="attention-icon">↻</span>
-        <div>
-          <h3>Requirements for Revision</h3>
-          @if (needsRevisionRequirements > 0) {
-            <p>{{ needsRevisionRequirements }} submission(s) need revision. Please review the coordinator's feedback.</p>
-          } @else {
-            <p>You have no requirements marked for revision.</p>
-          }
+        <div class="attention-item">
+          <span class="attention-icon gold">↻</span>
+          <div><h3>Requirements for Revision</h3>
+            @if (needsRevisionRequirements > 0) { <p>{{ needsRevisionRequirements }} submission(s) need revision. Please review the coordinator's feedback.</p> }
+            @else { <p>You have no requirements marked for revision.</p> }
+          </div>
+          <span class="attention-arrow">›</span>
         </div>
-      </div>
-
-      <div class="attention-item">
-        <span class="attention-icon">◷</span>
-        <div>
-          <h3>Internship Hours</h3>
-          <p>Review your attendance records and make sure each session has a Time Out.</p>
+        <div class="attention-item">
+          <span class="attention-icon green">◷</span>
+          <div><h3>Internship Hours</h3><p>Review your attendance records and make sure each session has a Time Out.</p></div>
+          <span class="attention-arrow">›</span>
         </div>
       </div>
     </article>
-
   </section>
 
+  <!-- PLACEMENT AND ACCOMPLISHMENTS -->
   <section class="dashboard-grid lower-grid">
-
-    <article class="dashboard-panel">
+    <article class="dashboard-panel placement-panel">
       <div class="panel-heading">
-        <div>
-          <h2>Internship Placement</h2>
-          <p>Your internship information</p>
-        </div>
+        <div><span class="panel-eyebrow">YOUR WORKPLACE</span><h2><span class="heading-icon">⌂</span> Internship Placement</h2><p>Your internship information</p></div>
+        <div class="panel-symbol">⌖</div>
       </div>
-
+      <div class="placement-status"><span class="status-dot"></span>{{ placementStatus }}</div>
       <div class="placement-details">
-        <div class="detail-row">
-          <span>Placement Status</span>
-          <strong>{{ placementStatus }}</strong>
-        </div>
-
-        <div class="detail-row">
-          <span>Company</span>
-          <strong>{{ placementCompany }}</strong>
-        </div>
-
-        <div class="detail-row">
-          <span>Department</span>
-          <strong>{{ placementDepartment }}</strong>
-        </div>
-
-        <div class="detail-row">
-          <span>Industry Supervisor</span>
-          <strong>{{ placementSupervisor }}</strong>
-        </div>
+        <div class="detail-row"><span class="detail-icon">▦</span><div><span class="detail-label">Company</span><strong>{{ placementCompany }}</strong></div></div>
+        <div class="detail-row"><span class="detail-icon">▤</span><div><span class="detail-label">Department</span><strong>{{ placementDepartment }}</strong></div></div>
+        <div class="detail-row"><span class="detail-icon">♙</span><div><span class="detail-label">Industry Supervisor</span><strong>{{ placementSupervisor }}</strong></div></div>
       </div>
     </article>
 
-    <article class="dashboard-panel">
+    <article class="dashboard-panel accomplishments-panel">
       <div class="panel-heading">
-        <div>
-          <h2>Recent Accomplishments</h2>
-          <p>Your latest OJT accomplishment records</p>
-        </div>
+        <div><span class="panel-eyebrow">YOUR WEEKLY WORK</span><h2><span class="heading-icon">▤</span> Recent Accomplishments</h2><p>Your latest OJT accomplishment records</p></div>
+        <div class="panel-symbol gold-symbol">✦</div>
       </div>
-
       @if (accomplishments.length > 0) {
-        <div class="placement-details">
+        <div class="accomplishment-list">
           @for (item of accomplishments; track item.id) {
-            <div class="detail-row">
-              <div>
-                <strong>{{ item.title }}</strong>
-                <p class="card-note">
-                  Week: {{ item.weekStarting }} – {{ item.weekEnding }}
-                </p>
-              </div>
-              <strong>{{ item.status }}</strong>
+            <div class="accomplishment-item">
+              <span class="accomplishment-icon">✓</span>
+              <div class="accomplishment-info"><strong>{{ item.title }}</strong><p>Week: {{ item.weekStarting }} – {{ item.weekEnding }}</p><span class="accomplishment-status">{{ item.status }}</span></div>
+              <span class="accomplishment-arrow">›</span>
             </div>
           }
         </div>
       } @else {
-        <div class="empty-state">
-          <div class="empty-icon">▤</div>
-          <h3>No accomplishments yet</h3>
-          <p>Your accomplishment records will appear here once available.</p>
-        </div>
+        <div class="empty-state"><div class="empty-icon">▤</div><h3>No accomplishments yet</h3><p>Your accomplishment records will appear here once available.</p></div>
       }
     </article>
-
   </section>
 
+  <!-- RECENT ACTIVITY -->
   <section class="dashboard-panel activity-panel">
     <div class="panel-heading">
-      <div>
-        <h2>Recent Activity</h2>
-        <p>Summary of your current OJT records</p>
-      </div>
+      <div><span class="panel-eyebrow">YOUR RECORDS</span><h2><span class="heading-icon">◷</span> Recent Activity</h2><p>Summary of your current OJT records</p></div>
+      <div class="panel-symbol">↗</div>
     </div>
-
-    <div class="placement-details">
-      <div class="detail-row">
-        <span>Requirement submissions</span>
-        <strong>{{ submissions.length }}</strong>
-      </div>
-
-      <div class="detail-row">
-        <span>Accomplishment records</span>
-        <strong>{{ accomplishments.length }}</strong>
-      </div>
-
-      <div class="detail-row">
-        <span>Placement status</span>
-        <strong>{{ placementStatus }}</strong>
-      </div>
+    <div class="activity-list">
+      <div class="activity-item"><span class="activity-icon blue">▤</span><div class="activity-info"><strong>Requirement submissions</strong><span>Your submitted internship requirements</span></div><strong class="activity-value">{{ submissions.length }}</strong></div>
+      <div class="activity-item"><span class="activity-icon gold">✎</span><div class="activity-info"><strong>Accomplishment records</strong><span>Your weekly accomplishment reports</span></div><strong class="activity-value">{{ accomplishments.length }}</strong></div>
+      <div class="activity-item"><span class="activity-icon green">⌂</span><div class="activity-info"><strong>Placement status</strong><span>Your current internship assignment</span></div><strong class="activity-status">{{ placementStatus }}</strong></div>
     </div>
   </section>
 
